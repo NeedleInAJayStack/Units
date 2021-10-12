@@ -110,6 +110,28 @@ struct Measurement {
     let value: Double
     let unit: Unit
     
+    static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
+        guard lhs.unit.dimension == rhs.unit.dimension else {
+            throw UnitError.incompatibleUnits(message: "Incompatible units")
+        }
+        
+        return Measurement(
+            value: lhs.value + rhs.value,
+            unit: lhs.unit
+        )
+    }
+    
+    static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
+        guard lhs.unit.dimension == rhs.unit.dimension else {
+            throw UnitError.incompatibleUnits(message: "Incompatible units")
+        }
+        
+        return Measurement(
+            value: lhs.value - rhs.value,
+            unit: lhs.unit
+        )
+    }
+    
     static func * (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
             value: lhs.value * rhs.value,
@@ -123,4 +145,8 @@ struct Measurement {
             unit: lhs.unit / rhs.unit
         )
     }
+}
+
+enum UnitError: Error {
+    case incompatibleUnits(message: String)
 }

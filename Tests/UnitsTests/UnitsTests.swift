@@ -2,6 +2,40 @@ import XCTest
 @testable import Units
 
 final class UnitsTests: XCTestCase {
+    func testAdd() throws {
+        let length1 = Measurement(value: 5, unit: UnitLength.meter)
+        let length2 = Measurement(value: 5, unit: UnitLength.meter)
+        XCTAssertEqual(
+            try (length1 + length2).value,
+            10
+        )
+        XCTAssertEqual(
+            try (length1 + length2).unit.dimension,
+            [.Length: 1]
+        )
+        
+        XCTAssertThrowsError(
+            try Measurement(value: 5, unit: UnitLength.meter) + Measurement(value: 5, unit: UnitTime.second)
+        )
+    }
+    
+    func testSubtract() throws {
+        let length1 = Measurement(value: 5, unit: UnitLength.meter)
+        let length2 = Measurement(value: 3, unit: UnitLength.meter)
+        XCTAssertEqual(
+            try (length1 - length2).value,
+            2
+        )
+        XCTAssertEqual(
+            try (length1 - length2).unit.dimension,
+            [.Length: 1]
+        )
+        
+        XCTAssertThrowsError(
+            try Measurement(value: 5, unit: UnitLength.meter) - Measurement(value: 5, unit: UnitTime.second)
+        )
+    }
+    
     func testMultiply() throws {
         let length1 = Measurement(value: 5, unit: UnitLength.meter)
         let length2 = Measurement(value: 5, unit: UnitLength.meter)
