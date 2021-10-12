@@ -27,39 +27,33 @@ class Unit {
         self.dimension = dimension
     }
     
-    func multiply(by: Unit) -> Unit {
-        let dimension1 = self.dimension
-        let dimension2 = by.dimension
-        
+    static func * (lhs: Unit, rhs: Unit) -> Unit {
         var newDimension: [BaseQuantity: Int] = [:]
         for base in BaseQuantity.allValues {
-            if let exp1 = dimension1[base], let exp2 = dimension2[base] {
-                newDimension[base] = exp1 + exp2
-            } else if let exp1 = dimension1[base] {
-                newDimension[base] = exp1
-            } else if let exp2 = dimension2[base] {
-                newDimension[base] = exp2
+            if let expL = lhs.dimension[base], let expR = rhs.dimension[base] {
+                newDimension[base] = expL + expR
+            } else if let expL = lhs.dimension[base] {
+                newDimension[base] = expL
+            } else if let expR = rhs.dimension[base] {
+                newDimension[base] = expR
             }
         }
         
         return Unit(dimension: newDimension)
     }
     
-    func divide(by: Unit) -> Unit {
-        let dimension1 = self.dimension
-        let dimension2 = by.dimension
-        
+    static func / (lhs: Unit, rhs: Unit) -> Unit {
         var newDimension: [BaseQuantity: Int] = [:]
         for base in BaseQuantity.allValues {
-            if let exp1 = dimension1[base], let exp2 = dimension2[base] {
+            if let exp1 = lhs.dimension[base], let exp2 = rhs.dimension[base] {
                 let newExp = exp1 - exp2
                 if newExp != 0 {
                     newDimension[base] = newExp
                 }
                 // Don't add to newDimension at all if it zeros out
-            } else if let exp1 = dimension1[base] {
+            } else if let exp1 = lhs.dimension[base] {
                 newDimension[base] = exp1
-            } else if let exp2 = dimension2[base] {
+            } else if let exp2 = rhs.dimension[base] {
                 newDimension[base] = -1 * exp2
             }
         }
@@ -116,17 +110,17 @@ struct Measurement {
     let value: Double
     let unit: Unit
     
-    func multiply(by: Measurement) -> Measurement {
+    static func * (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
-            value: self.value * by.value,
-            unit: self.unit.multiply(by: by.unit)
+            value: lhs.value * rhs.value,
+            unit: lhs.unit * rhs.unit
         )
     }
     
-    func divide(by: Measurement) -> Measurement {
+    static func / (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
-            value: self.value / by.value,
-            unit: self.unit.divide(by: by.unit)
+            value: lhs.value / rhs.value,
+            unit: lhs.unit / rhs.unit
         )
     }
 }
