@@ -29,6 +29,7 @@ class Unit {
     
     static func * (lhs: Unit, rhs: Unit) -> Unit {
         var newDimension: [BaseQuantity: Int] = [:]
+        // TODO: Optimize this. Can we avoid going through every BaseQuantity case?
         for base in BaseQuantity.allValues {
             if let expL = lhs.dimension[base], let expR = rhs.dimension[base] {
                 newDimension[base] = expL + expR
@@ -72,7 +73,8 @@ class DefinedUnit: Unit {
     }
 }
 
-// TODO: Organize units into a nice enum or a static class vars (like Foundation)
+// Predefined units
+// TODO: Make more
 class UnitLength {
     static var meter = DefinedUnit (
         symbol: "m",
