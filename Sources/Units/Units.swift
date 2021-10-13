@@ -18,6 +18,18 @@ enum BaseQuantity {
         Amount,
         LuminousIntensity,
     ]
+    
+    func baseUnit() -> DefinedUnit {
+        switch self {
+        case .Time:
+            return UnitTime.second
+        case .Length:
+            return UnitLength.meter
+        default:
+            // TODO: Fix this when more units are added
+            return UnitForce.newton
+        }
+    }
 }
 
 class Unit {
@@ -66,9 +78,11 @@ class Unit {
 // Hard-coded symbols are for predefined units.
 class DefinedUnit: Unit {
     let symbol: String
+    let baseConversion: (Double) -> Double
     
-    init(symbol: String, dimension: [BaseQuantity: Int]) {
+    init(symbol: String, dimension: [BaseQuantity: Int], baseConversion: @escaping (Double) -> Double = { $0 }) {
         self.symbol = symbol
+        self.baseConversion = baseConversion
         super.init(dimension: dimension)
     }
 }
@@ -82,7 +96,8 @@ class UnitLength {
     )
     static var foot = DefinedUnit (
         symbol: "ft",
-        dimension: [.Length: 1]
+        dimension: [.Length: 1],
+        baseConversion: { $0 * 0.3048 }
     )
 }
 class UnitTime {
@@ -111,6 +126,10 @@ class UnitForce {
 struct Measurement {
     let value: Double
     let unit: Unit
+    
+//    func convertToBase() -> Measurement {
+//
+//    }
     
     static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit.dimension == rhs.unit.dimension else {
