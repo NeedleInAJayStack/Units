@@ -32,14 +32,35 @@ enum BaseQuantity {
     }
 }
 
-class Unit {
+class Unit: CustomStringConvertible, Hashable {
+    
     let dimension: [BaseQuantity: Int]
     
     init(dimension: [BaseQuantity: Int]) {
         self.dimension = dimension
     }
     
-    static func * (lhs: Unit, rhs: Unit) -> Unit {
+    var description: String {
+        return dimension.description
+    }
+    
+    static func == (lhs: Unit, rhs: Unit) -> Bool {
+        return lhs.dimension == rhs.dimension
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(description)
+    }
+    
+    static func * (lhs: Unit, rhs: Unit) -> CompositeUnit {
+        var units: [Unit: Int] = [:]
+        if lhs == rhs {
+            units[lhs] = 2
+        } else {
+            units[lhs] = 1
+            units[rhs] = 1
+        }
+        
         var newDimension: [BaseQuantity: Int] = [:]
         // TODO: Optimize this. Can we avoid going through every BaseQuantity case?
         for base in BaseQuantity.allValues {
@@ -52,26 +73,32 @@ class Unit {
             }
         }
         
-        return Unit(dimension: newDimension)
+        return CompositeUnit(units: units, dimension: newDimension)
     }
     
     static func / (lhs: Unit, rhs: Unit) -> Unit {
+        var units: [Unit: Int] = [:]
+        if lhs != rhs {
+            units[lhs] = 1
+            units[rhs] = -1
+        }
+        
         var newDimension: [BaseQuantity: Int] = [:]
         for base in BaseQuantity.allValues {
-            if let exp1 = lhs.dimension[base], let exp2 = rhs.dimension[base] {
-                let newExp = exp1 - exp2
+            if let expL = lhs.dimension[base], let expR = rhs.dimension[base] {
+                let newExp = expL - expR
                 if newExp != 0 {
                     newDimension[base] = newExp
                 }
                 // Don't add to newDimension at all if it zeros out
-            } else if let exp1 = lhs.dimension[base] {
-                newDimension[base] = exp1
-            } else if let exp2 = rhs.dimension[base] {
-                newDimension[base] = -1 * exp2
+            } else if let expL = lhs.dimension[base] {
+                newDimension[base] = expL
+            } else if let expR = rhs.dimension[base] {
+                newDimension[base] = -1 * expR
             }
         }
         
-        return Unit(dimension: newDimension)
+        return CompositeUnit(units: units, dimension: newDimension)
     }
 }
 
@@ -84,6 +111,11 @@ class DefinedUnit: Unit {
         self.symbol = symbol
         self.baseConversion = baseConversion
         super.init(dimension: dimension)
+    }
+    
+    // TODO: We assume that desciption is completely unique. Perhaps create a unit registry to ensure this?
+    override var description: String {
+        return symbol
     }
 }
 
@@ -114,13 +146,14 @@ class UnitForce {
 }
 
 // TODO: Computed units should auto-calculate their symbol...
-//class CompositeUnit: Unit {
-//    let composedOf: [String: Int]
-//
-//    init(dimension: [BaseQuantity: Int]) {
-//        super.init(dimension: dimension)
-//    }
-//}
+class CompositeUnit: Unit {
+    let composedOf: [Unit: Int]
+
+    init(units: [Unit: Int], dimension: [BaseQuantity: Int]) {
+        composedOf = units
+        super.init(dimension: dimension)
+    }
+}
 
 /// Measurement models a value with a unit
 struct Measurement {
