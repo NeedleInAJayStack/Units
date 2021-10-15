@@ -37,7 +37,7 @@ class Unit: CustomStringConvertible, Hashable {
     
     // Populated only on predefined units
     private let dimension: [BaseQuantity: Int]?
-    let symbol: String?
+    private let symbol: String?
     let baseConversion: ((Double) -> Double?)?
     
     // Populated only on composite units
@@ -80,6 +80,7 @@ class Unit: CustomStringConvertible, Hashable {
         } else if let subUnits = self.subUnits {
             var computedDimension: [BaseQuantity: Int] = [:]
             for (subUnit, exp) in subUnits {
+                // multiply subDimensions by unit exponent
                 let subDimensions = subUnit.getDimension().mapValues { value in
                     exp * value
                 }
@@ -93,6 +94,44 @@ class Unit: CustomStringConvertible, Hashable {
                 }
             }
             return computedDimension
+        } else {
+            // We should either be a defined or composed unit
+            fatalError()
+        }
+    }
+    
+    func getSymbol() -> String {
+        if let symbol = self.symbol {
+            return symbol
+        } else if let subUnits = self.subUnits {
+            // TODO: Fix unpredictable stirngs by sorting units from greatest to smallest exponent
+            var computedSymbol = ""
+            for (subUnit, exp) in subUnits {
+                if exp != 0 {
+                    var prefix = ""
+                    if computedSymbol == "" {
+                        if exp >= 0 {
+                            prefix = ""
+                        } else {
+                            prefix = "1/"
+                        }
+                    } else {
+                        if exp >= 0 {
+                            prefix = "*"
+                        } else {
+                            prefix = "/"
+                        }
+                    }
+                    let symbol = subUnit.getSymbol()
+                    var expStr = ""
+                    if abs(exp) > 1 {
+                        expStr = "^\(abs(exp))"
+                    }
+                    
+                    computedSymbol += "\(prefix)\(symbol)\(expStr)"
+                }
+            }
+            return computedSymbol
         } else {
             // We should either be a defined or composed unit
             fatalError()

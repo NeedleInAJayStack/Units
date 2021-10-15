@@ -2,6 +2,22 @@ import XCTest
 @testable import Units
 
 final class UnitsTests: XCTestCase {
+    func testSingle() throws {
+        let length = Measurement(value: 5, unit: UnitLength.meter)
+        XCTAssertEqual(
+            try length.value,
+            5
+        )
+        XCTAssertEqual(
+            try length.unit.getDimension(),
+            [.Length: 1]
+        )
+        XCTAssertEqual(
+            try length.unit.getSymbol(),
+            "m"
+        )
+    }
+    
     func testAdd() throws {
         let length1 = Measurement(value: 5, unit: UnitLength.meter)
         let length2 = Measurement(value: 5, unit: UnitLength.meter)
@@ -12,6 +28,10 @@ final class UnitsTests: XCTestCase {
         XCTAssertEqual(
             try (length1 + length2).unit.getDimension(),
             [.Length: 1]
+        )
+        XCTAssertEqual(
+            try (length1 + length2).unit.getSymbol(),
+            "m"
         )
         
         XCTAssertThrowsError(
@@ -29,6 +49,10 @@ final class UnitsTests: XCTestCase {
         XCTAssertEqual(
             try (length1 - length2).unit.getDimension(),
             [.Length: 1]
+        )
+        XCTAssertEqual(
+            try (length1 - length2).unit.getSymbol(),
+            "m"
         )
         
         XCTAssertThrowsError(
@@ -48,6 +72,10 @@ final class UnitsTests: XCTestCase {
             (length1 * length2).unit.getDimension(),
             [.Length: 2]
         )
+        XCTAssertEqual(
+            (length1 * length2).unit.getSymbol(),
+            "m^2"
+        )
         
         // Test mixed units
         let force = Measurement(value: 2, unit: UnitForce.newton)
@@ -59,6 +87,10 @@ final class UnitsTests: XCTestCase {
         XCTAssertEqual(
             (force * time).unit.getDimension(),
             [.Mass: 1, .Length: 1, .Time: -1]
+        )
+        XCTAssertEqual(
+            (force * time).unit.getSymbol(),
+            "N*s"
         )
         
         // Test composite units
@@ -80,6 +112,10 @@ final class UnitsTests: XCTestCase {
         XCTAssertEqual(
             (length / time).unit.getDimension(),
             [.Length: 1, .Time: -1]
+        )
+        XCTAssertEqual(
+            (length / time).unit.getSymbol(),
+            "m/s"
         )
     }
 }
