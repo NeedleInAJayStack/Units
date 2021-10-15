@@ -10,7 +10,7 @@ final class UnitsTests: XCTestCase {
             10
         )
         XCTAssertEqual(
-            try (length1 + length2).unit.dimension,
+            try (length1 + length2).unit.getDimension(),
             [.Length: 1]
         )
         
@@ -27,7 +27,7 @@ final class UnitsTests: XCTestCase {
             2
         )
         XCTAssertEqual(
-            try (length1 - length2).unit.dimension,
+            try (length1 - length2).unit.getDimension(),
             [.Length: 1]
         )
         
@@ -45,7 +45,7 @@ final class UnitsTests: XCTestCase {
             25
         )
         XCTAssertEqual(
-            (length1 * length2).unit.dimension,
+            (length1 * length2).unit.getDimension(),
             [.Length: 2]
         )
         
@@ -57,14 +57,14 @@ final class UnitsTests: XCTestCase {
             14
         )
         XCTAssertEqual(
-            (force * time).unit.dimension,
+            (force * time).unit.getDimension(),
             [.Mass: 1, .Length: 1, .Time: -1]
         )
         
         // Test composite units
         let work = Measurement(value: 2, unit: UnitForce.newton * UnitLength.meter)
         XCTAssertEqual(
-            work.unit.dimension,
+            work.unit.getDimension(),
             [.Mass: 1, .Length: 2, .Time: -2]
         )
     }
@@ -78,7 +78,7 @@ final class UnitsTests: XCTestCase {
             2
         )
         XCTAssertEqual(
-            (length / time).unit.dimension,
+            (length / time).unit.getDimension(),
             [.Length: 1, .Time: -1]
         )
     }
