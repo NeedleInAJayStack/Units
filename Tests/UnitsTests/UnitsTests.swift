@@ -2,19 +2,57 @@ import XCTest
 @testable import Units
 
 final class UnitsTests: XCTestCase {
+    func testSymbol() throws {
+        XCTAssertEqual(
+            UnitLength.meter.getSymbol(),
+            "m"
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / UnitTime.second).getSymbol(),
+            "m/s"
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter * UnitLength.foot / UnitTime.second).getSymbol(),
+            "ft*m/s"
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter * UnitLength.meter / UnitTime.second).getSymbol(),
+            "m^2/s"
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / UnitTime.second / UnitLength.foot).getSymbol(),
+            "m/ft/s"
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / (UnitTime.second * UnitLength.foot)).getSymbol(),
+            "m/ft/s"
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / UnitTime.second / UnitTime.second).getSymbol(),
+            "m/s^2"
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / (UnitTime.second * UnitTime.second)).getSymbol(),
+            "m/s^2"
+        )
+    }
+    
     func testSingle() throws {
         let length = Measurement(value: 5, unit: UnitLength.meter)
         XCTAssertEqual(
-            try length.value,
+            length.value,
             5
         )
         XCTAssertEqual(
-            try length.unit.getDimension(),
+            length.unit.getDimension(),
             [.Length: 1]
-        )
-        XCTAssertEqual(
-            try length.unit.getSymbol(),
-            "m"
         )
     }
     

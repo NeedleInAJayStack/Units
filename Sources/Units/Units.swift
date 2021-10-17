@@ -41,6 +41,7 @@ class Unit: CustomStringConvertible, Hashable {
     let baseConversion: ((Double) -> Double?)?
     
     // Populated only on composite units
+    // TODO: Consider changing to a list of unit/exp pairs
     let subUnits: [Unit: Int]?
     
     private init(
@@ -65,13 +66,8 @@ class Unit: CustomStringConvertible, Hashable {
         self.init(subUnits: composedOf)
     }
     
-    // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
     var description: String {
-        if let symbol = symbol {
-            return symbol
-        } else {
-            return dimension?.description ?? "nil"
-        }
+        return getSymbol()
     }
     
     func getDimension() -> [BaseQuantity: Int] {
@@ -104,9 +100,40 @@ class Unit: CustomStringConvertible, Hashable {
         if let symbol = self.symbol {
             return symbol
         } else if let subUnits = self.subUnits {
-            // TODO: Fix unpredictable stirngs by sorting units from greatest to smallest exponent
-            var computedSymbol = ""
+            // Sort units into positive and negative groups, each going from smallest to greatest exponent,
+            // with each in alphabetical order by symbol
+            var unitList = [(Unit, Int)]()
             for (subUnit, exp) in subUnits {
+                unitList.append((subUnit, exp))
+            }
+            unitList.sort { lhs, rhs in
+                if lhs.1 > 0 && rhs.1 > 0 {
+                    if lhs.1 == rhs.1 {
+                        if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
+                            return lhsSymbol < rhsSymbol
+                        }
+                        return true
+                    } else {
+                        return lhs.1 < rhs.1
+                    }
+                } else if lhs.1 > 0 && rhs.1 < 0 {
+                    return true
+                } else if lhs.1 < 0 && rhs.1 > 0 {
+                    return false
+                } else { // lhs.1 < 0 && rhs.1 > 0
+                    if lhs.1 == rhs.1 {
+                        if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
+                            return lhsSymbol < rhsSymbol
+                        }
+                        return true
+                    } else {
+                        return lhs.1 > rhs.1
+                    }
+                }
+            }
+            
+            var computedSymbol = ""
+            for (subUnit, exp) in unitList {
                 if exp != 0 {
                     var prefix = ""
                     if computedSymbol == "" {
@@ -139,34 +166,72 @@ class Unit: CustomStringConvertible, Hashable {
     }
     
     static func == (lhs: Unit, rhs: Unit) -> Bool {
-        return lhs.dimension == rhs.dimension
+        return lhs.symbol == rhs.symbol
     }
     
-    // TODO: We assume that desciption is completely unique. Perhaps create a unit registry to ensure this?
+    // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
     func hash(into hasher: inout Hasher) {
-        hasher.combine(description)
+        hasher.combine(getSymbol())
     }
     
     static func * (lhs: Unit, rhs: Unit) -> Unit {
-        var units: [Unit: Int] = [:]
-        if lhs == rhs {
-            units[lhs] = 2
+        var subUnits: [Unit: Int] = [:]
+        
+        if let lhsSubUnits = lhs.subUnits {
+            for (lhsSubUnit, lhsExp) in lhsSubUnits {
+                subUnits[lhsSubUnit] = lhsExp
+            }
         } else {
-            units[lhs] = 1
-            units[rhs] = 1
+            subUnits[lhs] = 1
         }
         
-        return Unit(composedOf: units)
+        if let rhsSubUnits = rhs.subUnits {
+            for (rhsSubUnit, rhsExp) in rhsSubUnits {
+                if let lhsExp = subUnits[rhsSubUnit] {
+                    subUnits[rhsSubUnit] = lhsExp + rhsExp
+                } else {
+                    subUnits[rhsSubUnit] = rhsExp
+                }
+            }
+        } else {
+            if let lhsExp = subUnits[rhs] {
+                subUnits[rhs] = lhsExp + 1
+            } else {
+                subUnits[rhs] = 1
+            }
+        }
+        
+        return Unit(composedOf: subUnits)
     }
     
     static func / (lhs: Unit, rhs: Unit) -> Unit {
-        var units: [Unit: Int] = [:]
-        if lhs != rhs {
-            units[lhs] = 1
-            units[rhs] = -1
+        var subUnits: [Unit: Int] = [:]
+        
+        if let lhsSubUnits = lhs.subUnits {
+            for (lhsSubUnit, lhsExp) in lhsSubUnits {
+                subUnits[lhsSubUnit] = lhsExp
+            }
+        } else {
+            subUnits[lhs] = 1
         }
         
-        return Unit(composedOf: units)
+        if let rhsSubUnits = rhs.subUnits {
+            for (rhsSubUnit, rhsExp) in rhsSubUnits {
+                if let lhsExp = subUnits[rhsSubUnit] {
+                    subUnits[rhsSubUnit] = lhsExp - rhsExp
+                } else {
+                    subUnits[rhsSubUnit] = -1 * rhsExp
+                }
+            }
+        } else {
+            if let lhsExp = subUnits[rhs] {
+                subUnits[rhs] = lhsExp - 1
+            } else {
+                subUnits[rhs] = -1
+            }
+        }
+        
+        return Unit(composedOf: subUnits)
     }
 }
 
