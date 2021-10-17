@@ -1,7 +1,7 @@
 import XCTest
 @testable import Units
 
-final class UnitsTests: XCTestCase {
+final class UnitTests: XCTestCase {
     func testSymbol() throws {
         XCTAssertEqual(
             UnitLength.meter.getSymbol(),
@@ -44,6 +44,50 @@ final class UnitsTests: XCTestCase {
         )
     }
     
+    func testDimension() throws {
+        XCTAssertEqual(
+            UnitLength.meter.getDimension(),
+            [.Length: 1]
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / UnitTime.second).getDimension(),
+            [.Length: 1, .Time: -1]
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter * UnitLength.foot / UnitTime.second).getDimension(),
+            [.Length: 2, .Time: -1]
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter * UnitLength.meter / UnitTime.second).getDimension(),
+            [.Length: 2, .Time: -1]
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / UnitTime.second / UnitLength.foot).getDimension(),
+            [.Time: -1]
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / (UnitTime.second * UnitLength.foot)).getDimension(),
+            [.Time: -1]
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / UnitTime.second / UnitTime.second).getDimension(),
+            [.Length: 1, .Time: -2]
+        )
+        
+        XCTAssertEqual(
+            (UnitLength.meter / (UnitTime.second * UnitTime.second)).getDimension(),
+            [.Length: 1, .Time: -2]
+        )
+    }
+}
+
+final class MeasurementTests: XCTestCase {
     func testSingle() throws {
         let length = Measurement(value: 5, unit: UnitLength.meter)
         XCTAssertEqual(

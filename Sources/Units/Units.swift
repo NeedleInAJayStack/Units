@@ -83,7 +83,12 @@ class Unit: CustomStringConvertible, Hashable {
                 // Append or sum values into computed dimension
                 for (subDimension, dimExp) in subDimensions {
                     if let computedDimensionExp = computedDimension[subDimension] {
-                        computedDimension[subDimension] = computedDimensionExp + dimExp
+                        let newExp = computedDimensionExp + dimExp
+                        if newExp == 0 {
+                            computedDimension.removeValue(forKey: subDimension)
+                        } else {
+                            computedDimension[subDimension] = newExp
+                        }
                     } else {
                         computedDimension[subDimension] = dimExp
                     }
@@ -166,7 +171,13 @@ class Unit: CustomStringConvertible, Hashable {
     }
     
     static func == (lhs: Unit, rhs: Unit) -> Bool {
-        return lhs.symbol == rhs.symbol
+        if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
+            return lhsSymbol == rhsSymbol
+        } else if let lhsSubUnits = lhs.subUnits, let rhsSubUnits = rhs.subUnits {
+            return lhsSubUnits == rhsSubUnits
+        } else {
+            return lhs.getSymbol() == rhs.getSymbol()
+        }
     }
     
     // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
@@ -188,14 +199,24 @@ class Unit: CustomStringConvertible, Hashable {
         if let rhsSubUnits = rhs.subUnits {
             for (rhsSubUnit, rhsExp) in rhsSubUnits {
                 if let lhsExp = subUnits[rhsSubUnit] {
-                    subUnits[rhsSubUnit] = lhsExp + rhsExp
+                    let newExp = lhsExp + rhsExp
+                    if newExp == 0 {
+                        subUnits.removeValue(forKey: rhsSubUnit)
+                    } else {
+                        subUnits[rhsSubUnit] = newExp
+                    }
                 } else {
                     subUnits[rhsSubUnit] = rhsExp
                 }
             }
         } else {
             if let lhsExp = subUnits[rhs] {
-                subUnits[rhs] = lhsExp + 1
+                let newExp = lhsExp + 1
+                if newExp == 0 {
+                    subUnits.removeValue(forKey: rhs)
+                } else {
+                    subUnits[rhs] = newExp
+                }
             } else {
                 subUnits[rhs] = 1
             }
@@ -218,14 +239,24 @@ class Unit: CustomStringConvertible, Hashable {
         if let rhsSubUnits = rhs.subUnits {
             for (rhsSubUnit, rhsExp) in rhsSubUnits {
                 if let lhsExp = subUnits[rhsSubUnit] {
-                    subUnits[rhsSubUnit] = lhsExp - rhsExp
+                    let newExp = lhsExp - rhsExp
+                    if newExp == 0 {
+                        subUnits.removeValue(forKey: rhsSubUnit)
+                    } else {
+                        subUnits[rhsSubUnit] = newExp
+                    }
                 } else {
                     subUnits[rhsSubUnit] = -1 * rhsExp
                 }
             }
         } else {
             if let lhsExp = subUnits[rhs] {
-                subUnits[rhs] = lhsExp - 1
+                let newExp = lhsExp - 1
+                if newExp == 0 {
+                    subUnits.removeValue(forKey: rhs)
+                } else {
+                    subUnits[rhs] = newExp
+                }
             } else {
                 subUnits[rhs] = -1
             }
@@ -272,7 +303,7 @@ struct Measurement {
     
     static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         // TODO: Change this to check unit instead of dimension
-        guard lhs.unit.getDimension() == rhs.unit.getDimension() else {
+        guard lhs.unit == rhs.unit else {
             throw UnitError.incompatibleUnits(message: "Incompatible units")
         }
         
@@ -284,7 +315,7 @@ struct Measurement {
     
     static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         // TODO: Change this to check unit instead of dimension
-        guard lhs.unit.getDimension() == rhs.unit.getDimension() else {
+        guard lhs.unit == rhs.unit else {
             throw UnitError.incompatibleUnits(message: "Incompatible units")
         }
         
