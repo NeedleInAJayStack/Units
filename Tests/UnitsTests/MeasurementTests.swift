@@ -114,4 +114,24 @@ final class MeasurementTests: XCTestCase {
             "m/s"
         )
     }
+    
+    func testPow() throws {
+        XCTAssertEqual(
+            Measurement(value: 2, unit: UnitLength.meter).pow(2).value,
+            4
+        )
+        XCTAssertEqual(
+            Measurement(value: 2, unit: UnitLength.meter).pow(2).unit,
+            UnitLength.meter * UnitLength.meter
+        )
+        
+        XCTAssertEqual(
+            Measurement(value: 2, unit: UnitLength.meter).pow(3).value,
+            8
+        )
+        XCTAssertEqual(
+            Measurement(value: 2, unit: UnitLength.meter).pow(3).unit,
+            UnitLength.meter * UnitLength.meter * UnitLength.meter
+        )
+    }
 }

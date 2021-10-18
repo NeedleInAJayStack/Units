@@ -1,12 +1,20 @@
+import Foundation
+
 /// Models a value with a unit
 struct Measurement {
     let value: Double
     let unit: Unit
     
+    func pow(_ raiseTo: Int) -> Measurement {
+        return Measurement(
+            value: Foundation.pow(self.value, Double(raiseTo)),
+            unit: self.unit.pow(raiseTo)
+        )
+    }
+    
     static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
-        // TODO: Change this to check unit instead of dimension
         guard lhs.unit == rhs.unit else {
-            throw UnitsError.incompatibleUnits(message: "Incompatible units")
+            throw UnitsError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
         }
         
         return Measurement(
@@ -16,9 +24,8 @@ struct Measurement {
     }
     
     static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
-        // TODO: Change this to check unit instead of dimension
         guard lhs.unit == rhs.unit else {
-            throw UnitsError.incompatibleUnits(message: "Incompatible units")
+            throw UnitsError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
         }
         
         return Measurement(
