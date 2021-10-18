@@ -38,7 +38,8 @@ class Unit: CustomStringConvertible, Hashable {
     // Populated only on predefined units
     private let dimension: [BaseQuantity: Int]?
     private let symbol: String?
-    let baseConversion: ((Double) -> Double?)?
+    let coefficient: Double?
+    let constant: Double?
     
     // Populated only on composite units
     // TODO: Consider changing to a list of unit/exp pairs
@@ -47,18 +48,20 @@ class Unit: CustomStringConvertible, Hashable {
     private init(
         dimension: [BaseQuantity: Int]? = nil,
         symbol: String? = nil,
-        baseConversion: ((Double) -> Double?)? = nil,
+        coefficient: Double? = nil,
+        constant: Double? = nil,
         subUnits: [Unit: Int]? = nil
     ) {
         self.dimension = dimension
         self.symbol = symbol
-        self.baseConversion = baseConversion
+        self.coefficient = coefficient
+        self.constant = constant
         self.subUnits = subUnits
     }
     
     // Predefined unit
-    convenience init(symbol: String, dimension: [BaseQuantity: Int], baseConversion: @escaping (Double) -> Double = { $0 }) {
-        self.init(dimension: dimension, symbol: symbol, baseConversion: baseConversion)
+    convenience init(symbol: String, dimension: [BaseQuantity: Int], coefficient: Double = 1, constant: Double = 0) {
+        self.init(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant)
     }
     
     // Composite unit
@@ -276,7 +279,7 @@ class UnitLength {
     static var foot = Unit (
         symbol: "ft",
         dimension: [.Length: 1],
-        baseConversion: { $0 * 0.3048 }
+        constant: 0.3048
     )
 }
 class UnitTime {
@@ -296,10 +299,6 @@ class UnitForce {
 struct Measurement {
     let value: Double
     let unit: Unit
-    
-//    func convertToBase() -> Measurement {
-//
-//    }
     
     static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         // TODO: Change this to check unit instead of dimension
