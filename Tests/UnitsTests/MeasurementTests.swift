@@ -107,4 +107,11 @@ final class MeasurementTests: XCTestCase {
                 .isDimensionallyEquivalent(to: Measurement(value: 4, unit: UnitMass.kilogram * UnitLength.meter / UnitTime.second.pow(2)))
         )
     }
+    
+    func testConvert() throws {
+        XCTAssertEqual(
+            try Measurement(value: 1, unit: UnitMass.kilogram).convert(to: UnitMass.gram),
+            Measurement(value: 1000, unit: UnitMass.gram)
+        )
+    }
 }

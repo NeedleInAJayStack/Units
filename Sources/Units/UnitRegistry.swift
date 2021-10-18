@@ -16,6 +16,17 @@ class UnitLength {
         constant: 0.3048
     )
 }
+class UnitMass {
+    static var kilogram = Unit (
+        symbol: "kg",
+        dimension: [.Mass: 1]
+    )
+    static var gram = Unit (
+        symbol: "g",
+        dimension: [.Mass: 1],
+        coefficient: 1000
+    )
+}
 class UnitTime {
     static var second = Unit (
         symbol: "s",

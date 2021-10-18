@@ -16,6 +16,12 @@ struct Measurement: Equatable {
         )
     }
     
+    func convert(to newUnit: Unit) throws -> Measurement {
+        let baseValue = self.unit.toBaseUnit(self.value)
+        let convertedValue = newUnit.fromBaseUnit(baseValue)
+        return Measurement(value: convertedValue, unit: newUnit)
+    }
+    
     static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit == rhs.unit else {
             throw UnitsError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")

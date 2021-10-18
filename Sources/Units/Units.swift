@@ -39,6 +39,14 @@ class Unit {
         return self.getDimension() == to.getDimension()
     }
     
+    func toBaseUnit(_ number: Double) -> Double {
+        return number / coefficient! // TODO: Support composite units
+    }
+    
+    func fromBaseUnit(_ number: Double) -> Double {
+        return number * coefficient! // TODO: Support composite units
+    }
+    
     /// Return the dimension of the unit in terms of base quanties
     func getDimension() -> [BaseQuantity: Int] {
         if let dimension = self.dimension {
