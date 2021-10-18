@@ -1,7 +1,6 @@
 import Foundation
 
 class Unit {
-    
     // Populated only on predefined units
     private let dimension: [BaseQuantity: Int]?
     private let symbol: String?
@@ -36,6 +35,7 @@ class Unit {
         self.init(subUnits: composedOf)
     }
     
+    /// Return the dimension of the unit in terms of base quanties
     func getDimension() -> [BaseQuantity: Int] {
         if let dimension = self.dimension {
             return dimension
@@ -67,42 +67,12 @@ class Unit {
         }
     }
     
+    /// Return a string symbol representing the unit
     func getSymbol() -> String {
         if let symbol = self.symbol {
             return symbol
-        } else if let subUnits = self.subUnits {
-            // Sort units into positive and negative groups, each going from smallest to greatest exponent,
-            // with each in alphabetical order by symbol
-            var unitList = [(Unit, Int)]()
-            for (subUnit, exp) in subUnits {
-                unitList.append((subUnit, exp))
-            }
-            unitList.sort { lhs, rhs in
-                if lhs.1 > 0 && rhs.1 > 0 {
-                    if lhs.1 == rhs.1 {
-                        if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
-                            return lhsSymbol < rhsSymbol
-                        }
-                        return true
-                    } else {
-                        return lhs.1 < rhs.1
-                    }
-                } else if lhs.1 > 0 && rhs.1 < 0 {
-                    return true
-                } else if lhs.1 < 0 && rhs.1 > 0 {
-                    return false
-                } else { // lhs.1 < 0 && rhs.1 > 0
-                    if lhs.1 == rhs.1 {
-                        if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
-                            return lhsSymbol < rhsSymbol
-                        }
-                        return true
-                    } else {
-                        return lhs.1 > rhs.1
-                    }
-                }
-            }
-            
+        } else {
+            let unitList = self.sortedUnits()
             var computedSymbol = ""
             for (subUnit, exp) in unitList {
                 if exp != 0 {
@@ -130,14 +100,12 @@ class Unit {
                 }
             }
             return computedSymbol
-        } else {
-            // We should either be a defined or composed unit
-            fatalError()
         }
     }
     
     // MARK: Arithmatic
     
+    /// Raise this unit to the given power
     func pow(_ raiseTo: Int) -> Unit {
         var subUnits: [Unit: Int] = [:]
         
@@ -152,6 +120,7 @@ class Unit {
         return Unit(composedOf: subUnits)
     }
     
+    /// Multiply one unit by another and return the resulting unit
     static func * (lhs: Unit, rhs: Unit) -> Unit {
         var subUnits: [Unit: Int] = [:]
         
@@ -192,6 +161,7 @@ class Unit {
         return Unit(composedOf: subUnits)
     }
     
+    /// Divide one unit by another and return the resulting unit
     static func / (lhs: Unit, rhs: Unit) -> Unit {
         var subUnits: [Unit: Int] = [:]
         
@@ -230,6 +200,45 @@ class Unit {
         }
         
         return Unit(composedOf: subUnits)
+    }
+    
+    /// Sort units into positive and negative groups, each going from smallest to largest exponent,
+    /// with each in alphabetical order by symbol
+    private func sortedUnits() -> [(Unit, Int)] {
+        guard let subUnits = self.subUnits else {
+            return [(self, 1)]
+        }
+        
+        var unitList = [(Unit, Int)]()
+        for (subUnit, exp) in subUnits {
+            unitList.append((subUnit, exp))
+        }
+        unitList.sort { lhs, rhs in
+            if lhs.1 > 0 && rhs.1 > 0 {
+                if lhs.1 == rhs.1 {
+                    if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
+                        return lhsSymbol < rhsSymbol
+                    }
+                    return true
+                } else {
+                    return lhs.1 < rhs.1
+                }
+            } else if lhs.1 > 0 && rhs.1 < 0 {
+                return true
+            } else if lhs.1 < 0 && rhs.1 > 0 {
+                return false
+            } else { // lhs.1 < 0 && rhs.1 > 0
+                if lhs.1 == rhs.1 {
+                    if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
+                        return lhsSymbol < rhsSymbol
+                    }
+                    return true
+                } else {
+                    return lhs.1 > rhs.1
+                }
+            }
+        }
+        return unitList
     }
 }
 
