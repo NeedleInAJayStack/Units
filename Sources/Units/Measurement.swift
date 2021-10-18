@@ -1,7 +1,7 @@
 import Foundation
 
 /// Models a value with a unit
-struct Measurement {
+struct Measurement: Equatable {
     let value: Double
     let unit: Unit
     
@@ -48,4 +48,3 @@ struct Measurement {
         )
     }
 }
-
