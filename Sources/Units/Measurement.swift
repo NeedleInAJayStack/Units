@@ -5,6 +5,10 @@ struct Measurement: Equatable {
     let value: Double
     let unit: Unit
     
+    public func isDimensionallyEquivalent(to: Measurement) -> Bool {
+        return self.unit.isDimensionallyEquivalent(to: to.unit)
+    }
+    
     func pow(_ raiseTo: Int) -> Measurement {
         return Measurement(
             value: Foundation.pow(self.value, Double(raiseTo)),

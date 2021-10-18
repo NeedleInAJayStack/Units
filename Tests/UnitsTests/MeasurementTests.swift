@@ -92,4 +92,19 @@ final class MeasurementTests: XCTestCase {
             Measurement(value: 8, unit: UnitLength.meter.pow(3))
         )
     }
+    
+    func testIsDimensionallyEquivalent() throws {
+        XCTAssertTrue(
+            Measurement(value: 2, unit: UnitLength.meter)
+                .isDimensionallyEquivalent(to: Measurement(value: 2, unit: UnitLength.meter))
+        )
+        XCTAssertTrue(
+            Measurement(value: 2, unit: UnitLength.meter)
+                .isDimensionallyEquivalent(to: Measurement(value: 4, unit: UnitLength.meter))
+        )
+        XCTAssertTrue(
+            Measurement(value: 2, unit: UnitForce.newton)
+                .isDimensionallyEquivalent(to: Measurement(value: 4, unit: UnitMass.kilogram * UnitLength.meter / UnitTime.second.pow(2)))
+        )
+    }
 }

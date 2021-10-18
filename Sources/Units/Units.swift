@@ -35,6 +35,10 @@ class Unit {
         self.init(subUnits: composedOf)
     }
     
+    public func isDimensionallyEquivalent(to: Unit) -> Bool {
+        return self.getDimension() == to.getDimension()
+    }
+    
     /// Return the dimension of the unit in terms of base quanties
     func getDimension() -> [BaseQuantity: Int] {
         if let dimension = self.dimension {

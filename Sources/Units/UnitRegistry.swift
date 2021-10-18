@@ -1,4 +1,10 @@
 // TODO: Make more
+class UnitForce {
+    static var newton = Unit (
+        symbol: "N",
+        dimension: [.Mass: 1, .Length: 1, .Time: -2]
+    )
+}
 class UnitLength {
     static var meter = Unit (
         symbol: "m",
@@ -14,11 +20,5 @@ class UnitTime {
     static var second = Unit (
         symbol: "s",
         dimension: [.Time: 1]
-    )
-}
-class UnitForce {
-    static var newton = Unit (
-        symbol: "N",
-        dimension: [.Mass: 1, .Length: 1, .Time: -2]
     )
 }
