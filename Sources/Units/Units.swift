@@ -1,6 +1,6 @@
 import Foundation
 
-class Unit: CustomStringConvertible, Equatable, Hashable {
+class Unit {
     
     // Populated only on predefined units
     private let dimension: [BaseQuantity: Int]?
@@ -34,10 +34,6 @@ class Unit: CustomStringConvertible, Equatable, Hashable {
     // Composite unit
     private convenience init(composedOf: [Unit: Int]) {
         self.init(subUnits: composedOf)
-    }
-    
-    var description: String {
-        return getSymbol()
     }
     
     func getDimension() -> [BaseQuantity: Int] {
@@ -140,21 +136,6 @@ class Unit: CustomStringConvertible, Equatable, Hashable {
         }
     }
     
-    static func == (lhs: Unit, rhs: Unit) -> Bool {
-        if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
-            return lhsSymbol == rhsSymbol
-        } else if let lhsSubUnits = lhs.subUnits, let rhsSubUnits = rhs.subUnits {
-            return lhsSubUnits == rhsSubUnits
-        } else {
-            return lhs.getSymbol() == rhs.getSymbol()
-        }
-    }
-    
-    // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(getSymbol())
-    }
-    
     // MARK: Arithmatic
     
     func pow(_ raiseTo: Int) -> Unit {
@@ -249,5 +230,30 @@ class Unit: CustomStringConvertible, Equatable, Hashable {
         }
         
         return Unit(composedOf: subUnits)
+    }
+}
+
+extension Unit: CustomStringConvertible {
+    var description: String {
+        return getSymbol()
+    }
+}
+
+extension Unit: Equatable {
+    static func == (lhs: Unit, rhs: Unit) -> Bool {
+        if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol { // Both predefined units
+            return lhsSymbol == rhsSymbol
+        } else if let lhsSubUnits = lhs.subUnits, let rhsSubUnits = rhs.subUnits { // Both composite units
+            return lhsSubUnits == rhsSubUnits
+        } else {
+            return lhs.getSymbol() == rhs.getSymbol()
+        }
+    }
+}
+
+extension Unit: Hashable {
+    // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(getSymbol())
     }
 }
