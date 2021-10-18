@@ -1,6 +1,6 @@
 import Foundation
 
-class Unit: CustomStringConvertible, Hashable {
+class Unit: CustomStringConvertible, Equatable, Hashable {
     
     // Populated only on predefined units
     private let dimension: [BaseQuantity: Int]?
@@ -153,6 +153,22 @@ class Unit: CustomStringConvertible, Hashable {
     // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
     func hash(into hasher: inout Hasher) {
         hasher.combine(getSymbol())
+    }
+    
+    // MARK: Arithmatic
+    
+    func pow(_ raiseTo: Int) -> Unit {
+        var subUnits: [Unit: Int] = [:]
+        
+        if let lhsSubUnits = self.subUnits {
+            subUnits = lhsSubUnits.mapValues { subExp in
+                subExp * raiseTo
+            }
+        } else {
+            subUnits[self] = raiseTo
+        }
+        
+        return Unit(composedOf: subUnits)
     }
     
     static func * (lhs: Unit, rhs: Unit) -> Unit {

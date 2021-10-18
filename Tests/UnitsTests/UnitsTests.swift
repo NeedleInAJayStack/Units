@@ -2,6 +2,35 @@ import XCTest
 @testable import Units
 
 final class UnitTests: XCTestCase {
+    func testPow() throws {
+        XCTAssertEqual(
+            UnitLength.meter.pow(2),
+            UnitLength.meter * UnitLength.meter
+        )
+        
+        XCTAssertEqual(
+            UnitLength.meter.pow(3),
+            UnitLength.meter * UnitLength.meter * UnitLength.meter
+        )
+        
+        // Test dividing by powers works (order of operations is preserved)
+        XCTAssertEqual(
+            UnitLength.meter / UnitTime.second.pow(2),
+            UnitLength.meter / UnitTime.second / UnitTime.second
+        )
+        
+        XCTAssertEqual(
+            UnitLength.meter / UnitTime.second.pow(2),
+            UnitLength.meter / (UnitTime.second * UnitTime.second)
+        )
+        
+        // Test negative powers is the same as dividing by powers
+        XCTAssertEqual(
+            UnitLength.meter * UnitTime.second.pow(-2),
+            UnitLength.meter / (UnitTime.second * UnitTime.second)
+        )
+    }
+    
     func testSymbol() throws {
         XCTAssertEqual(
             UnitLength.meter.getSymbol(),
@@ -34,12 +63,7 @@ final class UnitTests: XCTestCase {
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second / UnitTime.second).getSymbol(),
-            "m/s^2"
-        )
-        
-        XCTAssertEqual(
-            (UnitLength.meter / (UnitTime.second * UnitTime.second)).getSymbol(),
+            (UnitLength.meter / UnitTime.second.pow(2)).getSymbol(),
             "m/s^2"
         )
     }
@@ -76,12 +100,7 @@ final class UnitTests: XCTestCase {
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second / UnitTime.second).getDimension(),
-            [.Length: 1, .Time: -2]
-        )
-        
-        XCTAssertEqual(
-            (UnitLength.meter / (UnitTime.second * UnitTime.second)).getDimension(),
+            (UnitLength.meter / UnitTime.second.pow(2)).getDimension(),
             [.Length: 1, .Time: -2]
         )
     }
