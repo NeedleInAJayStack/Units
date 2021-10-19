@@ -47,6 +47,11 @@ class UnitMass {
         dimension: [.Mass: 1],
         coefficient: 0.001
     )
+    static var pound = Unit (
+        symbol: "lb",
+        dimension: [.Mass: 1],
+        coefficient: 0.45359237
+    )
 }
 class UnitTime {
     static var second = Unit (

@@ -25,16 +25,22 @@ class Unit {
         self.subUnits = subUnits
     }
     
-    // Predefined unit
+    /// Define a new Unit
+    /// - parameter symbol: The string symbol of the unit. This should be globally unique
+    /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
+    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
+    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
     convenience init(symbol: String, dimension: [BaseQuantity: Int], coefficient: Double = 1, constant: Double = 0) {
         self.init(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant)
     }
     
-    // Composite unit
+    /// Create a new composite Unit
+    /// - parameter composedOf: A list of units and exponents that define this composite unit. The units used as keys must be defined units.
     private convenience init(composedOf: [Unit: Int]) {
         self.init(subUnits: composedOf)
     }
     
+    /// Boolean indicating whether this unit and the input unit are of the same dimension
     public func isDimensionallyEquivalent(to: Unit) -> Bool {
         return self.getDimension() == to.getDimension()
     }

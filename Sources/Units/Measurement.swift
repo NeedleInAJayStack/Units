@@ -16,6 +16,14 @@ struct Measurement: Equatable {
         )
     }
     
+    /// Return a measurement of the same value, but with the provided unit. That is,
+    /// the value **is not matematically converted**.
+    func declare(as newUnit: Unit) -> Measurement {
+        return Measurement(value: value, unit: newUnit)
+    }
+    
+    /// Convert this unit to the provided one, and return the result. The provided unit must
+    /// be dimensionally equivalent to this measurement's unit.
     func convert(to newUnit: Unit) throws -> Measurement {
         guard unit.isDimensionallyEquivalent(to: newUnit) else {
             throw UnitsError.incompatibleUnits(message: "Cannot convert \(unit) to \(newUnit)")
