@@ -58,3 +58,9 @@ struct Measurement: Equatable {
         )
     }
 }
+
+extension Measurement: CustomStringConvertible {
+    var description: String {
+        return "\(value)\(unit)"
+    }
+}
