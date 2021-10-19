@@ -113,5 +113,9 @@ final class MeasurementTests: XCTestCase {
             try Measurement(value: 1, unit: UnitMass.kilogram).convert(to: UnitMass.gram),
             Measurement(value: 1000, unit: UnitMass.gram)
         )
+        XCTAssertEqual(
+            try Measurement(value: 1, unit: UnitPower.kilowatt).convert(to: UnitPower.horsepower),
+            Measurement(value: 1.3410220895950278, unit: UnitPower.horsepower)
+        )
     }
 }

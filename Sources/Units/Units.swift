@@ -40,11 +40,11 @@ class Unit {
     }
     
     func toBaseUnit(_ number: Double) -> Double {
-        return number / coefficient! // TODO: Support composite units
+        return number * coefficient! // TODO: Support composite units
     }
     
     func fromBaseUnit(_ number: Double) -> Double {
-        return number * coefficient! // TODO: Support composite units
+        return number / coefficient! // TODO: Support composite units
     }
     
     /// Return the dimension of the unit in terms of base quanties
