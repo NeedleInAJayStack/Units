@@ -40,15 +40,44 @@ class Unit {
     }
     
     func toBaseUnit(_ number: Double) -> Double {
-        return number * coefficient! // TODO: Support composite units
+        // TODO: Remove fatalErrors
+        if let coefficient = coefficient {
+            return number * coefficient
+        } else if let subUnits = subUnits {
+            var product = 1.0
+            for (subUnit, exponent) in subUnits {
+                guard let coefficient = subUnit.coefficient else {
+                    fatalError() // subUnits must be defined units
+                }
+                product = product * Foundation.pow(coefficient, Double(exponent))
+            }
+            return number * product
+        } else {
+            fatalError() // Unit must be either defined or composite
+        }
     }
     
     func fromBaseUnit(_ number: Double) -> Double {
-        return number / coefficient! // TODO: Support composite units
+        // TODO: Remove fatalErrors
+        if let coefficient = coefficient {
+            return number / coefficient
+        } else if let subUnits = subUnits {
+            var product = 1.0
+            for (subUnit, exponent) in subUnits {
+                guard let coefficient = subUnit.coefficient else {
+                    fatalError() // subUnits must be defined units
+                }
+                product = product * Foundation.pow(coefficient, Double(exponent))
+            }
+            return number / product
+        } else {
+            fatalError() // Unit must be either defined or composite
+        }
     }
     
     /// Return the dimension of the unit in terms of base quanties
     func getDimension() -> [BaseQuantity: Int] {
+        // TODO: Remove fatalErrors
         if let dimension = self.dimension {
             return dimension
         } else if let subUnits = self.subUnits {

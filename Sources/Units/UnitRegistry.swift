@@ -26,10 +26,15 @@ class UnitLength {
         symbol: "m",
         dimension: [.Length: 1]
     )
+    static var kilometer = Unit (
+        symbol: "km",
+        dimension: [.Length: 1],
+        coefficient: 1000
+    )
     static var foot = Unit (
         symbol: "ft",
         dimension: [.Length: 1],
-        constant: 0.3048
+        coefficient: 0.3048
     )
 }
 class UnitMass {

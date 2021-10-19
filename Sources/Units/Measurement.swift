@@ -17,6 +17,9 @@ struct Measurement: Equatable {
     }
     
     func convert(to newUnit: Unit) throws -> Measurement {
+        guard unit.isDimensionallyEquivalent(to: newUnit) else {
+            throw UnitsError.incompatibleUnits(message: "Cannot convert \(unit) to \(newUnit)")
+        }
         let baseValue = self.unit.toBaseUnit(self.value)
         let convertedValue = newUnit.fromBaseUnit(baseValue)
         return Measurement(value: convertedValue, unit: newUnit)

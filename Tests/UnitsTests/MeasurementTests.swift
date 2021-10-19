@@ -110,12 +110,34 @@ final class MeasurementTests: XCTestCase {
     
     func testConvert() throws {
         XCTAssertEqual(
-            try Measurement(value: 1, unit: UnitMass.kilogram).convert(to: UnitMass.gram),
-            Measurement(value: 1000, unit: UnitMass.gram)
+            try Measurement(value: 1, unit: UnitLength.kilometer).convert(to: UnitLength.meter),
+            Measurement(value: 1000, unit: UnitLength.meter)
         )
         XCTAssertEqual(
             try Measurement(value: 1, unit: UnitPower.kilowatt).convert(to: UnitPower.horsepower),
             Measurement(value: 1.3410220895950278, unit: UnitPower.horsepower)
+        )
+        
+        XCTAssertThrowsError(
+            try Measurement(value: 1, unit: UnitPower.kilowatt).convert(to: UnitLength.meter)
+        )
+        
+        XCTAssertEqual(
+            try Measurement(value: 1, unit: UnitLength.kilometer).pow(2).convert(to: UnitLength.meter.pow(2)),
+            Measurement(value: 1000000, unit: UnitLength.meter.pow(2))
+        )
+        XCTAssertEqual(
+            try Measurement(value: 1, unit: UnitLength.meter).pow(2).convert(to: UnitLength.kilometer.pow(2)),
+            Measurement(value: 0.000001, unit: UnitLength.kilometer.pow(2))
+        )
+        
+        XCTAssertEqual(
+            try Measurement(value: 1, unit: UnitLength.meter / UnitTime.second).convert(to: UnitLength.foot / UnitTime.minute),
+            Measurement(value: 196.85039370078738, unit: UnitLength.foot / UnitTime.minute)
+        )
+        XCTAssertEqual(
+            try Measurement(value: 1, unit: UnitLength.meter / UnitTime.second.pow(2)).convert(to: UnitLength.foot / UnitTime.minute.pow(2)),
+            Measurement(value: 11811.023622047243, unit: UnitLength.foot / UnitTime.minute.pow(2))
         )
     }
 }
