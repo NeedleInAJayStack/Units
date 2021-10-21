@@ -67,7 +67,7 @@ final class MeasurementTests: XCTestCase {
         // Test composite units
         let work = Measurement(value: 2, unit: UnitForce.newton * UnitLength.meter)
         XCTAssertEqual(
-            work.unit.getDimension(),
+            work.unit.dimension,
             [.Mass: 1, .Length: 2, .Time: -2]
         )
     }

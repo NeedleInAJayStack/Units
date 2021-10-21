@@ -54,74 +54,74 @@ final class UnitTests: XCTestCase {
     
     func testSymbol() throws {
         XCTAssertEqual(
-            UnitLength.meter.getSymbol(),
+            UnitLength.meter.symbol,
             "m"
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second).getSymbol(),
+            (UnitLength.meter / UnitTime.second).symbol,
             "m/s"
         )
         
         XCTAssertEqual(
-            (UnitLength.meter * UnitLength.foot / UnitTime.second).getSymbol(),
+            (UnitLength.meter * UnitLength.foot / UnitTime.second).symbol,
             "ft*m/s"
         )
         
         XCTAssertEqual(
-            (UnitLength.meter * UnitLength.meter / UnitTime.second).getSymbol(),
+            (UnitLength.meter * UnitLength.meter / UnitTime.second).symbol,
             "m^2/s"
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second / UnitLength.foot).getSymbol(),
+            (UnitLength.meter / UnitTime.second / UnitLength.foot).symbol,
             "m/ft/s"
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / (UnitTime.second * UnitLength.foot)).getSymbol(),
+            (UnitLength.meter / (UnitTime.second * UnitLength.foot)).symbol,
             "m/ft/s"
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second.pow(2)).getSymbol(),
+            (UnitLength.meter / UnitTime.second.pow(2)).symbol,
             "m/s^2"
         )
     }
     
     func testDimension() throws {
         XCTAssertEqual(
-            UnitLength.meter.getDimension(),
+            UnitLength.meter.dimension,
             [.Length: 1]
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second).getDimension(),
+            (UnitLength.meter / UnitTime.second).dimension,
             [.Length: 1, .Time: -1]
         )
         
         XCTAssertEqual(
-            (UnitLength.meter * UnitLength.foot / UnitTime.second).getDimension(),
+            (UnitLength.meter * UnitLength.foot / UnitTime.second).dimension,
             [.Length: 2, .Time: -1]
         )
         
         XCTAssertEqual(
-            (UnitLength.meter * UnitLength.meter / UnitTime.second).getDimension(),
+            (UnitLength.meter * UnitLength.meter / UnitTime.second).dimension,
             [.Length: 2, .Time: -1]
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second / UnitLength.foot).getDimension(),
+            (UnitLength.meter / UnitTime.second / UnitLength.foot).dimension,
             [.Time: -1]
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / (UnitTime.second * UnitLength.foot)).getDimension(),
+            (UnitLength.meter / (UnitTime.second * UnitLength.foot)).dimension,
             [.Time: -1]
         )
         
         XCTAssertEqual(
-            (UnitLength.meter / UnitTime.second.pow(2)).getDimension(),
+            (UnitLength.meter / UnitTime.second.pow(2)).dimension,
             [.Length: 1, .Time: -2]
         )
     }

@@ -20,7 +20,7 @@ public struct Unit {
     }
     
     /// Return the dimension of the unit in terms of base quanties
-    public func getDimension() -> [Quantity: Int] {
+    public var dimension: [Quantity: Int] {
         switch type {
         case .defined(let definedUnit):
             return definedUnit.dimension
@@ -50,7 +50,7 @@ public struct Unit {
     }
     
     /// Return a string symbol representing the unit
-    public func getSymbol() -> String {
+    public var symbol: String {
         switch type {
         case .defined(let definedUnit):
             return definedUnit.symbol
@@ -192,7 +192,7 @@ public struct Unit {
     
     /// Boolean indicating whether this unit and the input unit are of the same dimension
     public func isDimensionallyEquivalent(to: Unit) -> Bool {
-        return self.getDimension() == to.getDimension()
+        return self.dimension == to.dimension
     }
     
     /// Convert a number to its base value, as defined by the coefficient and constant
@@ -268,20 +268,20 @@ public struct Unit {
 
 extension Unit: CustomStringConvertible {
     public var description: String {
-        return getSymbol()
+        return symbol
     }
 }
 
 extension Unit: Equatable {
     public static func == (lhs: Unit, rhs: Unit) -> Bool {
-        return lhs.getSymbol() == rhs.getSymbol()
+        return lhs.symbol == rhs.symbol
     }
 }
 
 extension Unit: Hashable {
     // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(getSymbol())
+        hasher.combine(symbol)
     }
 }
 
