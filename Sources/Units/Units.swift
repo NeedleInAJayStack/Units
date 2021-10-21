@@ -2,7 +2,7 @@ import Foundation
 
 public struct Unit {
     
-    private let type: RecordType
+    private let type: UnitType
     
     /// Define a new Unit
     /// - parameter symbol: The string symbol of the unit. This should be globally unique
@@ -22,38 +22,39 @@ public struct Unit {
     /// Return the dimension of the unit in terms of base quanties
     public var dimension: [Quantity: Int] {
         switch type {
-        case .defined(let definedUnit):
-            return definedUnit.dimension
+        case .defined(let definition):
+            return definition.dimension
         case .composite(let subUnits):
-            var computedDimension: [Quantity: Int] = [:]
+            var dimensions: [Quantity: Int] = [:]
             for (subUnit, exp) in subUnits {
                 // multiply subDimensions by unit exponent
                 let subDimensions = subUnit.dimension.mapValues { value in
                     exp * value
                 }
                 // Append or sum values into computed dimension
-                for (subDimension, dimExp) in subDimensions {
-                    if let computedDimensionExp = computedDimension[subDimension] {
-                        let newExp = computedDimensionExp + dimExp
+                // TODO: Abstract & unify this process across methods
+                for (subDimension, subDimExp) in subDimensions {
+                    if let existingExp = dimensions[subDimension] {
+                        let newExp = existingExp + subDimExp
                         if newExp == 0 {
-                            computedDimension.removeValue(forKey: subDimension)
+                            dimensions.removeValue(forKey: subDimension)
                         } else {
-                            computedDimension[subDimension] = newExp
+                            dimensions[subDimension] = newExp
                         }
                     } else {
-                        computedDimension[subDimension] = dimExp
+                        dimensions[subDimension] = subDimExp
                     }
                 }
             }
-            return computedDimension
+            return dimensions
         }
     }
     
     /// Return a string symbol representing the unit
     public var symbol: String {
         switch type {
-        case .defined(let definedUnit):
-            return definedUnit.symbol
+        case .defined(let definition):
+            return definition.symbol
         case .composite(_):
             let unitList = self.sortedUnits()
             var computedSymbol = ""
@@ -201,14 +202,14 @@ public struct Unit {
         case .defined(let defined):
             return number * defined.coefficient + defined.constant
         case .composite(let subUnits):
-            var product = 1.0
+            var totalCoefficient = 1.0
             for (subUnit, exponent) in subUnits {
                 guard subUnit.constant == 0 else { // subUnit must not have constant
                     throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                product = product * Foundation.pow(subUnit.coefficient, Double(exponent))
+                totalCoefficient *= Foundation.pow(subUnit.coefficient, Double(exponent))
             }
-            return number * product
+            return number * totalCoefficient
         }
     }
     
@@ -218,14 +219,14 @@ public struct Unit {
         case .defined(let defined):
             return (number - defined.constant) / defined.coefficient
         case .composite(let subUnits):
-            var product = 1.0
+            var totalCoefficient = 1.0
             for (subUnit, exponent) in subUnits {
                 guard subUnit.constant == 0 else { // subUnit must not have constant
                     throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                product = product * Foundation.pow(subUnit.coefficient, Double(exponent))
+                totalCoefficient *= Foundation.pow(subUnit.coefficient, Double(exponent))
             }
-            return number / product
+            return number / totalCoefficient
         }
     }
     
@@ -274,22 +275,18 @@ extension Unit: CustomStringConvertible {
 
 extension Unit: Equatable {
     public static func == (lhs: Unit, rhs: Unit) -> Bool {
+        // TODO: Consider if there's a more explicit way to compute equality
         return lhs.symbol == rhs.symbol
     }
 }
 
-extension Unit: Hashable {
-    // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(symbol)
-    }
-}
-
-private enum RecordType {
+/// The two possible types of unit - predefined or composite
+private enum UnitType {
     case defined(DefinedUnit)
     case composite([DefinedUnit: Int])
 }
 
+/// A predefined unit, which has quantity, symbol, and conversion information
 private struct DefinedUnit {
     let dimension: [Quantity: Int]
     let symbol: String
