@@ -1,4 +1,4 @@
-enum UnitsError: Error {
+public enum UnitsError: Error {
     case incompatibleUnits(message: String)
     case invalidCompositeUnit(message: String)
 }

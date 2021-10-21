@@ -1,15 +1,15 @@
 import Foundation
 
-class Unit {
+public class Unit {
     // Populated only on predefined units
     private let dimension: [BaseQuantity: Int]?
     private let symbol: String?
-    let coefficient: Double?
-    let constant: Double?
+    private let coefficient: Double?
+    private let constant: Double?
     
     // Populated only on composite units
     // TODO: Consider changing to a list of unit/exp pairs
-    let subUnits: [Unit: Int]?
+    private let subUnits: [Unit: Int]?
     
     private init(
         dimension: [BaseQuantity: Int]? = nil,
@@ -30,7 +30,7 @@ class Unit {
     /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
     /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
     /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
-    convenience init(symbol: String, dimension: [BaseQuantity: Int], coefficient: Double = 1, constant: Double = 0) {
+    public convenience init(symbol: String, dimension: [BaseQuantity: Int], coefficient: Double = 1, constant: Double = 0) {
         self.init(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant)
     }
     
@@ -40,55 +40,8 @@ class Unit {
         self.init(subUnits: composedOf)
     }
     
-    /// Boolean indicating whether this unit and the input unit are of the same dimension
-    public func isDimensionallyEquivalent(to: Unit) -> Bool {
-        return self.getDimension() == to.getDimension()
-    }
-    
-    func toBaseUnit(_ number: Double) throws -> Double {
-        // TODO: Remove fatalErrors
-        if let coefficient = coefficient, let constant = constant {
-            return number * coefficient + constant
-        } else if let subUnits = subUnits {
-            var product = 1.0
-            for (subUnit, exponent) in subUnits {
-                guard let coefficient = subUnit.coefficient else {
-                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
-                }
-                guard subUnit.constant == 0 else { // subUnit must not have constant
-                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
-                }
-                product = product * Foundation.pow(coefficient, Double(exponent))
-            }
-            return number * product
-        } else {
-            fatalError() // Unit must be either defined or composite
-        }
-    }
-    
-    func fromBaseUnit(_ number: Double) throws -> Double {
-        // TODO: Remove fatalErrors
-        if let coefficient = coefficient, let constant = constant {
-            return (number - constant) / coefficient
-        } else if let subUnits = subUnits {
-            var product = 1.0
-            for (subUnit, exponent) in subUnits {
-                guard let coefficient = subUnit.coefficient else {
-                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
-                }
-                guard subUnit.constant == 0 else { // subUnit must not have constant
-                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
-                }
-                product = product * Foundation.pow(coefficient, Double(exponent))
-            }
-            return number / product
-        } else {
-            fatalError() // Unit must be either defined or composite
-        }
-    }
-    
     /// Return the dimension of the unit in terms of base quanties
-    func getDimension() -> [BaseQuantity: Int] {
+    public func getDimension() -> [BaseQuantity: Int] {
         // TODO: Remove fatalErrors
         if let dimension = self.dimension {
             return dimension
@@ -121,7 +74,7 @@ class Unit {
     }
     
     /// Return a string symbol representing the unit
-    func getSymbol() -> String {
+    public func getSymbol() -> String {
         if let symbol = self.symbol {
             return symbol
         } else {
@@ -156,25 +109,10 @@ class Unit {
         }
     }
     
-    // MARK: Arithmatic
-    
-    /// Raise this unit to the given power
-    func pow(_ raiseTo: Int) -> Unit {
-        var subUnits: [Unit: Int] = [:]
-        
-        if let lhsSubUnits = self.subUnits {
-            subUnits = lhsSubUnits.mapValues { subExp in
-                subExp * raiseTo
-            }
-        } else {
-            subUnits[self] = raiseTo
-        }
-        
-        return Unit(composedOf: subUnits)
-    }
+    // MARK: - Arithmatic
     
     /// Multiply one unit by another and return the resulting unit
-    static func * (lhs: Unit, rhs: Unit) -> Unit {
+    public static func * (lhs: Unit, rhs: Unit) -> Unit {
         var subUnits: [Unit: Int] = [:]
         
         if let lhsSubUnits = lhs.subUnits {
@@ -215,7 +153,7 @@ class Unit {
     }
     
     /// Divide one unit by another and return the resulting unit
-    static func / (lhs: Unit, rhs: Unit) -> Unit {
+    public static func / (lhs: Unit, rhs: Unit) -> Unit {
         var subUnits: [Unit: Int] = [:]
         
         if let lhsSubUnits = lhs.subUnits {
@@ -254,6 +192,74 @@ class Unit {
         
         return Unit(composedOf: subUnits)
     }
+    
+    /// Raise this unit to the given power
+    public func pow(_ raiseTo: Int) -> Unit {
+        var subUnits: [Unit: Int] = [:]
+        
+        if let lhsSubUnits = self.subUnits {
+            subUnits = lhsSubUnits.mapValues { subExp in
+                subExp * raiseTo
+            }
+        } else {
+            subUnits[self] = raiseTo
+        }
+        
+        return Unit(composedOf: subUnits)
+    }
+    
+    // MARK: - Conversions
+    
+    /// Boolean indicating whether this unit and the input unit are of the same dimension
+    public func isDimensionallyEquivalent(to: Unit) -> Bool {
+        return self.getDimension() == to.getDimension()
+    }
+    
+    /// Convert a number to its base value, as defined by the coefficient and constant
+    func toBaseUnit(_ number: Double) throws -> Double {
+        // TODO: Remove fatalErrors
+        if let coefficient = coefficient, let constant = constant {
+            return number * coefficient + constant
+        } else if let subUnits = subUnits {
+            var product = 1.0
+            for (subUnit, exponent) in subUnits {
+                guard let coefficient = subUnit.coefficient else {
+                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
+                }
+                guard subUnit.constant == 0 else { // subUnit must not have constant
+                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
+                }
+                product = product * Foundation.pow(coefficient, Double(exponent))
+            }
+            return number * product
+        } else {
+            fatalError() // Unit must be either defined or composite
+        }
+    }
+    
+    /// Convert a number from its base value, as defined by the coefficient and constant
+    func fromBaseUnit(_ number: Double) throws -> Double {
+        // TODO: Remove fatalErrors
+        if let coefficient = coefficient, let constant = constant {
+            return (number - constant) / coefficient
+        } else if let subUnits = subUnits {
+            var product = 1.0
+            for (subUnit, exponent) in subUnits {
+                guard let coefficient = subUnit.coefficient else {
+                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
+                }
+                guard subUnit.constant == 0 else { // subUnit must not have constant
+                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
+                }
+                product = product * Foundation.pow(coefficient, Double(exponent))
+            }
+            return number / product
+        } else {
+            fatalError() // Unit must be either defined or composite
+        }
+    }
+    
+    // MARK: - Private helpers
     
     /// Sort units into positive and negative groups, each going from smallest to largest exponent,
     /// with each in alphabetical order by symbol
@@ -296,13 +302,13 @@ class Unit {
 }
 
 extension Unit: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         return getSymbol()
     }
 }
 
 extension Unit: Equatable {
-    static func == (lhs: Unit, rhs: Unit) -> Bool {
+    public static func == (lhs: Unit, rhs: Unit) -> Bool {
         if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol { // Both predefined units
             return lhsSymbol == rhsSymbol
         } else if let lhsSubUnits = lhs.subUnits, let rhsSubUnits = rhs.subUnits { // Both composite units
@@ -315,7 +321,7 @@ extension Unit: Equatable {
 
 extension Unit: Hashable {
     // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(getSymbol())
     }
 }
