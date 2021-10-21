@@ -6,11 +6,11 @@ public struct Unit {
     
     // Populated only on composite units
     // TODO: Consider changing to a list of unit/exp pairs
-    private let subUnits: [Unit: Int]?
+    private let subUnits: [DefinedUnit: Int]?
     
     private init(
         definedUnit: DefinedUnit? = nil,
-        subUnits: [Unit: Int]? = nil
+        subUnits: [DefinedUnit: Int]? = nil
     ) {
         self.definedUnit = definedUnit
         self.subUnits = subUnits
@@ -27,7 +27,7 @@ public struct Unit {
     
     /// Create a new composite Unit
     /// - parameter composedOf: A list of units and exponents that define this composite unit. The units used as keys must be defined units.
-    private init(composedOf: [Unit: Int]) {
+    private init(composedOf: [DefinedUnit: Int]) {
         self.init(subUnits: composedOf)
     }
     
@@ -40,7 +40,7 @@ public struct Unit {
             var computedDimension: [Quantity: Int] = [:]
             for (subUnit, exp) in subUnits {
                 // multiply subDimensions by unit exponent
-                let subDimensions = subUnit.getDimension().mapValues { value in
+                let subDimensions = subUnit.dimension.mapValues { value in
                     exp * value
                 }
                 // Append or sum values into computed dimension
@@ -87,7 +87,7 @@ public struct Unit {
                             prefix = "/"
                         }
                     }
-                    let symbol = subUnit.getSymbol()
+                    let symbol = subUnit.symbol
                     var expStr = ""
                     if abs(exp) > 1 {
                         expStr = "^\(abs(exp))"
@@ -104,14 +104,16 @@ public struct Unit {
     
     /// Multiply one unit by another and return the resulting unit
     public static func * (lhs: Unit, rhs: Unit) -> Unit {
-        var subUnits: [Unit: Int] = [:]
+        var subUnits: [DefinedUnit: Int] = [:]
         
         if let lhsSubUnits = lhs.subUnits {
             for (lhsSubUnit, lhsExp) in lhsSubUnits {
                 subUnits[lhsSubUnit] = lhsExp
             }
+        } else if let lhsDefined = lhs.definedUnit {
+            subUnits[lhsDefined] = 1
         } else {
-            subUnits[lhs] = 1
+            fatalError()
         }
         
         if let rhsSubUnits = rhs.subUnits {
@@ -127,17 +129,19 @@ public struct Unit {
                     subUnits[rhsSubUnit] = rhsExp
                 }
             }
-        } else {
-            if let lhsExp = subUnits[rhs] {
+        } else if let rhsDefined = rhs.definedUnit {
+            if let lhsExp = subUnits[rhsDefined] {
                 let newExp = lhsExp + 1
                 if newExp == 0 {
-                    subUnits.removeValue(forKey: rhs)
+                    subUnits.removeValue(forKey: rhsDefined)
                 } else {
-                    subUnits[rhs] = newExp
+                    subUnits[rhsDefined] = newExp
                 }
             } else {
-                subUnits[rhs] = 1
+                subUnits[rhsDefined] = 1
             }
+        } else {
+            fatalError()
         }
         
         return Unit(composedOf: subUnits)
@@ -145,14 +149,16 @@ public struct Unit {
     
     /// Divide one unit by another and return the resulting unit
     public static func / (lhs: Unit, rhs: Unit) -> Unit {
-        var subUnits: [Unit: Int] = [:]
+        var subUnits: [DefinedUnit: Int] = [:]
         
         if let lhsSubUnits = lhs.subUnits {
             for (lhsSubUnit, lhsExp) in lhsSubUnits {
                 subUnits[lhsSubUnit] = lhsExp
             }
+        } else if let lhsDefined = lhs.definedUnit {
+            subUnits[lhsDefined] = 1
         } else {
-            subUnits[lhs] = 1
+            fatalError()
         }
         
         if let rhsSubUnits = rhs.subUnits {
@@ -168,17 +174,19 @@ public struct Unit {
                     subUnits[rhsSubUnit] = -1 * rhsExp
                 }
             }
-        } else {
-            if let lhsExp = subUnits[rhs] {
+        } else if let rhsDefined = rhs.definedUnit {
+            if let lhsExp = subUnits[rhsDefined] {
                 let newExp = lhsExp - 1
                 if newExp == 0 {
-                    subUnits.removeValue(forKey: rhs)
+                    subUnits.removeValue(forKey: rhsDefined)
                 } else {
-                    subUnits[rhs] = newExp
+                    subUnits[rhsDefined] = newExp
                 }
             } else {
-                subUnits[rhs] = -1
+                subUnits[rhsDefined] = -1
             }
+        } else {
+            fatalError()
         }
         
         return Unit(composedOf: subUnits)
@@ -186,14 +194,16 @@ public struct Unit {
     
     /// Raise this unit to the given power
     public func pow(_ raiseTo: Int) -> Unit {
-        var subUnits: [Unit: Int] = [:]
+        var subUnits: [DefinedUnit: Int] = [:]
         
         if let lhsSubUnits = self.subUnits {
             subUnits = lhsSubUnits.mapValues { subExp in
                 subExp * raiseTo
             }
+        } else if let defined = self.definedUnit {
+            subUnits[defined] = raiseTo
         } else {
-            subUnits[self] = raiseTo
+            fatalError()
         }
         
         return Unit(composedOf: subUnits)
@@ -214,13 +224,10 @@ public struct Unit {
         } else if let subUnits = subUnits {
             var product = 1.0
             for (subUnit, exponent) in subUnits {
-                guard let defined = subUnit.definedUnit else {
-                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
-                }
-                guard defined.constant == 0 else { // subUnit must not have constant
+                guard subUnit.constant == 0 else { // subUnit must not have constant
                     throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                product = product * Foundation.pow(defined.coefficient, Double(exponent))
+                product = product * Foundation.pow(subUnit.coefficient, Double(exponent))
             }
             return number * product
         } else {
@@ -236,13 +243,10 @@ public struct Unit {
         } else if let subUnits = subUnits {
             var product = 1.0
             for (subUnit, exponent) in subUnits {
-                guard let defined = subUnit.definedUnit else {
-                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
-                }
-                guard defined.constant == 0 else { // subUnit must not have constant
+                guard subUnit.constant == 0 else { // subUnit must not have constant
                     throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                product = product * Foundation.pow(defined.coefficient, Double(exponent))
+                product = product * Foundation.pow(subUnit.coefficient, Double(exponent))
             }
             return number / product
         } else {
@@ -254,41 +258,37 @@ public struct Unit {
     
     /// Sort units into positive and negative groups, each going from smallest to largest exponent,
     /// with each in alphabetical order by symbol
-    private func sortedUnits() -> [(Unit, Int)] {
-        guard let subUnits = self.subUnits else {
-            return [(self, 1)]
-        }
-        
-        var unitList = [(Unit, Int)]()
-        for (subUnit, exp) in subUnits {
-            unitList.append((subUnit, exp))
-        }
-        unitList.sort { lhs, rhs in
-            if lhs.1 > 0 && rhs.1 > 0 {
-                if lhs.1 == rhs.1 {
-                    if let lhsDefined = lhs.0.definedUnit, let rhsDefined = rhs.0.definedUnit {
-                        return lhsDefined.symbol < rhsDefined.symbol
+    private func sortedUnits() -> [(DefinedUnit, Int)] {
+        if let defined = definedUnit {
+            return [(defined, 1)]
+        } else if let subUnits = self.subUnits {
+            var unitList = [(DefinedUnit, Int)]()
+            for (subUnit, exp) in subUnits {
+                unitList.append((subUnit, exp))
+            }
+            unitList.sort { lhs, rhs in
+                if lhs.1 > 0 && rhs.1 > 0 {
+                    if lhs.1 == rhs.1 {
+                        return lhs.0.symbol < rhs.0.symbol
+                    } else {
+                        return lhs.1 < rhs.1
                     }
+                } else if lhs.1 > 0 && rhs.1 < 0 {
                     return true
-                } else {
-                    return lhs.1 < rhs.1
-                }
-            } else if lhs.1 > 0 && rhs.1 < 0 {
-                return true
-            } else if lhs.1 < 0 && rhs.1 > 0 {
-                return false
-            } else { // lhs.1 < 0 && rhs.1 > 0
-                if lhs.1 == rhs.1 {
-                    if let lhsDefined = lhs.0.definedUnit, let rhsDefined = rhs.0.definedUnit {
-                        return lhsDefined.symbol < rhsDefined.symbol
+                } else if lhs.1 < 0 && rhs.1 > 0 {
+                    return false
+                } else { // lhs.1 < 0 && rhs.1 > 0
+                    if lhs.1 == rhs.1 {
+                        return lhs.0.symbol < rhs.0.symbol
+                    } else {
+                        return lhs.1 > rhs.1
                     }
-                    return true
-                } else {
-                    return lhs.1 > rhs.1
                 }
             }
+            return unitList
+        } else {
+            fatalError()
         }
-        return unitList
     }
 }
 
@@ -322,4 +322,11 @@ private struct DefinedUnit {
     let symbol: String
     let coefficient: Double
     let constant: Double
+}
+
+extension DefinedUnit: Hashable {
+    // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(symbol)
+    }
 }
