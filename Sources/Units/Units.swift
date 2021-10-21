@@ -1,27 +1,18 @@
 import Foundation
 
-public class Unit {
+public struct Unit {
     // Populated only on predefined units
-    private let dimension: [BaseQuantity: Int]?
-    private let symbol: String?
-    private let coefficient: Double?
-    private let constant: Double?
+    private let definedUnit: DefinedUnit?
     
     // Populated only on composite units
     // TODO: Consider changing to a list of unit/exp pairs
     private let subUnits: [Unit: Int]?
     
     private init(
-        dimension: [BaseQuantity: Int]? = nil,
-        symbol: String? = nil,
-        coefficient: Double? = nil,
-        constant: Double? = nil,
+        definedUnit: DefinedUnit? = nil,
         subUnits: [Unit: Int]? = nil
     ) {
-        self.dimension = dimension
-        self.symbol = symbol
-        self.coefficient = coefficient
-        self.constant = constant
+        self.definedUnit = definedUnit
         self.subUnits = subUnits
     }
     
@@ -30,23 +21,23 @@ public class Unit {
     /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
     /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
     /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
-    public convenience init(symbol: String, dimension: [BaseQuantity: Int], coefficient: Double = 1, constant: Double = 0) {
-        self.init(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant)
+    public init(symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
+        self.init(definedUnit: DefinedUnit(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant))
     }
     
     /// Create a new composite Unit
     /// - parameter composedOf: A list of units and exponents that define this composite unit. The units used as keys must be defined units.
-    private convenience init(composedOf: [Unit: Int]) {
+    private init(composedOf: [Unit: Int]) {
         self.init(subUnits: composedOf)
     }
     
     /// Return the dimension of the unit in terms of base quanties
-    public func getDimension() -> [BaseQuantity: Int] {
+    public func getDimension() -> [Quantity: Int] {
         // TODO: Remove fatalErrors
-        if let dimension = self.dimension {
-            return dimension
+        if let defined = definedUnit {
+            return defined.dimension
         } else if let subUnits = self.subUnits {
-            var computedDimension: [BaseQuantity: Int] = [:]
+            var computedDimension: [Quantity: Int] = [:]
             for (subUnit, exp) in subUnits {
                 // multiply subDimensions by unit exponent
                 let subDimensions = subUnit.getDimension().mapValues { value in
@@ -75,8 +66,8 @@ public class Unit {
     
     /// Return a string symbol representing the unit
     public func getSymbol() -> String {
-        if let symbol = self.symbol {
-            return symbol
+        if let defined = definedUnit {
+            return defined.symbol
         } else {
             let unitList = self.sortedUnits()
             var computedSymbol = ""
@@ -218,18 +209,18 @@ public class Unit {
     /// Convert a number to its base value, as defined by the coefficient and constant
     func toBaseUnit(_ number: Double) throws -> Double {
         // TODO: Remove fatalErrors
-        if let coefficient = coefficient, let constant = constant {
-            return number * coefficient + constant
+        if let defined = definedUnit {
+            return number * defined.coefficient + defined.constant
         } else if let subUnits = subUnits {
             var product = 1.0
             for (subUnit, exponent) in subUnits {
-                guard let coefficient = subUnit.coefficient else {
+                guard let defined = subUnit.definedUnit else {
                     throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
                 }
-                guard subUnit.constant == 0 else { // subUnit must not have constant
+                guard defined.constant == 0 else { // subUnit must not have constant
                     throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                product = product * Foundation.pow(coefficient, Double(exponent))
+                product = product * Foundation.pow(defined.coefficient, Double(exponent))
             }
             return number * product
         } else {
@@ -240,18 +231,18 @@ public class Unit {
     /// Convert a number from its base value, as defined by the coefficient and constant
     func fromBaseUnit(_ number: Double) throws -> Double {
         // TODO: Remove fatalErrors
-        if let coefficient = coefficient, let constant = constant {
-            return (number - constant) / coefficient
+        if let defined = definedUnit {
+            return (number - defined.constant) / defined.coefficient
         } else if let subUnits = subUnits {
             var product = 1.0
             for (subUnit, exponent) in subUnits {
-                guard let coefficient = subUnit.coefficient else {
+                guard let defined = subUnit.definedUnit else {
                     throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
                 }
-                guard subUnit.constant == 0 else { // subUnit must not have constant
+                guard defined.constant == 0 else { // subUnit must not have constant
                     throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                product = product * Foundation.pow(coefficient, Double(exponent))
+                product = product * Foundation.pow(defined.coefficient, Double(exponent))
             }
             return number / product
         } else {
@@ -275,8 +266,8 @@ public class Unit {
         unitList.sort { lhs, rhs in
             if lhs.1 > 0 && rhs.1 > 0 {
                 if lhs.1 == rhs.1 {
-                    if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
-                        return lhsSymbol < rhsSymbol
+                    if let lhsDefined = lhs.0.definedUnit, let rhsDefined = rhs.0.definedUnit {
+                        return lhsDefined.symbol < rhsDefined.symbol
                     }
                     return true
                 } else {
@@ -288,8 +279,8 @@ public class Unit {
                 return false
             } else { // lhs.1 < 0 && rhs.1 > 0
                 if lhs.1 == rhs.1 {
-                    if let lhsSymbol = lhs.0.symbol, let rhsSymbol = rhs.0.symbol {
-                        return lhsSymbol < rhsSymbol
+                    if let lhsDefined = lhs.0.definedUnit, let rhsDefined = rhs.0.definedUnit {
+                        return lhsDefined.symbol < rhsDefined.symbol
                     }
                     return true
                 } else {
@@ -309,8 +300,8 @@ extension Unit: CustomStringConvertible {
 
 extension Unit: Equatable {
     public static func == (lhs: Unit, rhs: Unit) -> Bool {
-        if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol { // Both predefined units
-            return lhsSymbol == rhsSymbol
+        if let lhsDefined = lhs.definedUnit, let rhsDefined = rhs.definedUnit {
+            return lhsDefined.symbol == rhsDefined.symbol
         } else if let lhsSubUnits = lhs.subUnits, let rhsSubUnits = rhs.subUnits { // Both composite units
             return lhsSubUnits == rhsSubUnits
         } else {
@@ -324,4 +315,11 @@ extension Unit: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(getSymbol())
     }
+}
+
+private struct DefinedUnit {
+    let dimension: [Quantity: Int]
+    let symbol: String
+    let coefficient: Double
+    let constant: Double
 }
