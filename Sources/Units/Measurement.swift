@@ -28,8 +28,8 @@ struct Measurement: Equatable {
         guard unit.isDimensionallyEquivalent(to: newUnit) else {
             throw UnitsError.incompatibleUnits(message: "Cannot convert \(unit) to \(newUnit)")
         }
-        let baseValue = self.unit.toBaseUnit(self.value)
-        let convertedValue = newUnit.fromBaseUnit(baseValue)
+        let baseValue = try self.unit.toBaseUnit(self.value)
+        let convertedValue = try newUnit.fromBaseUnit(baseValue)
         return Measurement(value: convertedValue, unit: newUnit)
     }
     

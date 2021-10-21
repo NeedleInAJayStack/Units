@@ -69,3 +69,25 @@ class UnitTime {
         coefficient: 3600
     )
 }
+class UnitTemperature {
+    static var kelvin = Unit (
+        symbol: "K",
+        dimension: [.Temperature: 1]
+    )
+    static var celsius = Unit (
+        symbol: "°C",
+        dimension: [.Temperature: 1],
+        constant: 273.15
+    )
+    static var fahrenheit = Unit (
+        symbol: "°F",
+        dimension: [.Temperature: 1],
+        coefficient: 5.0/9.0,
+        constant: 273.15 - (32 * 5.0/9.0)
+    )
+    static var rankine = Unit (
+        symbol: "°R",
+        dimension: [.Temperature: 1],
+        coefficient: 5.0/9.0
+    )
+}

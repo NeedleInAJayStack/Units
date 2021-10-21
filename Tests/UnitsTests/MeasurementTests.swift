@@ -152,5 +152,25 @@ final class MeasurementTests: XCTestCase {
         XCTAssertThrowsError(
             try Measurement(value: 1, unit: UnitLength.meter / UnitTime.second.pow(2)).convert(to: UnitLength.foot / UnitTime.minute)
         )
+        
+        // Test conversion with constant
+        XCTAssertEqual(
+            try Measurement(value: 25, unit: UnitTemperature.celsius).convert(to: UnitTemperature.kelvin),
+            Measurement(value: 298.15, unit: UnitTemperature.kelvin)
+        )
+        XCTAssertEqual(
+            try Measurement(value: 0, unit: UnitTemperature.celsius).convert(to: UnitTemperature.fahrenheit),
+            Measurement(value: 31.999999999999986, unit: UnitTemperature.fahrenheit)
+        )
+        XCTAssertEqual(
+            try Measurement(value: 32, unit: UnitTemperature.fahrenheit).convert(to: UnitTemperature.celsius),
+            Measurement(value: 0, unit: UnitTemperature.celsius)
+        )
+        
+        // Test composite unit with constant cannot be converted
+        XCTAssertThrowsError(
+            try Measurement(value: 25, unit: UnitLength.meter * UnitTemperature.celsius)
+                .convert(to: UnitLength.meter * UnitTemperature.fahrenheit)
+        )
     }
 }

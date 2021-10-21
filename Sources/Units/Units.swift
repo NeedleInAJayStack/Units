@@ -45,15 +45,18 @@ class Unit {
         return self.getDimension() == to.getDimension()
     }
     
-    func toBaseUnit(_ number: Double) -> Double {
+    func toBaseUnit(_ number: Double) throws -> Double {
         // TODO: Remove fatalErrors
-        if let coefficient = coefficient {
-            return number * coefficient
+        if let coefficient = coefficient, let constant = constant {
+            return number * coefficient + constant
         } else if let subUnits = subUnits {
             var product = 1.0
             for (subUnit, exponent) in subUnits {
                 guard let coefficient = subUnit.coefficient else {
-                    fatalError() // subUnits must be defined units
+                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
+                }
+                guard subUnit.constant == 0 else { // subUnit must not have constant
+                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
                 product = product * Foundation.pow(coefficient, Double(exponent))
             }
@@ -63,15 +66,18 @@ class Unit {
         }
     }
     
-    func fromBaseUnit(_ number: Double) -> Double {
+    func fromBaseUnit(_ number: Double) throws -> Double {
         // TODO: Remove fatalErrors
-        if let coefficient = coefficient {
-            return number / coefficient
+        if let coefficient = coefficient, let constant = constant {
+            return (number - constant) / coefficient
         } else if let subUnits = subUnits {
             var product = 1.0
             for (subUnit, exponent) in subUnits {
                 guard let coefficient = subUnit.coefficient else {
-                    fatalError() // subUnits must be defined units
+                    throw UnitsError.invalidCompositeUnit(message: "Composite unit must be composed of defined units")
+                }
+                guard subUnit.constant == 0 else { // subUnit must not have constant
+                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
                 product = product * Foundation.pow(coefficient, Double(exponent))
             }
