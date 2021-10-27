@@ -27,26 +27,16 @@ public struct Unit {
         case .composite(let subUnits):
             var dimensions: [Quantity: Int] = [:]
             for (subUnit, exp) in subUnits {
-                // multiply subDimensions by unit exponent
                 let subDimensions = subUnit.dimension.mapValues { value in
                     exp * value
                 }
-                // Append or sum values into computed dimension
-                // TODO: Abstract & unify this process across methods
-                for (subDimension, subDimExp) in subDimensions {
-                    if let existingExp = dimensions[subDimension] {
-                        let newExp = existingExp + subDimExp
-                        if newExp == 0 {
-                            dimensions.removeValue(forKey: subDimension)
-                        } else {
-                            dimensions[subDimension] = newExp
-                        }
-                    } else {
-                        dimensions[subDimension] = subDimExp
-                    }
+                dimensions.merge(subDimensions) { existingExp, subDimensionExp in
+                    existingExp + subDimensionExp
                 }
             }
-            return dimensions
+            return dimensions.filter { (key, value) in
+               value != 0
+            }
         }
     }
     
@@ -59,29 +49,31 @@ public struct Unit {
             let unitList = self.sortedUnits()
             var computedSymbol = ""
             for (subUnit, exp) in unitList {
-                if exp != 0 {
-                    var prefix = ""
-                    if computedSymbol == "" {
-                        if exp >= 0 {
-                            prefix = ""
-                        } else {
-                            prefix = "1/"
-                        }
-                    } else {
-                        if exp >= 0 {
-                            prefix = "*"
-                        } else {
-                            prefix = "/"
-                        }
-                    }
-                    let symbol = subUnit.symbol
-                    var expStr = ""
-                    if abs(exp) > 1 {
-                        expStr = "^\(abs(exp))"
-                    }
-                    
-                    computedSymbol += "\(prefix)\(symbol)\(expStr)"
+                guard exp != 0 else {
+                    break
                 }
+                
+                var prefix = ""
+                if computedSymbol == "" { // first symbol
+                    if exp >= 0 {
+                        prefix = ""
+                    } else {
+                        prefix = "1/"
+                    }
+                } else {
+                    if exp >= 0 {
+                        prefix = "*"
+                    } else {
+                        prefix = "/"
+                    }
+                }
+                let symbol = subUnit.symbol
+                var expStr = ""
+                if abs(exp) > 1 {
+                    expStr = "^\(abs(exp))"
+                }
+                
+                computedSymbol += "\(prefix)\(symbol)\(expStr)"
             }
             return computedSymbol
         }
@@ -91,42 +83,15 @@ public struct Unit {
     
     /// Multiply one unit by another and return the resulting unit
     public static func * (lhs: Unit, rhs: Unit) -> Unit {
-        var subUnits: [DefinedUnit: Int] = [:]
+        let lhsUnits = lhs.subUnits
+        let rhsUnits = rhs.subUnits
         
-        switch lhs.type {
-        case .defined(let lhsDefined):
-            subUnits[lhsDefined] = 1
-        case .composite(let lhsSubUnits):
-            for (lhsSubUnit, lhsExp) in lhsSubUnits {
-                subUnits[lhsSubUnit] = lhsExp
-            }
+        var subUnits = lhsUnits
+        subUnits.merge(rhsUnits) { lhsUnitExp, rhsUnitExp in
+            lhsUnitExp + rhsUnitExp
         }
-        
-        switch rhs.type {
-        case .defined(let rhsDefined):
-            if let lhsExp = subUnits[rhsDefined] {
-                let newExp = lhsExp + 1
-                if newExp == 0 {
-                    subUnits.removeValue(forKey: rhsDefined)
-                } else {
-                    subUnits[rhsDefined] = newExp
-                }
-            } else {
-                subUnits[rhsDefined] = 1
-            }
-        case .composite(let rhsSubUnits):
-            for (rhsSubUnit, rhsExp) in rhsSubUnits {
-                if let lhsExp = subUnits[rhsSubUnit] {
-                    let newExp = lhsExp + rhsExp
-                    if newExp == 0 {
-                        subUnits.removeValue(forKey: rhsSubUnit)
-                    } else {
-                        subUnits[rhsSubUnit] = newExp
-                    }
-                } else {
-                    subUnits[rhsSubUnit] = rhsExp
-                }
-            }
+        subUnits = subUnits.filter { (key, value) in
+            value != 0
         }
         
         return Unit(composedOf: subUnits)
@@ -134,43 +99,21 @@ public struct Unit {
     
     /// Divide one unit by another and return the resulting unit
     public static func / (lhs: Unit, rhs: Unit) -> Unit {
-        var subUnits: [DefinedUnit: Int] = [:]
+        let lhsUnits = lhs.subUnits
+        let rhsUnits = rhs.subUnits
         
-        switch lhs.type {
-        case .defined(let lhsDefined):
-            subUnits[lhsDefined] = 1
-        case .composite(let lhsSubUnits):
-            for (lhsSubUnit, lhsExp) in lhsSubUnits {
-                subUnits[lhsSubUnit] = lhsExp
-            }
+        let negRhsUnits = rhsUnits.mapValues { rhsUnitExp in
+            -1 * rhsUnitExp
         }
         
-        switch rhs.type {
-        case .defined(let rhsDefined):
-            if let lhsExp = subUnits[rhsDefined] {
-                let newExp = lhsExp - 1
-                if newExp == 0 {
-                    subUnits.removeValue(forKey: rhsDefined)
-                } else {
-                    subUnits[rhsDefined] = newExp
-                }
-            } else {
-                subUnits[rhsDefined] = -1
-            }
-        case .composite(let rhsSubUnits):
-            for (rhsSubUnit, rhsExp) in rhsSubUnits {
-                if let lhsExp = subUnits[rhsSubUnit] {
-                    let newExp = lhsExp - rhsExp
-                    if newExp == 0 {
-                        subUnits.removeValue(forKey: rhsSubUnit)
-                    } else {
-                        subUnits[rhsSubUnit] = newExp
-                    }
-                } else {
-                    subUnits[rhsSubUnit] = -1 * rhsExp
-                }
-            }
+        var subUnits = lhsUnits
+        subUnits.merge(negRhsUnits) { lhsUnitExp, negRhsUnitExp in
+            lhsUnitExp + negRhsUnitExp
         }
+        subUnits = subUnits.filter { (key, value) in
+            value != 0
+        }
+        
         return Unit(composedOf: subUnits)
     }
     
@@ -232,6 +175,17 @@ public struct Unit {
     
     // MARK: - Private helpers
     
+    /// Returns a dictionary that represents the unique defined units and their exponents. For a
+    /// composite unit, this is simply the `subUnits`, but for a defined unit, this is `[self: 1]`
+    private var subUnits: [DefinedUnit: Int] {
+        switch self.type {
+        case .defined(let defined):
+            return [defined: 1]
+        case .composite(let subUnits):
+            return subUnits
+        }
+    }
+    
     /// Sort units into positive and negative groups, each going from smallest to largest exponent,
     /// with each in alphabetical order by symbol
     private func sortedUnits() -> [(DefinedUnit, Int)] {
@@ -267,16 +221,31 @@ public struct Unit {
     }
 }
 
-extension Unit: CustomStringConvertible {
-    public var description: String {
-        return symbol
+extension Unit: Equatable {
+    public static func == (lhs: Unit, rhs: Unit) -> Bool {
+        switch lhs.type {
+        case .defined(let lhsDefined):
+            switch rhs.type {
+            case .defined(let rhsDefined):
+                // TODO: This assumes symbol is unique. Need registry to guarantee.
+                return lhsDefined.symbol == rhsDefined.symbol
+            case .composite(_):
+                return false
+            }
+        case .composite(let lhsSubUnits):
+            switch rhs.type {
+            case .defined(_):
+                return false
+            case .composite(let rhsSubUnits):
+                return lhsSubUnits == rhsSubUnits
+            }
+        }
     }
 }
 
-extension Unit: Equatable {
-    public static func == (lhs: Unit, rhs: Unit) -> Bool {
-        // TODO: Consider if there's a more explicit way to compute equality
-        return lhs.symbol == rhs.symbol
+extension Unit: CustomStringConvertible {
+    public var description: String {
+        return symbol
     }
 }
 
@@ -287,14 +256,12 @@ private enum UnitType {
 }
 
 /// A predefined unit, which has quantity, symbol, and conversion information
-private struct DefinedUnit {
+private struct DefinedUnit: Hashable {
     let dimension: [Quantity: Int]
     let symbol: String
     let coefficient: Double
     let constant: Double
-}
-
-extension DefinedUnit: Hashable {
+    
     // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
     public func hash(into hasher: inout Hasher) {
         hasher.combine(symbol)
