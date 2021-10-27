@@ -4,6 +4,17 @@ public struct Unit {
     
     private let type: UnitType
     
+    /// Create a new from the subUnit map.
+    /// - parameter composedOf: A dictionary of defined units and exponents. If this dictionary only has one value with an exponent of one,
+    /// we return it as that defined unit.
+    private init(composedOf subUnits: [DefinedUnit: Int]) {
+        if subUnits.count == 1, let subUnit = subUnits.first, subUnit.value == 1 {
+            self.type = .defined(subUnit.key)
+        } else {
+            self.type = .composite(subUnits)
+        }
+    }
+    
     /// Define a new Unit
     /// - parameter symbol: The string symbol of the unit. This should be globally unique
     /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
@@ -11,12 +22,6 @@ public struct Unit {
     /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
     public init(symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
         self.type = .defined(DefinedUnit(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant))
-    }
-    
-    /// Create a new composite Unit
-    /// - parameter composedOf: A list of units and exponents that define this composite unit. The units used as keys must be defined units.
-    private init(composedOf: [DefinedUnit: Int]) {
-        self.type = .composite(composedOf)
     }
     
     /// Return the dimension of the unit in terms of base quanties
@@ -129,6 +134,7 @@ public struct Unit {
                 subExp * raiseTo
             }
         }
+        
         return Unit(composedOf: newSubUnits)
     }
     

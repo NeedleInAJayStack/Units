@@ -2,6 +2,13 @@ import XCTest
 @testable import Units
 
 final class UnitTests: XCTestCase {
+    func testEqual() throws {
+        XCTAssertEqual(UnitLength.meter, UnitLength.meter)
+        XCTAssertNotEqual(UnitLength.meter, UnitLength.foot)
+        XCTAssertEqual(UnitLength.meter * UnitTime.second / UnitTime.second, UnitLength.meter)
+        XCTAssertNotEqual(UnitForce.newton, UnitMass.kilogram * UnitLength.meter / UnitTime.second.pow(2))
+    }
+    
     func testIsDimensionallyEquivalent() throws {
         XCTAssertTrue(
             UnitLength.meter.isDimensionallyEquivalent(to: UnitLength.meter)
