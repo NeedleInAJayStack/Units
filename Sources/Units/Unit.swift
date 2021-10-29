@@ -10,6 +10,7 @@ public struct Unit {
     /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
     /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
     public init(symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
+        // TODO: Should we allow people to create their own units, or define them as extensions?
         self.type = .defined(DefinedUnit(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant))
     }
     
