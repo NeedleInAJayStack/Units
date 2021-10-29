@@ -173,4 +173,20 @@ final class MeasurementTests: XCTestCase {
                 .convert(to: .meter * .fahrenheit)
         )
     }
+    
+    func testCustomUnit() throws {
+        XCTAssertEqual(
+            try Measurement(value: 25, unit: .centifoot).convert(to: .foot),
+            Measurement(value: 0.25, unit: .foot)
+        )
+    }
+}
+
+// Unit extended with custom units
+extension Units.Unit {
+    public static var centifoot = Unit (
+        symbol: "cft",
+        dimension: [.Length: 1],
+        coefficient: 0.003048
+    )
 }
