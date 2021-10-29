@@ -155,7 +155,7 @@ public struct Unit {
             var totalCoefficient = 1.0
             for (subUnit, exponent) in subUnits {
                 guard subUnit.constant == 0 else { // subUnit must not have constant
-                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
+                    throw UnitError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
                 totalCoefficient *= Foundation.pow(subUnit.coefficient, Double(exponent))
             }
@@ -172,7 +172,7 @@ public struct Unit {
             var totalCoefficient = 1.0
             for (subUnit, exponent) in subUnits {
                 guard subUnit.constant == 0 else { // subUnit must not have constant
-                    throw UnitsError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
+                    throw UnitError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
                 totalCoefficient *= Foundation.pow(subUnit.coefficient, Double(exponent))
             }

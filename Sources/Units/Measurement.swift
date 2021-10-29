@@ -26,7 +26,7 @@ public struct Measurement: Equatable {
     /// be dimensionally equivalent to this measurement's unit.
     public func convert(to newUnit: Unit) throws -> Measurement {
         guard unit.isDimensionallyEquivalent(to: newUnit) else {
-            throw UnitsError.incompatibleUnits(message: "Cannot convert \(unit) to \(newUnit)")
+            throw UnitError.incompatibleUnits(message: "Cannot convert \(unit) to \(newUnit)")
         }
         let baseValue = try self.unit.toBaseUnit(self.value)
         let convertedValue = try newUnit.fromBaseUnit(baseValue)
@@ -35,7 +35,7 @@ public struct Measurement: Equatable {
     
     public static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit == rhs.unit else {
-            throw UnitsError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
+            throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
         }
         
         return Measurement(
@@ -46,7 +46,7 @@ public struct Measurement: Equatable {
     
     public static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit == rhs.unit else {
-            throw UnitsError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
+            throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
         }
         
         return Measurement(
