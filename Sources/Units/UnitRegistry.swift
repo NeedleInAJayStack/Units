@@ -5,14 +5,15 @@
 // - Information Storage
 //
 
-public class UnitAcceleration {
-    public static var gravitational = Unit (
+extension Unit {
+    // Acceleration
+    public static var gravitationalAcceleration = Unit (
         symbol: "g",
         dimension: [.Length: 1, .Time: -2],
         coefficient: 9.80665
     )
-}
-public class UnitArea {
+    
+    // Area
     public static var acre = Unit (
         symbol: "ac",
         dimension: [.Length: 2],
@@ -28,14 +29,14 @@ public class UnitArea {
         dimension: [.Length: 2],
         coefficient: 10000
     )
-}
-public class UnitCharge {
+    
+    // Charge
     public static var coulomb = Unit (
         symbol: "C",
         dimension: [.Current: 1, .Time: 1]
     )
-}
-public class UnitCurrent {
+    
+    // Current
     public static var ampere = Unit (
         symbol: "A",
         dimension: [.Current: 1]
@@ -60,8 +61,8 @@ public class UnitCurrent {
         dimension: [.Current: 1],
         coefficient: 1e6
     )
-}
-public class UnitElectricPotentialDifference {
+    
+    // Electric Potential Difference
     public static var volt = Unit (
         symbol: "V",
         dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1]
@@ -86,8 +87,8 @@ public class UnitElectricPotentialDifference {
         dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1],
         coefficient: 1e6
     )
-}
-public class UnitElectricResistance {
+    
+    // Resistance
     public static var ohm = Unit (
         symbol: "Ω",
         dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2]
@@ -112,8 +113,8 @@ public class UnitElectricResistance {
         dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
         coefficient: 1e6
     )
-}
-public class UnitEnergy {
+    
+    // Energy
     public static var joule = Unit (
         symbol: "J",
         dimension: [.Mass: 1, .Length: 2, .Time: -2]
@@ -133,14 +134,14 @@ public class UnitEnergy {
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
         coefficient: 4184
     )
-}
-public class UnitForce {
+    
+    // Force
     public static var newton = Unit (
         symbol: "N",
         dimension: [.Mass: 1, .Length: 1, .Time: -2]
     )
-}
-public class UnitFrequency {
+    
+    // Frequency
     public static var hertz = Unit (
         symbol: "Hz",
         dimension: [.Time: -1]
@@ -180,14 +181,14 @@ public class UnitFrequency {
         dimension: [.Time: -1],
         coefficient: 1e12
     )
-}
-public class UnitIlluminance {
+    
+    // Illuminance
     public static var lux = Unit (
         symbol: "lx",
         dimension: [.LuminousIntensity: 1, .Length: -2]
     )
-}
-public class UnitLength {
+    
+    // Length
     public static var meter = Unit (
         symbol: "m",
         dimension: [.Length: 1]
@@ -292,14 +293,14 @@ public class UnitLength {
         dimension: [.Length: 1],
         coefficient: 3.0856775814913673e16
     )
-}
-public class UnitLuminousIntensity {
+    
+    // Luminous Intensity
     public static var candela = Unit (
         symbol: "cd",
         dimension: [.LuminousIntensity: 1]
     )
-}
-public class UnitMass {
+    
+    // Mass
     public static var kilogram = Unit (
         symbol: "kg",
         dimension: [.Mass: 1]
@@ -379,8 +380,8 @@ public class UnitMass {
         dimension: [.Mass: 1],
         coefficient: 14.5939
     )
-}
-public class UnitPower {
+    
+    // Power
     public static var watt = Unit (
         symbol: "W",
         dimension: [.Mass: 1, .Length: 2, .Time: -3]
@@ -435,8 +436,8 @@ public class UnitPower {
         dimension: [.Mass: 1, .Length: 2, .Time: -3],
         coefficient: 745.6998715822702
     )
-}
-public class UnitPressure {
+    
+    // Pressure
     public static var pascal = Unit (
         symbol: "Pa",
         dimension: [.Mass: 1, .Length: -1, .Time: -2]
@@ -481,15 +482,15 @@ public class UnitPressure {
         dimension: [.Mass: 1, .Length: -1, .Time: -2],
         coefficient: 133.322387415
     )
-}
-public class UnitSpeed {
+    
+    // Speed
     public static var knots = Unit (
         symbol: "knot",
         dimension: [.Length: 1, .Time: -1],
         coefficient: 0.514444
     )
-}
-public class UnitTemperature {
+    
+    // Temperature
     public static var kelvin = Unit (
         symbol: "K",
         dimension: [.Temperature: 1]
@@ -510,8 +511,8 @@ public class UnitTemperature {
         dimension: [.Temperature: 1],
         coefficient: 5.0/9.0
     )
-}
-public class UnitTime {
+    
+    // Time
     public static var second = Unit (
         symbol: "s",
         dimension: [.Time: 1]
@@ -526,8 +527,8 @@ public class UnitTime {
         dimension: [.Time: 1],
         coefficient: 3600
     )
-}
-public class UnitVolume {
+    
+    // Volume
     // Base unit is meter^3
     public static var liter = Unit (
         symbol: "L",

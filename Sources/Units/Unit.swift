@@ -4,6 +4,15 @@ public struct Unit {
     
     private let type: UnitType
     
+    /// Define a new Unit
+    /// - parameter symbol: The string symbol of the unit.
+    /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
+    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
+    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
+    public init(symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
+        self.type = .defined(DefinedUnit(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant))
+    }
+    
     /// Create a new from the subUnit map.
     /// - parameter composedOf: A dictionary of defined units and exponents. If this dictionary only has one value with an exponent of one,
     /// we return it as that defined unit.
@@ -13,15 +22,6 @@ public struct Unit {
         } else {
             self.type = .composite(subUnits)
         }
-    }
-    
-    /// Define a new Unit
-    /// - parameter symbol: The string symbol of the unit. This should be globally unique
-    /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
-    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
-    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
-    public init(symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
-        self.type = .defined(DefinedUnit(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant))
     }
     
     /// Return the dimension of the unit in terms of base quanties
@@ -233,8 +233,7 @@ extension Unit: Equatable {
         case .defined(let lhsDefined):
             switch rhs.type {
             case .defined(let rhsDefined):
-                // TODO: This assumes symbol is unique. Need registry to guarantee.
-                return lhsDefined.symbol == rhsDefined.symbol
+                return lhsDefined == rhsDefined
             case .composite(_):
                 return false
             }
@@ -267,9 +266,4 @@ private struct DefinedUnit: Hashable {
     let symbol: String
     let coefficient: Double
     let constant: Double
-    
-    // TODO: We assume that symbol is completely unique. Perhaps create a unit registry to ensure this?
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(symbol)
-    }
 }
