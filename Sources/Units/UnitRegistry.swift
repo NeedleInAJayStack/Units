@@ -1,19 +1,46 @@
 // TODO: Make more
-// - Angle
 // - Concentration Mass
 // - Dispersion
-// - Information Storage
-//
+// - Information Storage: https://developer.apple.com/documentation/foundation/unitinformationstorage
 
 extension Unit {
-    // Acceleration
+    // MARK: Acceleration
+    // Base unit is m/s^2
     public static var gravitationalAcceleration = Unit (
         symbol: "g",
         dimension: [.Length: 1, .Time: -2],
         coefficient: 9.80665
     )
     
-    // Area
+    // MARK: Amount
+    public static var mole = Unit (
+        symbol: "mol",
+        dimension: [.Amount: 1]
+    )
+    public static var millimole = Unit (
+        symbol: "mmol",
+        dimension: [.Amount: 1],
+        coefficient: 0.001
+    )
+    public static var particle = Unit (
+        symbol: "particle",
+        dimension: [.Amount: 1],
+        coefficient: 6.02214076E23
+    )
+    
+    // MARK: Angle
+    public static var radian = Unit (
+        symbol: "rad",
+        dimension: [.Angle: 1]
+    )
+    public static var degree = Unit (
+        symbol: "°",
+        dimension: [.Angle: 1],
+        coefficient: 180 / Double.pi
+    )
+    
+    // MARK: Area
+    // Base unit is m^2
     public static var acre = Unit (
         symbol: "ac",
         dimension: [.Length: 2],
@@ -30,13 +57,19 @@ extension Unit {
         coefficient: 10000
     )
     
-    // Charge
+    // MARK: Capacitance
+    public static var farad = Unit (
+        symbol: "F",
+        dimension: [.Current: 2, .Time: 4, .Length: -2, .Mass: -1]
+    )
+    
+    // MARK: Charge
     public static var coulomb = Unit (
         symbol: "C",
         dimension: [.Current: 1, .Time: 1]
     )
     
-    // Current
+    // MARK: Current
     public static var ampere = Unit (
         symbol: "A",
         dimension: [.Current: 1]
@@ -62,7 +95,38 @@ extension Unit {
         coefficient: 1e6
     )
     
-    // Electric Potential Difference
+    // MARK: Data
+    public static var bit = Unit (
+        symbol: "bit",
+        dimension: [.Data: 1]
+    )
+    public static var byte = Unit (
+        symbol: "byte",
+        dimension: [.Data: 1],
+        coefficient: 8
+    )
+    public static var kilobyte = Unit (
+        symbol: "kB",
+        dimension: [.Data: 1],
+        coefficient: 8000
+    )
+    public static var megabyte = Unit (
+        symbol: "MB",
+        dimension: [.Data: 1],
+        coefficient: 8e6
+    )
+    public static var gigabyte = Unit (
+        symbol: "GB",
+        dimension: [.Data: 1],
+        coefficient: 8e9
+    )
+    public static var petabyte = Unit (
+        symbol: "PB",
+        dimension: [.Data: 1],
+        coefficient: 8e12
+    )
+    
+    // MARK: Electric Potential Difference
     public static var volt = Unit (
         symbol: "V",
         dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1]
@@ -88,33 +152,7 @@ extension Unit {
         coefficient: 1e6
     )
     
-    // Resistance
-    public static var ohm = Unit (
-        symbol: "Ω",
-        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2]
-    )
-    public static var microohm = Unit (
-        symbol: "μΩ",
-        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
-        coefficient: 1e-6
-    )
-    public static var milliohm = Unit (
-        symbol: "mΩ",
-        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
-        coefficient: 0.001
-    )
-    public static var kiloohm = Unit (
-        symbol: "kΩ",
-        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
-        coefficient: 1000
-    )
-    public static var megaohm = Unit (
-        symbol: "MΩ",
-        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
-        coefficient: 1e6
-    )
-    
-    // Energy
+    // MARK: Energy
     public static var joule = Unit (
         symbol: "J",
         dimension: [.Mass: 1, .Length: 2, .Time: -2]
@@ -134,14 +172,44 @@ extension Unit {
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
         coefficient: 4184
     )
+    public static var btu = Unit (
+        symbol: "BTU",
+        dimension: [.Mass: 1, .Length: 2, .Time: -2],
+        coefficient: 1054.35
+    )
+    public static var kilobtu = Unit (
+        symbol: "kBTU",
+        dimension: [.Mass: 1, .Length: 2, .Time: -2],
+        coefficient: 1.05435E6
+    )
+    public static var megabtu = Unit (
+        symbol: "MBTU",
+        dimension: [.Mass: 1, .Length: 2, .Time: -2],
+        coefficient: 1.05435E9
+    )
+    public static var therm = Unit (
+        symbol: "therm",
+        dimension: [.Mass: 1, .Length: 2, .Time: -2],
+        coefficient: 1.05435E8
+    )
+    public static var electronVolt = Unit (
+        symbol: "eV",
+        dimension: [.Mass: 1, .Length: 2, .Time: -2],
+        coefficient: 1.602176634e-19
+    )
     
-    // Force
+    // MARK: Force
     public static var newton = Unit (
         symbol: "N",
         dimension: [.Mass: 1, .Length: 1, .Time: -2]
     )
+    public static var poundForce = Unit (
+        symbol: "lbf",
+        dimension: [.Mass: 1, .Length: 1, .Time: -2],
+        coefficient: 4.448222
+    )
     
-    // Frequency
+    // MARK: Frequency
     public static var hertz = Unit (
         symbol: "Hz",
         dimension: [.Time: -1]
@@ -182,13 +250,29 @@ extension Unit {
         coefficient: 1e12
     )
     
-    // Illuminance
+    // MARK: Illuminance
     public static var lux = Unit (
         symbol: "lx",
         dimension: [.LuminousIntensity: 1, .Length: -2]
     )
+    public static var footCandle = Unit (
+        symbol: "fc",
+        dimension: [.LuminousIntensity: 1, .Length: -2],
+        coefficient: 10.76
+    )
+    public static var phot = Unit (
+        symbol: "phot",
+        dimension: [.LuminousIntensity: 1, .Length: -2],
+        coefficient: 10000
+    )
     
-    // Length
+    // MARK: Inductance
+    public static var henry = Unit (
+        symbol: "H",
+        dimension: [.Length: 2, .Mass: 1, .Current: -2]
+    )
+    
+    // MARK: Length
     public static var meter = Unit (
         symbol: "m",
         dimension: [.Length: 1]
@@ -294,13 +378,25 @@ extension Unit {
         coefficient: 3.0856775814913673e16
     )
     
-    // Luminous Intensity
+    // MARK: Luminous Intensity
     public static var candela = Unit (
         symbol: "cd",
         dimension: [.LuminousIntensity: 1]
     )
     
-    // Mass
+    // MARK: Magnetic Flux
+    public static var weber = Unit (
+        symbol: "Wb",
+        dimension: [.Mass: 1, .Length: 2, .Time: -2, .Current: -1]
+    )
+    
+    // MARK: Magnetic Flux Density
+    public static var tesla = Unit (
+        symbol: "T",
+        dimension: [.Mass: 1, .Time: -2, .Current: -1]
+    )
+    
+    // MARK: Mass
     public static var kilogram = Unit (
         symbol: "kg",
         dimension: [.Mass: 1]
@@ -381,7 +477,7 @@ extension Unit {
         coefficient: 14.5939
     )
     
-    // Power
+    // MARK: Power
     public static var watt = Unit (
         symbol: "W",
         dimension: [.Mass: 1, .Length: 2, .Time: -3]
@@ -436,8 +532,13 @@ extension Unit {
         dimension: [.Mass: 1, .Length: 2, .Time: -3],
         coefficient: 745.6998715822702
     )
+    public static var tonRefrigeration = Unit (
+        symbol: "TR",
+        dimension: [.Mass: 1, .Length: 2, .Time: -3],
+        coefficient: 3500
+    )
     
-    // Pressure
+    // MARK: Pressure
     public static var pascal = Unit (
         symbol: "Pa",
         dimension: [.Mass: 1, .Length: -1, .Time: -2]
@@ -472,25 +573,70 @@ extension Unit {
         dimension: [.Mass: 1, .Length: -1, .Time: -2],
         coefficient: 100
     )
-    public static var inchOfMercury = Unit (
-        symbol: "inhg",
+    public static var atmosphere = Unit (
+        symbol: "atm",
         dimension: [.Mass: 1, .Length: -1, .Time: -2],
-        coefficient: 3386.389
+        coefficient: 101317.1
     )
     public static var millimeterOfMercury = Unit (
         symbol: "mmhg",
         dimension: [.Mass: 1, .Length: -1, .Time: -2],
         coefficient: 133.322387415
     )
-    
-    // Speed
-    public static var knots = Unit (
-        symbol: "knot",
-        dimension: [.Length: 1, .Time: -1],
-        coefficient: 0.514444
+    public static var centimeterOfMercury = Unit (
+        symbol: "mmhg",
+        dimension: [.Mass: 1, .Length: -1, .Time: -2],
+        coefficient: 1333.22387415
+    )
+    public static var inchOfMercury = Unit (
+        symbol: "inhg",
+        dimension: [.Mass: 1, .Length: -1, .Time: -2],
+        coefficient: 3386.389
+    )
+    public static var centimeterOfWater = Unit (
+        symbol: "mmH₂0",
+        dimension: [.Mass: 1, .Length: -1, .Time: -2],
+        coefficient: 98.0665
+    )
+    public static var inchOfWater = Unit (
+        symbol: "inH₂0",
+        dimension: [.Mass: 1, .Length: -1, .Time: -2],
+        coefficient: 249.082
     )
     
-    // Temperature
+    // MARK: Resistance
+    public static var ohm = Unit (
+        symbol: "Ω",
+        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2]
+    )
+    public static var microohm = Unit (
+        symbol: "μΩ",
+        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
+        coefficient: 1e-6
+    )
+    public static var milliohm = Unit (
+        symbol: "mΩ",
+        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
+        coefficient: 0.001
+    )
+    public static var kiloohm = Unit (
+        symbol: "kΩ",
+        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
+        coefficient: 1000
+    )
+    public static var megaohm = Unit (
+        symbol: "MΩ",
+        dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
+        coefficient: 1e6
+    )
+    
+    // MARK: Solid Angle
+    public static var steradian = Unit (
+        symbol: "sr",
+        dimension: [.Angle: 2]
+    )
+    
+    // MARK: Temperature
     public static var kelvin = Unit (
         symbol: "K",
         dimension: [.Temperature: 1]
@@ -512,10 +658,25 @@ extension Unit {
         coefficient: 5.0/9.0
     )
     
-    // Time
+    // MARK: Time
     public static var second = Unit (
         symbol: "s",
         dimension: [.Time: 1]
+    )
+    public static var nanosecond = Unit (
+        symbol: "ns",
+        dimension: [.Time: 1],
+        coefficient: 1E-9
+    )
+    public static var microsecond = Unit (
+        symbol: "μs",
+        dimension: [.Time: 1],
+        coefficient: 1E-6
+    )
+    public static var millisecond = Unit (
+        symbol: "ms",
+        dimension: [.Time: 1],
+        coefficient: 0.001
     )
     public static var minute = Unit (
         symbol: "min",
@@ -528,7 +689,15 @@ extension Unit {
         coefficient: 3600
     )
     
-    // Volume
+    // MARK: Velocity
+    // Base unit is m/s
+    public static var knots = Unit (
+        symbol: "knot",
+        dimension: [.Length: 1, .Time: -1],
+        coefficient: 0.514444
+    )
+    
+    // MARK: Volume
     // Base unit is meter^3
     public static var liter = Unit (
         symbol: "L",
