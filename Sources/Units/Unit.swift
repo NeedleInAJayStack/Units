@@ -1,17 +1,12 @@
 import Foundation
 
+// TODO: Add Serialize/Deserialize support based on Symbol
 public struct Unit {
     
     private let type: UnitType
     
-    /// Define a new Unit
-    /// - parameter symbol: The string symbol of the unit.
-    /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
-    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
-    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
-    public init(symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
-        // TODO: Should we allow people to create their own units, or define them as extensions?
-        self.type = .defined(DefinedUnit(dimension: dimension, symbol: symbol, coefficient: coefficient, constant: constant))
+    init(definedBy: DefinedUnit) {
+        self.type = .defined(definedBy)
     }
     
     /// Create a new from the subUnit map.
@@ -261,10 +256,25 @@ private enum UnitType {
     case composite([DefinedUnit: Int])
 }
 
-/// A predefined unit, which has quantity, symbol, and conversion information
-private struct DefinedUnit: Hashable {
-    let dimension: [Quantity: Int]
+/// A predefined unit, which has name, quantity, symbol, and conversion information
+/// These should all be stored in the UnitRegistry, not directly created
+struct DefinedUnit: Hashable {
+    let name: String
     let symbol: String
+    let dimension: [Quantity: Int]
     let coefficient: Double
     let constant: Double
+    
+    /// Define a new Unit
+    /// - parameter symbol: The string symbol of the unit.
+    /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
+    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
+    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
+    public init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
+        self.name = name
+        self.symbol = symbol
+        self.dimension = dimension
+        self.coefficient = coefficient
+        self.constant = constant
+    }
 }
