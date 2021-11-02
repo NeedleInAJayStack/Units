@@ -96,6 +96,43 @@ final class UnitTests: XCTestCase {
         )
     }
     
+    func testName() throws {
+        XCTAssertEqual(
+            Unit.meter.name,
+            "meter"
+        )
+        
+        XCTAssertEqual(
+            (Unit.meter / Unit.second).name,
+            "meter / second"
+        )
+        
+        XCTAssertEqual(
+            (Unit.meter * Unit.foot / Unit.second).name,
+            "foot * meter / second"
+        )
+        
+        XCTAssertEqual(
+            (Unit.meter * Unit.meter / Unit.second).name,
+            "meter^2 / second"
+        )
+        
+        XCTAssertEqual(
+            (Unit.meter / Unit.second / Unit.foot).name,
+            "meter / foot / second"
+        )
+        
+        XCTAssertEqual(
+            (Unit.meter / (Unit.second * Unit.foot)).name,
+            "meter / foot / second"
+        )
+        
+        XCTAssertEqual(
+            (Unit.meter / Unit.second.pow(2)).name,
+            "meter / second^2"
+        )
+    }
+    
     func testDimension() throws {
         XCTAssertEqual(
             Unit.meter.dimension,

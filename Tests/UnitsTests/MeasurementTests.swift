@@ -172,10 +172,9 @@ final class MeasurementTests: XCTestCase {
             try Measurement(value: 25, unit: .meter * .celsius)
                 .convert(to: .meter * .fahrenheit)
         )
-    }
-    
-    func testCustomUnit() throws {
-        UnitRegistry.instance.addUnit(
+        
+        // Test custom defined unit
+        try UnitRegistry.instance.addUnit(
             name: "centifoot",
             symbol: "cft",
             dimension: [.Length: 1],

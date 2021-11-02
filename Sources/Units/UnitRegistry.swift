@@ -1,40 +1,82 @@
+/// UnitRegistry defines a structure that contains all defined units. This ensures
+/// that we are able to parse to and from unit symbol representations.
 class UnitRegistry {
     
     // TODO: Should we eliminate this singleton and make clients keep track?
-    // Singleton access
     static let instance = UnitRegistry()
     
     // Store units as a dictionary based on symbol for fast access
+    // TODO: Change to Unit to avoid creating multiple Units in memory
     private var units: [String: DefinedUnit]
     private init() {
         self.units = [:]
         for defaultUnit in UnitRegistry.defaultUnits {
             // Protect against double-defining symbols
-            if let alreadyDefined = self.units[defaultUnit.symbol] {
-                fatalError("\(alreadyDefined.name) has same symbol as \(defaultUnit.name): \(defaultUnit.symbol)")
+            if self.units[defaultUnit.symbol] != nil {
+                fatalError("Duplicate symbol: \(defaultUnit.symbol)")
             }
             self.units[defaultUnit.symbol] = defaultUnit
         }
     }
     
+    /// Parses a string symbol into a unit. This supports composite units and is able to correspond directly with
+    /// `Unit.symbol`
     public func fromSymbol(_ symbol: String) throws -> Unit {
-        guard let unit = units[symbol] else {
-            throw UnitError.unitNotFound(message: "symbol '\(symbol)' not recognized")
+        if symbol.contains("*") || symbol.contains("/") || symbol.contains("^") {
+            var compositeUnits: [DefinedUnit: Int] = [:]
+            for multSymbol in symbol.split(separator: "*", omittingEmptySubsequences: false) {
+                for (index, divSymbol) in multSymbol.split(separator: "/", omittingEmptySubsequences: false).enumerated() {
+                    let symbolSplit = divSymbol.split(separator: "^", omittingEmptySubsequences: false)
+                    let subSymbol = String(symbolSplit[0])
+                    var exp = 1
+                    if symbolSplit.count == 2 {
+                        guard let expInt = Int(String(symbolSplit[1])) else {
+                            throw UnitError.invalidSymbol(message: "Symbol '^' must be followed by an integer: \(symbol)")
+                        }
+                        exp = expInt
+                    }
+                    if index > 0 {
+                        exp = -1 * exp
+                    }
+                    guard subSymbol != "1" else {
+                        continue
+                    }
+                    guard subSymbol != "" else {
+                        throw UnitError.unitNotFound(message: "Expected subsymbol missing")
+                    }
+                    guard let subUnit = units[subSymbol] else {
+                        throw UnitError.unitNotFound(message: "Symbol '\(subSymbol)' not recognized")
+                    }
+                    compositeUnits[subUnit] = exp
+                }
+            }
+            return Unit(composedOf: compositeUnits)
+        } else {
+            guard let unit = units[symbol] else {
+                throw UnitError.unitNotFound(message: "Symbol '\(symbol)' not recognized")
+            }
+            return Unit(definedBy: unit)
         }
-        return Unit(definedBy: unit)
     }
     
+    /// Define a new unit to add to the registry
+    /// - parameter name: The string name of the unit.
+    /// - parameter symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
+    /// - parameter dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
+    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
+    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
     public func addUnit(
         name: String,
         symbol: String,
         dimension: [Quantity: Int],
         coefficient: Double = 1,
         constant: Double = 0
-    ) {
-        let newUnit = DefinedUnit(name: name, symbol: symbol, dimension: dimension, coefficient: coefficient, constant: constant)
+    ) throws {
+        let newUnit = try DefinedUnit(name: name, symbol: symbol, dimension: dimension, coefficient: coefficient, constant: constant)
         self.units[symbol] = newUnit
     }
     
+    /// Returns all units currently defined by the registry
     public func allUnits() -> [Unit] {
         var allUnits = [Unit]()
         for (_, unit) in units {
@@ -43,30 +85,29 @@ class UnitRegistry {
         return allUnits
     }
     
-    
-    static let defaultUnits: [DefinedUnit] = [
+    private static let defaultUnits: [DefinedUnit] = [
         // MARK: Acceleration
         // Base unit is m/s^2
-        DefinedUnit (
-            name: "gravitationalAcceleration",
+        try! DefinedUnit(
+            name: "standardGravity",
             symbol: "ɡ",
             dimension: [.Length: 1, .Time: -2],
             coefficient: 9.80665
         ),
         
         // MARK: Amount
-        DefinedUnit (
+        try! DefinedUnit(
             name: "mole",
             symbol: "mol",
             dimension: [.Amount: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "millimole",
             symbol: "mmol",
             dimension: [.Amount: 1],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "particle",
             symbol: "particle",
             dimension: [.Amount: 1],
@@ -74,12 +115,12 @@ class UnitRegistry {
         ),
         
         // MARK: Angle
-        DefinedUnit (
+        try! DefinedUnit(
             name: "radian",
             symbol: "rad",
             dimension: [.Angle: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "degree",
             symbol: "°",
             dimension: [.Angle: 1],
@@ -88,19 +129,19 @@ class UnitRegistry {
         
         // MARK: Area
         // Base unit is m^2
-        DefinedUnit (
+        try! DefinedUnit(
             name: "acre",
             symbol: "ac",
             dimension: [.Length: 2],
             coefficient: 4046.8564224
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "are",
             symbol: "a",
             dimension: [.Length: 2],
             coefficient: 100
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "hectare",
             symbol: "ha",
             dimension: [.Length: 2],
@@ -108,44 +149,44 @@ class UnitRegistry {
         ),
         
         // MARK: Capacitance
-        DefinedUnit (
+        try! DefinedUnit(
             name: "farad",
             symbol: "F",
             dimension: [.Current: 2, .Time: 4, .Length: -2, .Mass: -1]
         ),
         
         // MARK: Charge
-        DefinedUnit (
+        try! DefinedUnit(
             name: "coulomb",
             symbol: "C",
             dimension: [.Current: 1, .Time: 1]
         ),
         
         // MARK: Current
-        DefinedUnit (
+        try! DefinedUnit(
             name: "ampere",
             symbol: "A",
             dimension: [.Current: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "microampere",
             symbol: "μA",
             dimension: [.Current: 1],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "milliampere",
             symbol: "mA",
             dimension: [.Current: 1],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kiloampere",
             symbol: "kA",
             dimension: [.Current: 1],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megaampere",
             symbol: "MA",
             dimension: [.Current: 1],
@@ -153,36 +194,36 @@ class UnitRegistry {
         ),
         
         // MARK: Data
-        DefinedUnit (
+        try! DefinedUnit(
             name: "bit",
             symbol: "bit",
             dimension: [.Data: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "byte",
             symbol: "byte",
             dimension: [.Data: 1],
             coefficient: 8
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilobyte",
             symbol: "kB",
             dimension: [.Data: 1],
             coefficient: 8000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megabyte",
             symbol: "MB",
             dimension: [.Data: 1],
             coefficient: 8e6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "gigabyte",
             symbol: "GB",
             dimension: [.Data: 1],
             coefficient: 8e9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "petabyte",
             symbol: "PB",
             dimension: [.Data: 1],
@@ -190,30 +231,30 @@ class UnitRegistry {
         ),
         
         // MARK: Electric Potential Difference
-        DefinedUnit (
+        try! DefinedUnit(
             name: "volt",
             symbol: "V",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "microvolt",
             symbol: "μV",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "millivolt",
             symbol: "mV",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilovolt",
             symbol: "kV",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megavolt",
             symbol: "MV",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1],
@@ -221,54 +262,54 @@ class UnitRegistry {
         ),
         
         // MARK: Energy
-        DefinedUnit (
+        try! DefinedUnit(
             name: "joule",
             symbol: "J",
             dimension: [.Mass: 1, .Length: 2, .Time: -2]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilojoule",
             symbol: "kJ",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "calorie",
             symbol: "cal",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
             coefficient: 4.184
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilocalorie",
             symbol: "kCal",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
             coefficient: 4184
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "btu",
             symbol: "BTU",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
             coefficient: 1054.35
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilobtu",
             symbol: "kBTU",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
             coefficient: 1.05435E6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megabtu",
             symbol: "MBTU",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
             coefficient: 1.05435E9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "therm",
             symbol: "therm",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
             coefficient: 1.05435E8
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "electronVolt",
             symbol: "eV",
             dimension: [.Mass: 1, .Length: 2, .Time: -2],
@@ -276,12 +317,12 @@ class UnitRegistry {
         ),
         
         // MARK: Force
-        DefinedUnit (
+        try! DefinedUnit(
             name: "newton",
             symbol: "N",
             dimension: [.Mass: 1, .Length: 1, .Time: -2]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "poundForce",
             symbol: "lbf",
             dimension: [.Mass: 1, .Length: 1, .Time: -2],
@@ -289,48 +330,48 @@ class UnitRegistry {
         ),
         
         // MARK: Frequency
-        DefinedUnit (
+        try! DefinedUnit(
             name: "hertz",
             symbol: "Hz",
             dimension: [.Time: -1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "nanohertz",
             symbol: "nHz",
             dimension: [.Time: -1],
             coefficient: 1e-9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "microhertz",
             symbol: "μHz",
             dimension: [.Time: -1],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "millihertz",
             symbol: "mHz",
             dimension: [.Time: -1],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilohertz",
             symbol: "kHz",
             dimension: [.Time: -1],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megahertz",
             symbol: "MHz",
             dimension: [.Time: -1],
             coefficient: 1e6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "gigahertz",
             symbol: "GHz",
             dimension: [.Time: -1],
             coefficient: 1e9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "terahertz",
             symbol: "THz",
             dimension: [.Time: -1],
@@ -338,18 +379,18 @@ class UnitRegistry {
         ),
         
         // MARK: Illuminance
-        DefinedUnit (
+        try! DefinedUnit(
             name: "lux",
             symbol: "lx",
             dimension: [.LuminousIntensity: 1, .Length: -2]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "footCandle",
             symbol: "fc",
             dimension: [.LuminousIntensity: 1, .Length: -2],
             coefficient: 10.76
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "phot",
             symbol: "phot",
             dimension: [.LuminousIntensity: 1, .Length: -2],
@@ -357,133 +398,133 @@ class UnitRegistry {
         ),
         
         // MARK: Inductance
-        DefinedUnit (
+        try! DefinedUnit(
             name: "henry",
             symbol: "H",
             dimension: [.Length: 2, .Mass: 1, .Current: -2]
         ),
         
         // MARK: Length
-        DefinedUnit (
+        try! DefinedUnit(
             name: "meter",
             symbol: "m",
             dimension: [.Length: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "picometer",
             symbol: "pm",
             dimension: [.Length: 1],
             coefficient: 1e-12
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "nanoometer",
             symbol: "nm",
             dimension: [.Length: 1],
             coefficient: 1e-9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "micrometer",
             symbol: "μm",
             dimension: [.Length: 1],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "millimeter",
             symbol: "mm",
             dimension: [.Length: 1],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "centimeter",
             symbol: "cm",
             dimension: [.Length: 1],
             coefficient: 0.01
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "decameter",
             symbol: "dm",
             dimension: [.Length: 1],
             coefficient: 10
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "hectometer",
             symbol: "hm",
             dimension: [.Length: 1],
             coefficient: 100
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilometer",
             symbol: "km",
             dimension: [.Length: 1],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megameter",
             symbol: "Mm",
             dimension: [.Length: 1],
             coefficient: 1e6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "inch",
             symbol: "in",
             dimension: [.Length: 1],
             coefficient: 0.0254
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "foot",
             symbol: "ft",
             dimension: [.Length: 1],
             coefficient: 0.3048
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "yard",
             symbol: "yd",
             dimension: [.Length: 1],
             coefficient: 0.9144
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "mile",
             symbol: "mi",
             dimension: [.Length: 1],
             coefficient: 1609.344
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "scandanavianMile",
             symbol: "smi",
             dimension: [.Length: 1],
             coefficient: 10000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "nauticalMile",
             symbol: "NM",
             dimension: [.Length: 1],
             coefficient: 1852
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "fathom",
             symbol: "fathom",
             dimension: [.Length: 1],
             coefficient: 1.8288
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "furlong",
             symbol: "furlong",
             dimension: [.Length: 1],
             coefficient: 201.168
         ),
-        DefinedUnit (
-            name: "astronomicalDefinedUnit",
+        try! DefinedUnit(
+            name: "astronomicalUnit",
             symbol: "au",
             dimension: [.Length: 1],
             coefficient: 1.495978707e11
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "lightyear",
             symbol: "ly",
             dimension: [.Length: 1],
             coefficient: 9.4607304725808e15
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "parsec",
             symbol: "pc",
             dimension: [.Length: 1],
@@ -491,117 +532,117 @@ class UnitRegistry {
         ),
         
         // MARK: Luminous Intensity
-        DefinedUnit (
+        try! DefinedUnit(
             name: "candela",
             symbol: "cd",
             dimension: [.LuminousIntensity: 1]
         ),
         
         // MARK: Magnetic Flux
-        DefinedUnit (
+        try! DefinedUnit(
             name: "weber",
             symbol: "Wb",
             dimension: [.Mass: 1, .Length: 2, .Time: -2, .Current: -1]
         ),
         
         // MARK: Magnetic Flux Density
-        DefinedUnit (
+        try! DefinedUnit(
             name: "tesla",
             symbol: "T",
             dimension: [.Mass: 1, .Time: -2, .Current: -1]
         ),
         
         // MARK: Mass
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilogram",
             symbol: "kg",
             dimension: [.Mass: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "picogram",
             symbol: "pg",
             dimension: [.Mass: 1],
             coefficient: 1e-15
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "nanogram",
             symbol: "ng",
             dimension: [.Mass: 1],
             coefficient: 1e-12
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "microgram",
             symbol: "μg",
             dimension: [.Mass: 1],
             coefficient: 1e-9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "milligram",
             symbol: "mg",
             dimension: [.Mass: 1],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "centigram",
             symbol: "cg",
             dimension: [.Mass: 1],
             coefficient: 0.00001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "decigram",
             symbol: "dg",
             dimension: [.Mass: 1],
             coefficient: 0.0001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "gram",
             symbol: "g",
             dimension: [.Mass: 1],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "metricTon",
             symbol: "t",
             dimension: [.Mass: 1],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "carat",
             symbol: "ct",
             dimension: [.Mass: 1],
             coefficient: 0.0002
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "ounce",
             symbol: "oz",
             dimension: [.Mass: 1],
             coefficient: 0.028349523125
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "pound",
             symbol: "lb",
             dimension: [.Mass: 1],
             coefficient: 0.45359237
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "stone",
             symbol: "st",
             dimension: [.Mass: 1],
             coefficient: 6.35029318
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "shortTon",
             symbol: "ton",
             dimension: [.Mass: 1],
             coefficient: 907.18474
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "troyOunces",
             symbol: "troyOunces",
             dimension: [.Mass: 1],
             coefficient: 0.0311034768
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "slug",
             symbol: "slug",
             dimension: [.Mass: 1],
@@ -609,72 +650,72 @@ class UnitRegistry {
         ),
         
         // MARK: Power
-        DefinedUnit (
+        try! DefinedUnit(
             name: "watt",
             symbol: "W",
             dimension: [.Mass: 1, .Length: 2, .Time: -3]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "femptowatt",
             symbol: "fW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1e-15
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "picowatt",
             symbol: "pW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1e-12
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "nanowatt",
             symbol: "nW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1e-9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "microwatt",
             symbol: "μW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "milliwatt",
             symbol: "mW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilowatt",
             symbol: "kW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megawatt",
             symbol: "MW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1e6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "gigawatt",
             symbol: "GW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1e9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "terawatt",
             symbol: "TW",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 1e12
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "horsepower",
             symbol: "hp",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
             coefficient: 745.6998715822702
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "tonRefrigeration",
             symbol: "TR",
             dimension: [.Mass: 1, .Length: 2, .Time: -3],
@@ -682,78 +723,78 @@ class UnitRegistry {
         ),
         
         // MARK: Pressure
-        DefinedUnit (
+        try! DefinedUnit(
             name: "pascal",
             symbol: "Pa",
             dimension: [.Mass: 1, .Length: -1, .Time: -2]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "hectopascal",
             symbol: "hPa",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 100
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kilopascal",
             symbol: "kPa",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megapascal",
             symbol: "MPa",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 1e6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "gigapascal",
             symbol: "GPa",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 1e9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "bar",
             symbol: "bar",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 100000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "millibar",
             symbol: "mbar",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 100
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "atmosphere",
             symbol: "atm",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 101317.1
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "millimeterOfMercury",
             symbol: "mmhg",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 133.322387415
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "centimeterOfMercury",
             symbol: "cmhg",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 1333.22387415
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "inchOfMercury",
             symbol: "inhg",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 3386.389
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "centimeterOfWater",
             symbol: "cmH₂0",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
             coefficient: 98.0665
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "inchOfWater",
             symbol: "inH₂0",
             dimension: [.Mass: 1, .Length: -1, .Time: -2],
@@ -761,30 +802,30 @@ class UnitRegistry {
         ),
         
         // MARK: Resistance
-        DefinedUnit (
+        try! DefinedUnit(
             name: "ohm",
             symbol: "Ω",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "microohm",
             symbol: "μΩ",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "milliohm",
             symbol: "mΩ",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kiloohm",
             symbol: "kΩ",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megaohm",
             symbol: "MΩ",
             dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
@@ -792,32 +833,32 @@ class UnitRegistry {
         ),
         
         // MARK: Solid Angle
-        DefinedUnit (
+        try! DefinedUnit(
             name: "steradian",
             symbol: "sr",
             dimension: [.Angle: 2]
         ),
         
         // MARK: Temperature
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kelvin",
             symbol: "K",
             dimension: [.Temperature: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "celsius",
             symbol: "°C",
             dimension: [.Temperature: 1],
             constant: 273.15
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "fahrenheit",
             symbol: "°F",
             dimension: [.Temperature: 1],
             coefficient: 5.0/9.0,
             constant: 273.15 - (32 * 5.0/9.0)
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "rankine",
             symbol: "°R",
             dimension: [.Temperature: 1],
@@ -825,36 +866,36 @@ class UnitRegistry {
         ),
         
         // MARK: Time
-        DefinedUnit (
+        try! DefinedUnit(
             name: "second",
             symbol: "s",
             dimension: [.Time: 1]
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "nanosecond",
             symbol: "ns",
             dimension: [.Time: 1],
             coefficient: 1E-9
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "microsecond",
             symbol: "μs",
             dimension: [.Time: 1],
             coefficient: 1E-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "millisecond",
             symbol: "ms",
             dimension: [.Time: 1],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "minute",
             symbol: "min",
             dimension: [.Time: 1],
             coefficient: 60
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "hour",
             symbol: "hr",
             dimension: [.Time: 1],
@@ -863,7 +904,7 @@ class UnitRegistry {
         
         // MARK: Velocity
         // Base unit is m/s
-        DefinedUnit (
+        try! DefinedUnit(
             name: "knots",
             symbol: "knot",
             dimension: [.Length: 1, .Time: -1],
@@ -872,109 +913,109 @@ class UnitRegistry {
         
         // MARK: Volume
         // Base unit is meter^3
-        DefinedUnit (
+        try! DefinedUnit(
             name: "liter",
             symbol: "L",
             dimension: [.Length: 3],
             coefficient: 0.001
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "milliliter",
             symbol: "mL",
             dimension: [.Length: 3],
             coefficient: 1e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "centiliter",
             symbol: "cL",
             dimension: [.Length: 3],
             coefficient: 1e-5
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "deciliter",
             symbol: "dL",
             dimension: [.Length: 3],
             coefficient: 1e-4
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "kiloliter",
             symbol: "kL",
             dimension: [.Length: 3],
             coefficient: 1
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "megaliter",
             symbol: "ML",
             dimension: [.Length: 3],
             coefficient: 1000
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "bushel",
             symbol: "bushel",
             dimension: [.Length: 3],
             coefficient: 0.03523907
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "teaspoon",
             symbol: "tsp",
             dimension: [.Length: 3],
             coefficient: 4.92892159375e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "tablespoon",
             symbol: "tbsp",
             dimension: [.Length: 3],
             coefficient: 14.7867647812e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "fluidOunce",
             symbol: "fl_oz",
             dimension: [.Length: 3],
             coefficient: 29.5735295625e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "cup",
             symbol: "cup",
             dimension: [.Length: 3],
             coefficient: 236.5882365e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "pint",
             symbol: "pt",
             dimension: [.Length: 3],
             coefficient: 473.176473e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "gallon",
             symbol: "gal",
             dimension: [.Length: 3],
             coefficient: 0.003785411784
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "imperialFluidOunce",
             symbol: "ifl_oz",
             dimension: [.Length: 3],
             coefficient: 28.4130625e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "imperialCup",
             symbol: "icup",
             dimension: [.Length: 3],
             coefficient: 197.15686375-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "imperialPint",
             symbol: "ipt",
             dimension: [.Length: 3],
             coefficient: 568.26125e-6
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "imperialGallon",
             symbol: "igal",
             dimension: [.Length: 3],
             coefficient: 0.00454609
         ),
-        DefinedUnit (
+        try! DefinedUnit(
             name: "metricCup",
             symbol: "mcup",
             dimension: [.Length: 3],

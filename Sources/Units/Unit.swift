@@ -1,18 +1,19 @@
 import Foundation
 
-// TODO: Add Serialize/Deserialize support based on Symbol
 public struct Unit {
     
     private let type: UnitType
     
-    init(definedBy: DefinedUnit) {
+    /// Create a new from the defined unit object.
+    /// - parameter definedBy: A defined unit to wrap
+    internal init(definedBy: DefinedUnit) {
         self.type = .defined(definedBy)
     }
     
-    /// Create a new from the subUnit map.
+    /// Create a new from the sub-unit map.
     /// - parameter composedOf: A dictionary of defined units and exponents. If this dictionary only has one value with an exponent of one,
     /// we return it as that defined unit.
-    private init(composedOf subUnits: [DefinedUnit: Int]) {
+    internal init(composedOf subUnits: [DefinedUnit: Int]) {
         if subUnits.count == 1, let subUnit = subUnits.first, subUnit.value == 1 {
             self.type = .defined(subUnit.key)
         } else {
@@ -77,6 +78,45 @@ public struct Unit {
                 computedSymbol += "\(prefix)\(symbol)\(expStr)"
             }
             return computedSymbol
+        }
+    }
+    
+    /// Return a string name representing the unit
+    public var name: String {
+        switch type {
+        case .defined(let definition):
+            return definition.name
+        case .composite(_):
+            let unitList = self.sortedUnits()
+            var computedName = ""
+            for (subUnit, exp) in unitList {
+                guard exp != 0 else {
+                    break
+                }
+                
+                var prefix = ""
+                if computedName == "" { // first name
+                    if exp >= 0 {
+                        prefix = ""
+                    } else {
+                        prefix = "1 / "
+                    }
+                } else {
+                    if exp >= 0 {
+                        prefix = " * "
+                    } else {
+                        prefix = " / "
+                    }
+                }
+                let name = subUnit.name
+                var expStr = ""
+                if abs(exp) > 1 {
+                    expStr = "^\(abs(exp))"
+                }
+                
+                computedName += "\(prefix)\(name)\(expStr)"
+            }
+            return computedName
         }
     }
     
@@ -265,12 +305,17 @@ struct DefinedUnit: Hashable {
     let coefficient: Double
     let constant: Double
     
-    /// Define a new Unit
-    /// - parameter symbol: The string symbol of the unit.
-    /// - parameter dimension: The unit dimensionality as a map of base quantities and their respective exponents.
-    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
-    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
-    public init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) {
+    internal init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) throws {
+        guard !symbol.contains("*") else {
+            throw UnitError.invalidSymbol(message: "Symbol cannot contain '*'")
+        }
+        guard !symbol.contains("/") else {
+            throw UnitError.invalidSymbol(message: "Symbol cannot contain '/'")
+        }
+        guard !symbol.contains("^") else {
+            throw UnitError.invalidSymbol(message: "Symbol cannot contain '^'")
+        }
+        
         self.name = name
         self.symbol = symbol
         self.dimension = dimension
