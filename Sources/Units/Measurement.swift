@@ -1,23 +1,18 @@
 import Foundation
 
-/// Models a value with a unit
+/// A double value with a unit of measure
 public struct Measurement: Equatable {
     public let value: Double
     public let unit: Unit
     
+    /// Indicates whether the measurement is dimensionally equivalent to the provided measurement.
+    /// Note that measurements with different units can be dimensionally equivalent.
     public func isDimensionallyEquivalent(to: Measurement) -> Bool {
         return self.unit.isDimensionallyEquivalent(to: to.unit)
     }
     
-    public func pow(_ raiseTo: Int) -> Measurement {
-        return Measurement(
-            value: Foundation.pow(self.value, Double(raiseTo)),
-            unit: self.unit.pow(raiseTo)
-        )
-    }
-    
     /// Return a measurement of the same value, but with the provided unit. That is,
-    /// the value **is not matematically converted**.
+    /// the value **is not mathematically converted**.
     public func declare(as newUnit: Unit) -> Measurement {
         return Measurement(value: value, unit: newUnit)
     }
@@ -33,6 +28,8 @@ public struct Measurement: Equatable {
         return Measurement(value: convertedValue, unit: newUnit)
     }
     
+    /// Add the left side measurement to the right side measurement. The measurements must have the
+    /// same unit.
     public static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit == rhs.unit else {
             throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
@@ -44,6 +41,8 @@ public struct Measurement: Equatable {
         )
     }
     
+    /// Subtract the left side measurement from the right side measurement The measurements must have the
+    /// same unit.
     public static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit == rhs.unit else {
             throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
@@ -55,6 +54,7 @@ public struct Measurement: Equatable {
         )
     }
     
+    /// Multiply the left side measurement by the right side measurement.
     public static func * (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
             value: lhs.value * rhs.value,
@@ -62,16 +62,27 @@ public struct Measurement: Equatable {
         )
     }
     
+    /// Divide the left side measurement by the right side measurement.
     public static func / (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
             value: lhs.value / rhs.value,
             unit: lhs.unit / rhs.unit
         )
     }
+    
+    /// Raise the measurement to an integer exponent. This will raise the unit
+    /// to the same exponent.
+    public func pow(_ raiseTo: Int) -> Measurement {
+        return Measurement(
+            value: Foundation.pow(self.value, Double(raiseTo)),
+            unit: self.unit.pow(raiseTo)
+        )
+    }
 }
 
 extension Measurement: CustomStringConvertible {
+    /// Displays the measurement as a string of the value and unit symbol
     public var description: String {
-        return "\(value)\(unit)"
+        return "\(value) \(unit)"
     }
 }
