@@ -1,7 +1,7 @@
 import Foundation
 
 /// A double value with a unit of measure
-public struct Measurement: Equatable {
+public struct Measurement: Equatable, Codable {
     public let value: Double
     public let unit: Unit
     

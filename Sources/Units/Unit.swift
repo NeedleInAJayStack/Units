@@ -290,6 +290,24 @@ extension Unit: CustomStringConvertible {
     }
 }
 
+extension Unit: Codable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(symbol)
+    }
+    
+    public init(from: Decoder) throws {
+        let symbol = try from.singleValueContainer().decode(String.self)
+        if symbol.contains("*") || symbol.contains("/") || symbol.contains("^") {
+            let compositeUnits = try UnitRegistry.instance.compositeUnitsFromSymbol(symbol: symbol)
+            self.init(composedOf: compositeUnits)
+        } else {
+            let definedUnit = try UnitRegistry.instance.definedUnitFromSymbol(symbol: symbol)
+            self.init(definedBy: definedUnit)
+        }
+    }
+}
+
 /// The two possible types of unit - predefined or composite
 private enum UnitType {
     case defined(DefinedUnit)

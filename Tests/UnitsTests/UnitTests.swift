@@ -169,4 +169,26 @@ final class UnitTests: XCTestCase {
             [.Length: 1, .Time: -2]
         )
     }
+    
+    func testEncode() throws {
+        let encoder = JSONEncoder()
+        
+        XCTAssertEqual(
+            try String(data: encoder.encode(Unit.meter / .second), encoding: .utf8),
+            "\"m\\/s\""
+        )
+        
+        // TODO: Add more tests
+    }
+    
+    func testDecode() throws {
+        let decoder = JSONDecoder()
+        
+        XCTAssertEqual(
+            try decoder.decode(Unit.self, from: "\"m\\/s\"".data(using: .utf8)!),
+            Unit.meter / .second
+        )
+        
+        // TODO: Add more tests
+    }
 }

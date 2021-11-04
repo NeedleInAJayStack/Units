@@ -23,40 +23,54 @@ class UnitRegistry {
     /// `Unit.symbol`
     public func fromSymbol(_ symbol: String) throws -> Unit {
         if symbol.contains("*") || symbol.contains("/") || symbol.contains("^") {
-            var compositeUnits: [DefinedUnit: Int] = [:]
-            for multSymbol in symbol.split(separator: "*", omittingEmptySubsequences: false) {
-                for (index, divSymbol) in multSymbol.split(separator: "/", omittingEmptySubsequences: false).enumerated() {
-                    let symbolSplit = divSymbol.split(separator: "^", omittingEmptySubsequences: false)
-                    let subSymbol = String(symbolSplit[0])
-                    var exp = 1
-                    if symbolSplit.count == 2 {
-                        guard let expInt = Int(String(symbolSplit[1])) else {
-                            throw UnitError.invalidSymbol(message: "Symbol '^' must be followed by an integer: \(symbol)")
-                        }
-                        exp = expInt
-                    }
-                    if index > 0 {
-                        exp = -1 * exp
-                    }
-                    guard subSymbol != "1" else {
-                        continue
-                    }
-                    guard subSymbol != "" else {
-                        throw UnitError.unitNotFound(message: "Expected subsymbol missing")
-                    }
-                    guard let subUnit = units[subSymbol] else {
-                        throw UnitError.unitNotFound(message: "Symbol '\(subSymbol)' not recognized")
-                    }
-                    compositeUnits[subUnit] = exp
-                }
-            }
+            let compositeUnits = try compositeUnitsFromSymbol(symbol: symbol)
             return Unit(composedOf: compositeUnits)
         } else {
-            guard let unit = units[symbol] else {
-                throw UnitError.unitNotFound(message: "Symbol '\(symbol)' not recognized")
-            }
-            return Unit(definedBy: unit)
+            let definedUnit = try definedUnitFromSymbol(symbol: symbol)
+            return Unit(definedBy: definedUnit)
         }
+    }
+    
+    /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
+    /// verified that this is a composite unit.
+    internal func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
+        var compositeUnits: [DefinedUnit: Int] = [:]
+        for multSymbol in symbol.split(separator: "*", omittingEmptySubsequences: false) {
+            for (index, divSymbol) in multSymbol.split(separator: "/", omittingEmptySubsequences: false).enumerated() {
+                let symbolSplit = divSymbol.split(separator: "^", omittingEmptySubsequences: false)
+                let subSymbol = String(symbolSplit[0])
+                var exp = 1
+                if symbolSplit.count == 2 {
+                    guard let expInt = Int(String(symbolSplit[1])) else {
+                        throw UnitError.invalidSymbol(message: "Symbol '^' must be followed by an integer: \(symbol)")
+                    }
+                    exp = expInt
+                }
+                if index > 0 {
+                    exp = -1 * exp
+                }
+                guard subSymbol != "1" else {
+                    continue
+                }
+                guard subSymbol != "" else {
+                    throw UnitError.unitNotFound(message: "Expected subsymbol missing")
+                }
+                guard let subUnit = units[subSymbol] else {
+                    throw UnitError.unitNotFound(message: "Symbol '\(subSymbol)' not recognized")
+                }
+                compositeUnits[subUnit] = exp
+            }
+        }
+        return compositeUnits
+    }
+    
+    /// Returns a defined unit given a defined unit symbol. It is expected that the caller has
+    /// verified that this is not a composite unit.
+    internal func definedUnitFromSymbol(symbol: String) throws -> DefinedUnit {
+        guard let definedUnit = units[symbol] else {
+            throw UnitError.unitNotFound(message: "Symbol '\(symbol)' not recognized")
+        }
+        return definedUnit
     }
     
     /// Define a new unit to add to the registry
