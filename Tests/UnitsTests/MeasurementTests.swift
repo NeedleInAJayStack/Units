@@ -187,4 +187,15 @@ final class MeasurementTests: XCTestCase {
             Measurement(value: 0.25, unit: .foot)
         )
     }
+    
+    func testDouble() throws {
+        XCTAssertEqual(
+            2.0.measured(in: .meter),
+            Measurement(value: 2, unit: .meter)
+        )
+        XCTAssertEqual(
+            2.measured(in: .meter),
+            Measurement(value: 2, unit: .meter)
+        )
+    }
 }
