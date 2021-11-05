@@ -4,6 +4,10 @@ public struct Unit {
     
     private let type: UnitType
     
+    /// Create a unit from the symbol. This symbol is compared to the global registry, decomposed if necessary,
+    /// and the relevant unit is initialized.
+    /// - parameter fromSymbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
+    /// or a complex unit symbol that combines basic units with `*`, `/`, or `^`.
     public init(fromSymbol symbol: String) throws {
         if symbol.contains("*") || symbol.contains("/") || symbol.contains("^") {
             let compositeUnits = try UnitRegistry.instance.compositeUnitsFromSymbol(symbol: symbol)
@@ -14,7 +18,7 @@ public struct Unit {
         }
     }
     
-    /// Create a new from the defined unit object.
+    /// Create a unit from the defined unit object.
     /// - parameter definedBy: A defined unit to wrap
     internal init(definedBy: DefinedUnit) {
         self.type = .defined(definedBy)
@@ -345,32 +349,4 @@ extension Unit: Codable {
 private enum UnitType {
     case defined(DefinedUnit)
     case composite([DefinedUnit: Int])
-}
-
-/// A predefined unit, which has name, quantity, symbol, and conversion information
-/// These should all be stored in the UnitRegistry, not directly created
-struct DefinedUnit: Hashable {
-    let name: String
-    let symbol: String
-    let dimension: [Quantity: Int]
-    let coefficient: Double
-    let constant: Double
-    
-    internal init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) throws {
-        guard !symbol.contains("*") else {
-            throw UnitError.invalidSymbol(message: "Symbol cannot contain '*'")
-        }
-        guard !symbol.contains("/") else {
-            throw UnitError.invalidSymbol(message: "Symbol cannot contain '/'")
-        }
-        guard !symbol.contains("^") else {
-            throw UnitError.invalidSymbol(message: "Symbol cannot contain '^'")
-        }
-        
-        self.name = name
-        self.symbol = symbol
-        self.dimension = dimension
-        self.coefficient = coefficient
-        self.constant = constant
-    }
 }

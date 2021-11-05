@@ -10,7 +10,7 @@ This approach allows us to easily handle any permutation of units imaginable. Yo
 
 ## Usage
 
-Users should mostly interact with the Measurement class. Here are a few usage examples:
+Users should interact primarily with Measurements. Here are a few usage examples:
 
 ```swift
 let drivingSpeed = 60.measured(in: .mile / .hour)
@@ -82,8 +82,5 @@ let measurement = Measurement(value: 5, unit: .centifoot)
 
 ## To Do:
 
-- Improve interoperability with Foundation
-
 - Add more defined units
 - Allow user-defined quantities
-- Add easier initializers (like `5.meters`, for example)

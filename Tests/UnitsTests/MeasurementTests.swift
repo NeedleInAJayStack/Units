@@ -174,7 +174,7 @@ final class MeasurementTests: XCTestCase {
         )
     }
     
-    func testDouble() throws {
+    func testNumericExtensions() throws {
         XCTAssertEqual(
             2.0.measured(in: .meter),
             Measurement(value: 2, unit: .meter)
