@@ -4,6 +4,16 @@ public struct Unit {
     
     private let type: UnitType
     
+    public init(fromSymbol symbol: String) throws {
+        if symbol.contains("*") || symbol.contains("/") || symbol.contains("^") {
+            let compositeUnits = try UnitRegistry.instance.compositeUnitsFromSymbol(symbol: symbol)
+            self.init(composedOf: compositeUnits)
+        } else {
+            let definedUnit = try UnitRegistry.instance.definedUnitFromSymbol(symbol: symbol)
+            self.init(definedBy: definedUnit)
+        }
+    }
+    
     /// Create a new from the defined unit object.
     /// - parameter definedBy: A defined unit to wrap
     internal init(definedBy: DefinedUnit) {
@@ -19,6 +29,35 @@ public struct Unit {
         } else {
             self.type = .composite(subUnits)
         }
+    }
+    
+    /// Define a new unit to add to the registry
+    /// - parameter name: The string name of the unit.
+    /// - parameter symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
+    /// - parameter dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
+    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
+    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
+    @discardableResult
+    public static func define(
+        name: String,
+        symbol: String,
+        dimension: [Quantity: Int],
+        coefficient: Double = 1,
+        constant: Double = 0
+    ) throws -> Unit {
+        try UnitRegistry.instance.addUnit(
+            name: name,
+            symbol: symbol,
+            dimension: dimension,
+            coefficient: coefficient,
+            constant: constant
+        )
+        return try Unit(fromSymbol: symbol)
+    }
+    
+    /// Return a list of all currently defined units
+    public static func allDefined() -> [Unit] {
+        UnitRegistry.instance.allUnits()
     }
     
     /// Return the dimension of the unit in terms of base quanties
@@ -298,13 +337,7 @@ extension Unit: Codable {
     
     public init(from: Decoder) throws {
         let symbol = try from.singleValueContainer().decode(String.self)
-        if symbol.contains("*") || symbol.contains("/") || symbol.contains("^") {
-            let compositeUnits = try UnitRegistry.instance.compositeUnitsFromSymbol(symbol: symbol)
-            self.init(composedOf: compositeUnits)
-        } else {
-            let definedUnit = try UnitRegistry.instance.definedUnitFromSymbol(symbol: symbol)
-            self.init(definedBy: definedUnit)
-        }
+        try self.init(fromSymbol: symbol)
     }
 }
 

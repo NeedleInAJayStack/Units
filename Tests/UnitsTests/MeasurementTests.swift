@@ -172,20 +172,6 @@ final class MeasurementTests: XCTestCase {
             try Measurement(value: 25, unit: .meter * .celsius)
                 .convert(to: .meter * .fahrenheit)
         )
-        
-        // Test custom defined unit
-        try UnitRegistry.instance.addUnit(
-            name: "centifoot",
-            symbol: "cft",
-            dimension: [.Length: 1],
-            coefficient: 0.003048
-        )
-        let centifoot = try! UnitRegistry.instance.fromSymbol("cft")
-        
-        XCTAssertEqual(
-            try Measurement(value: 25, unit: centifoot).convert(to: .foot),
-            Measurement(value: 0.25, unit: .foot)
-        )
     }
     
     func testDouble() throws {
@@ -198,4 +184,40 @@ final class MeasurementTests: XCTestCase {
             Measurement(value: 2, unit: .meter)
         )
     }
+    
+    func testCustomUnits() throws {
+        
+        // Test custom defined unit
+        let centifoot = try Unit.define(
+            name: "centifoot",
+            symbol: "cft",
+            dimension: [.Length: 1],
+            coefficient: 0.003048
+        )
+        
+        XCTAssertEqual(
+            try Measurement(value: 25, unit: centifoot).convert(to: .foot),
+            Measurement(value: 0.25, unit: .foot)
+        )
+        
+        // Test custom extended unit
+        XCTAssertEqual(
+            try Measurement(value: 25, unit: .centiinch).convert(to: .inch),
+            Measurement(value: 0.25, unit: .inch)
+        )
+        // Try using twice to verify that multiple access doesn't error
+        XCTAssertEqual(
+            try Measurement(value: 100, unit: .centiinch).convert(to: .inch),
+            Measurement(value: 1, unit: .inch)
+        )
+    }
+}
+
+extension Units.Unit {
+    static let centiinch = try! Unit.define(
+        name: "centiinch",
+        symbol: "cin",
+        dimension: [.Length: 1],
+        coefficient:  0.000254
+    )
 }

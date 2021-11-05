@@ -177,8 +177,6 @@ final class UnitTests: XCTestCase {
             try String(data: encoder.encode(Unit.meter / .second), encoding: .utf8),
             "\"m\\/s\""
         )
-        
-        // TODO: Add more tests
     }
     
     func testDecode() throws {
@@ -188,7 +186,65 @@ final class UnitTests: XCTestCase {
             try decoder.decode(Unit.self, from: "\"m\\/s\"".data(using: .utf8)!),
             Unit.meter / .second
         )
+    }
+    
+    func testFromSymbol() throws {
+        XCTAssertEqual(
+            try Unit.init(fromSymbol: "m"),
+            Unit.meter
+        )
+
+        XCTAssertEqual(
+            try Unit.init(fromSymbol: "m*s"),
+            Unit.meter * .second
+        )
+
+        XCTAssertEqual(
+            try Unit.init(fromSymbol: "m/s"),
+            Unit.meter / .second
+        )
+
+        XCTAssertEqual(
+            try Unit.init(fromSymbol: "m^2"),
+            Unit.meter.pow(2)
+        )
+
+        XCTAssertEqual(
+            try Unit.init(fromSymbol: "1/s"),
+            Unit.second.pow(-1)
+        )
         
-        // TODO: Add more tests
+        XCTAssertEqual(
+            try Unit.init(fromSymbol: "m*s/ft^2/N"),
+            Unit.meter * .second / .foot.pow(2) / .newton
+        )
+        
+        XCTAssertThrowsError(
+            try Unit.init(fromSymbol: "")
+        )
+        
+        XCTAssertThrowsError(
+            try Unit.init(fromSymbol: "notAUnit")
+        )
+        
+        XCTAssertThrowsError(
+            try Unit.init(fromSymbol: "m*")
+        )
+        
+        XCTAssertThrowsError(
+            try Unit.init(fromSymbol: "m/")
+        )
+        
+        XCTAssertThrowsError(
+            try Unit.init(fromSymbol: "m^")
+        )
+        
+        XCTAssertThrowsError(
+            try Unit.init(fromSymbol: "m*2")
+        )
+        
+        XCTAssertThrowsError(
+            try Unit.init(fromSymbol: "m/2")
+        )
     }
 }

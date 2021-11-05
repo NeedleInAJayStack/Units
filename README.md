@@ -51,24 +51,30 @@ the `*`, `/`, or `^` characters because those are used in the symbol representat
 
 ## Custom Units
 
-You may add your own custom units by adding them to the registry:
+You may add your own custom units using the `Unit.define` function. This unit is defined and added to the global Unit registry.
 
 ```swift
-try UnitRegistry.instance.addUnit(
+let centifoot = try Unit.define(
     name: "centifoot",
     symbol: "cft",
     dimension: [.Length: 1],
     coefficient: 0.003048 // This is the conversion to meters
 )
 
-let measurement = Measurement(value: 5, unit: UnitRegistry.instance.fromSymbol("cft"))
+let measurement = Measurement(value: 5, unit: centifoot)
 ```
 
-If desired, you can simplify access by extending `Unit` with a static property:
+Note that you can only define the unit once globally, and afterwards it should be accessed using `Unit(fromSymbol: String)`. 
+If desired, you can ensure single access by extending `Unit` with a static property:
 
 ```swift
 extension Unit {
-    public static var centifoot = try! UnitRegistry.instance.fromSymbol("cft")
+    public static var centifoot = try! Unit.define(
+        name: "centifoot",
+        symbol: "cft",
+        dimension: [.Length: 1],
+        coefficient: 0.003048 // This is the conversion to meters
+    )
 }
 
 let measurement = Measurement(value: 5, unit: .centifoot)
