@@ -16,7 +16,10 @@ public struct Unit {
     /// - parameter fromSymbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
     /// or a complex unit symbol that combines basic units with `*`, `/`, or `^`.
     public init(fromSymbol symbol: String) throws {
-        if symbol.contains("*") || symbol.contains("/") || symbol.contains("^") {
+        let symbolContainsOperator = Operator.allCases.contains { arithSymbol in
+            symbol.contains(arithSymbol.rawValue)
+        }
+        if symbolContainsOperator {
             let compositeUnits = try UnitRegistry.instance.compositeUnitsFromSymbol(symbol: symbol)
             self.init(composedOf: compositeUnits)
         } else {
@@ -110,19 +113,19 @@ public struct Unit {
                     if exp >= 0 {
                         prefix = ""
                     } else {
-                        prefix = "1/"
+                        prefix = "1\(Operator.div.rawValue)"
                     }
                 } else {
                     if exp >= 0 {
-                        prefix = "*"
+                        prefix = Operator.mult.rawValue
                     } else {
-                        prefix = "/"
+                        prefix = Operator.div.rawValue
                     }
                 }
                 let symbol = subUnit.symbol
                 var expStr = ""
                 if abs(exp) > 1 {
-                    expStr = "^\(abs(exp))"
+                    expStr = "\(Operator.exp.rawValue)\(abs(exp))"
                 }
                 
                 computedSymbol += "\(prefix)\(symbol)\(expStr)"
@@ -149,19 +152,19 @@ public struct Unit {
                     if exp >= 0 {
                         prefix = ""
                     } else {
-                        prefix = "1 / "
+                        prefix = "1 \(Operator.div.rawValue) "
                     }
                 } else {
                     if exp >= 0 {
-                        prefix = " * "
+                        prefix = " \(Operator.mult.rawValue) "
                     } else {
-                        prefix = " / "
+                        prefix = " \(Operator.div.rawValue) "
                     }
                 }
                 let name = subUnit.name
                 var expStr = ""
                 if abs(exp) > 1 {
-                    expStr = "^\(abs(exp))"
+                    expStr = "\(Operator.exp.rawValue)\(abs(exp))"
                 }
                 
                 computedName += "\(prefix)\(name)\(expStr)"
@@ -316,6 +319,12 @@ public struct Unit {
     private enum UnitType {
         case defined(DefinedUnit)
         case composite([DefinedUnit: Int])
+    }
+    
+    private enum Operator: String, CaseIterable {
+        case mult = "*"
+        case div = "/"
+        case exp = "^"
     }
 }
 
