@@ -1,7 +1,14 @@
 import Foundation
 
+/// Unit models a unit of measure. Each unit must specify a name, symbol, dimension, and conversion factors.
+///
+/// A unit can compute a conversion to any other unit of its dimension using its specified conversion factors.
+/// Units may be multiplied and divided, resulting in "composite" units, which retain all the characteristics
+/// of a basic, predefined unit.
+///
+/// This type is backed by a global registry that allows units to be encoded and decoded using their symbol.
+/// It also is given a large number of static members for easy access to this package's predefined units.
 public struct Unit {
-    
     private let type: UnitType
     
     /// Create a unit from the symbol. This symbol is compared to the global registry, decomposed if necessary,
@@ -258,7 +265,7 @@ public struct Unit {
         }
     }
     
-    // MARK: - Private helpers
+    // MARK: - Helpers
     
     /// Returns a dictionary that represents the unique defined units and their exponents. For a
     /// composite unit, this is simply the `subUnits`, but for a defined unit, this is `[self: 1]`
@@ -304,6 +311,12 @@ public struct Unit {
             return unitList
         }
     }
+    
+    /// The two possible types of unit - defined or composite
+    private enum UnitType {
+        case defined(DefinedUnit)
+        case composite([DefinedUnit: Int])
+    }
 }
 
 extension Unit: Equatable {
@@ -343,10 +356,4 @@ extension Unit: Codable {
         let symbol = try from.singleValueContainer().decode(String.self)
         try self.init(fromSymbol: symbol)
     }
-}
-
-/// The two possible types of unit - predefined or composite
-private enum UnitType {
-    case defined(DefinedUnit)
-    case composite([DefinedUnit: Int])
 }

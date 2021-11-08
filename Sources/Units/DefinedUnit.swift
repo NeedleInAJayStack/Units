@@ -1,5 +1,4 @@
-/// A predefined unit, which has name, quantity, symbol, and conversion information
-/// These should all be stored in the UnitRegistry, not directly created
+/// A predefined unit, which has name, quantity, symbol, and conversion information.
 struct DefinedUnit: Hashable {
     let name: String
     let symbol: String

@@ -24,7 +24,8 @@ print(drivingDistance.convert(to: .mile)) // Prints 30 mi
 ## Conversion
 
 Only linear conversions are supported. The vast majority of unit conversions are simply changes in scale, represented by a single
-conversion coefficient, sometimes with a constant shift.
+conversion coefficient, sometimes with a constant shift. Units that don't match this format (like currency conversions, which are
+typically time-based functions) are not supported.
 
 ### Coefficients
 
@@ -44,14 +45,15 @@ Units that include a constant value, such as Fahrenheit, cannot be used within c
 you may not convert `5m/°F` to `m/°C` because its unclear how to handle their shifted scale. Instead use the 
 non-shifted Kelvin and Rankine temperature units to refer to temperature differentials.
 
-## Serialization
+## Codability
 
-Each defined unit must have a unique symbol, which is used to identify and serialize it. These symbols must not contain
+Each defined unit must have a unique symbol, which is used to identify and encode/decode it. These symbols must not contain
 the `*`, `/`, or `^` characters because those are used in the symbol representation of complex units.
 
 ## Custom Units
 
-You may add your own custom units using the `Unit.define` function. This unit is defined and added to the global Unit registry.
+To support serialization, Unit is backed by a global registry which is populated with many values by default. However,
+you may add your own custom units to this registry using the `Unit.define` function.
 
 ```swift
 let centifoot = try Unit.define(
@@ -65,16 +67,11 @@ let measurement = Measurement(value: 5, unit: centifoot)
 ```
 
 Note that you can only define the unit once globally, and afterwards it should be accessed using `Unit(fromSymbol: String)`. 
-If desired, you can ensure single access by extending `Unit` with a static property:
+If desired, you can simplify access by extending `Unit` with a static property:
 
 ```swift
 extension Unit {
-    public static var centifoot = try! Unit.define(
-        name: "centifoot",
-        symbol: "cft",
-        dimension: [.Length: 1],
-        coefficient: 0.003048 // This is the conversion to meters
-    )
+    public static var centifoot = Unit.fromSymbol("cft")
 }
 
 let measurement = Measurement(value: 5, unit: .centifoot)

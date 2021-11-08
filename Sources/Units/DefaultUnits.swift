@@ -1,4 +1,8 @@
-struct DefinedUnits {
+/// Static struct containing this package's pre-defined units
+enum DefaultUnits {
+    // NOTE: If adding additional units to this list, they should get corresponding
+    // entries in the `Unit+DefinedUnits` and 
+    
     // MARK: Acceleration
     // Base unit is m/s^2
     static let standardGravity = try! DefinedUnit(

@@ -200,7 +200,20 @@ final class MeasurementTests: XCTestCase {
             Measurement(value: 0.25, unit: .foot)
         )
         
+        
         // Test custom extended unit
+        try Unit.define(
+            name: "centiinch",
+            symbol: "cin",
+            dimension: [.Length: 1],
+            coefficient:  0.000254
+        )
+        // Test referencing string before running the extension
+        XCTAssertEqual(
+            try Measurement(value: 25, unit: Unit.init(fromSymbol: "cin")).convert(to: .inch),
+            Measurement(value: 0.25, unit: .inch)
+        )
+        // Test typical usage
         XCTAssertEqual(
             try Measurement(value: 25, unit: .centiinch).convert(to: .inch),
             Measurement(value: 0.25, unit: .inch)
@@ -214,10 +227,5 @@ final class MeasurementTests: XCTestCase {
 }
 
 extension Units.Unit {
-    static let centiinch = try! Unit.define(
-        name: "centiinch",
-        symbol: "cin",
-        dimension: [.Length: 1],
-        coefficient:  0.000254
-    )
+    static let centiinch = try! Unit.init(fromSymbol: "cin")
 }
