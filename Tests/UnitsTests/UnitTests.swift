@@ -190,61 +190,61 @@ final class UnitTests: XCTestCase {
     
     func testFromSymbol() throws {
         XCTAssertEqual(
-            try Unit.init(fromSymbol: "m"),
+            try Unit(fromSymbol: "m"),
             Unit.meter
         )
 
         XCTAssertEqual(
-            try Unit.init(fromSymbol: "m*s"),
+            try Unit(fromSymbol: "m*s"),
             Unit.meter * .second
         )
 
         XCTAssertEqual(
-            try Unit.init(fromSymbol: "m/s"),
+            try Unit(fromSymbol: "m/s"),
             Unit.meter / .second
         )
 
         XCTAssertEqual(
-            try Unit.init(fromSymbol: "m^2"),
+            try Unit(fromSymbol: "m^2"),
             Unit.meter.pow(2)
         )
 
         XCTAssertEqual(
-            try Unit.init(fromSymbol: "1/s"),
+            try Unit(fromSymbol: "1/s"),
             Unit.second.pow(-1)
         )
         
         XCTAssertEqual(
-            try Unit.init(fromSymbol: "m*s/ft^2/N"),
+            try Unit(fromSymbol: "m*s/ft^2/N"),
             Unit.meter * .second / .foot.pow(2) / .newton
         )
         
         XCTAssertThrowsError(
-            try Unit.init(fromSymbol: "")
+            try Unit(fromSymbol: "")
         )
         
         XCTAssertThrowsError(
-            try Unit.init(fromSymbol: "notAUnit")
+            try Unit(fromSymbol: "notAUnit")
         )
         
         XCTAssertThrowsError(
-            try Unit.init(fromSymbol: "m*")
+            try Unit(fromSymbol: "m*")
         )
         
         XCTAssertThrowsError(
-            try Unit.init(fromSymbol: "m/")
+            try Unit(fromSymbol: "m/")
         )
         
         XCTAssertThrowsError(
-            try Unit.init(fromSymbol: "m^")
+            try Unit(fromSymbol: "m^")
         )
         
         XCTAssertThrowsError(
-            try Unit.init(fromSymbol: "m*2")
+            try Unit(fromSymbol: "m*2")
         )
         
         XCTAssertThrowsError(
-            try Unit.init(fromSymbol: "m/2")
+            try Unit(fromSymbol: "m/2")
         )
     }
 }
