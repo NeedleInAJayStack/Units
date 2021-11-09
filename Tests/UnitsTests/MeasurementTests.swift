@@ -53,7 +53,7 @@ final class MeasurementTests: XCTestCase {
         let length2 = 5.measured(in: .meter)
         XCTAssertEqual(
             length1 * length2,
-            Measurement(value: 25, unit: .meter.pow(2))
+            25.measured(in: .meter.pow(2))
         )
         
         // Test mixed units
@@ -61,11 +61,11 @@ final class MeasurementTests: XCTestCase {
         let time = 7.measured(in: .second)
         XCTAssertEqual(
             force * time,
-            Measurement(value: 14, unit: .newton * .second)
+            14.measured(in: .newton * .second)
         )
         
         // Test composite units
-        let work = Measurement(value: 2, unit: .newton * .meter)
+        let work = 2.measured(in: .newton * .meter)
         XCTAssertEqual(
             work.unit.dimension,
             [.Mass: 1, .Length: 2, .Time: -2]
@@ -78,18 +78,18 @@ final class MeasurementTests: XCTestCase {
         let time = 4.measured(in: .second)
         XCTAssertEqual(
             length / time,
-            Measurement(value: 2, unit: .meter / .second)
+            2.measured(in: .meter / .second)
         )
     }
     
     func testPow() throws {
         XCTAssertEqual(
             2.measured(in: .meter).pow(2),
-            Measurement(value: 4, unit: .meter.pow(2))
+            4.measured(in: .meter.pow(2))
         )
         XCTAssertEqual(
             2.measured(in: .meter).pow(3),
-            Measurement(value: 8, unit: .meter.pow(3))
+            8.measured(in: .meter.pow(3))
         )
     }
     
@@ -104,7 +104,7 @@ final class MeasurementTests: XCTestCase {
         )
         XCTAssertTrue(
             2.measured(in: .newton)
-                .isDimensionallyEquivalent(to: Measurement(value: 4, unit: .kilogram * .meter / .second.pow(2)))
+                .isDimensionallyEquivalent(to: 4.measured(in: .kilogram * .meter / .second.pow(2)))
         )
     }
     
@@ -126,31 +126,31 @@ final class MeasurementTests: XCTestCase {
         
         // Test composite unit conversion
         XCTAssertEqual(
-            try Measurement(value: 1, unit: .kilometer.pow(2)).convert(to: .meter.pow(2)),
-            Measurement(value: 1000000, unit: .meter.pow(2))
+            try 1.measured(in: .kilometer.pow(2)).convert(to: .meter.pow(2)),
+            1000000.measured(in: .meter.pow(2))
         )
         XCTAssertEqual(
-            try Measurement(value: 1, unit: .meter.pow(2)).convert(to: .kilometer.pow(2)),
-            Measurement(value: 0.000001, unit: .kilometer.pow(2))
+            try 1.measured(in: .meter.pow(2)).convert(to: .kilometer.pow(2)),
+            0.000001.measured(in: .kilometer.pow(2))
         )
         XCTAssertEqual(
-            try Measurement(value: 1, unit: .meter / .second).convert(to: .foot / .minute),
-            Measurement(value: 196.85039370078738, unit: .foot / .minute)
+            try 1.measured(in: .meter / .second).convert(to: .foot / .minute),
+            196.85039370078738.measured(in: .foot / .minute)
         )
         XCTAssertEqual(
-            try Measurement(value: 1, unit: .meter / .second.pow(2)).convert(to: .foot / .minute.pow(2)),
-            Measurement(value: 11811.023622047243, unit: .foot / .minute.pow(2))
+            try 1.measured(in: .meter / .second.pow(2)).convert(to: .foot / .minute.pow(2)),
+            11811.023622047243.measured(in: .foot / .minute.pow(2))
         )
         
         // Test mixed unit conversion
         XCTAssertEqual(
             try 1.measured(in: .newton).convert(to: .foot * .pound / .minute.pow(2)),
-            Measurement(value: 26038.849864355616, unit: .foot * .pound / .minute.pow(2))
+            26038.849864355616.measured(in: .foot * .pound / .minute.pow(2))
         )
         
         // Test incompatible composite units error
         XCTAssertThrowsError(
-            try Measurement(value: 1, unit: .meter / .second.pow(2)).convert(to: .foot / .minute)
+            try 1.measured(in: .meter / .second.pow(2)).convert(to: .foot / .minute)
         )
         
         // Test conversion with constant
@@ -169,7 +169,7 @@ final class MeasurementTests: XCTestCase {
         
         // Test composite unit with constant cannot be converted
         XCTAssertThrowsError(
-            try Measurement(value: 25, unit: .meter * .celsius)
+            try 25.measured(in: .meter * .celsius)
                 .convert(to: .meter * .fahrenheit)
         )
     }
