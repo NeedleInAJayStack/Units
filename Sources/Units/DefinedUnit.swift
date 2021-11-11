@@ -5,7 +5,7 @@ struct DefinedUnit: Hashable {
     let dimension: [Quantity: Int]
     let coefficient: Double
     let constant: Double
-    
+
     init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) throws {
         guard !symbol.contains("*") else {
             throw UnitError.invalidSymbol(message: "Symbol cannot contain '*'")
@@ -16,7 +16,7 @@ struct DefinedUnit: Hashable {
         guard !symbol.contains("^") else {
             throw UnitError.invalidSymbol(message: "Symbol cannot contain '^'")
         }
-        
+
         self.name = name
         self.symbol = symbol
         self.dimension = dimension

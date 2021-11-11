@@ -1,24 +1,23 @@
 /// UnitRegistry defines a structure that contains all defined units. This ensures
 /// that we are able to parse to and from unit symbol representations.
 internal class UnitRegistry {
-    
     // TODO: Should we eliminate this singleton and make clients keep track?
     internal static let instance = UnitRegistry()
-    
+
     // Store units as a dictionary based on symbol for fast access
     // TODO: Change to Unit to avoid creating multiple Units in memory
     private var units: [String: DefinedUnit]
     private init() {
-        self.units = [:]
+        units = [:]
         for defaultUnit in UnitRegistry.defaultUnits {
             // Protect against double-defining symbols
-            if self.units[defaultUnit.symbol] != nil {
+            if units[defaultUnit.symbol] != nil {
                 fatalError("Duplicate symbol: \(defaultUnit.symbol)")
             }
-            self.units[defaultUnit.symbol] = defaultUnit
+            units[defaultUnit.symbol] = defaultUnit
         }
     }
-    
+
     /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
     /// verified that this is a composite unit.
     internal func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
@@ -51,7 +50,7 @@ internal class UnitRegistry {
         }
         return compositeUnits
     }
-    
+
     /// Returns a defined unit given a defined unit symbol. It is expected that the caller has
     /// verified that this is not a composite unit.
     internal func definedUnitFromSymbol(symbol: String) throws -> DefinedUnit {
@@ -60,7 +59,7 @@ internal class UnitRegistry {
         }
         return definedUnit
     }
-    
+
     /// Define a new unit to add to the registry
     /// - parameter name: The string name of the unit.
     /// - parameter symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
@@ -82,12 +81,12 @@ internal class UnitRegistry {
             constant: constant
         )
         // Protect against double-defining symbols
-        if self.units[symbol] != nil {
+        if units[symbol] != nil {
             throw UnitError.invalidSymbol(message: "Duplicate symbol: \(symbol)")
         }
-        self.units[symbol] = newUnit
+        units[symbol] = newUnit
     }
-    
+
     /// Returns all units currently defined by the registry
     internal func allUnits() -> [Unit] {
         var allUnits = [Unit]()
@@ -96,54 +95,64 @@ internal class UnitRegistry {
         }
         return allUnits
     }
-    
+
     private static let defaultUnits: [DefinedUnit] = [
         // MARK: Acceleration
+
         DefaultUnits.standardGravity,
-        
+
         // MARK: Amount
+
         DefaultUnits.mole,
         DefaultUnits.millimole,
         DefaultUnits.particle,
-        
+
         // MARK: Angle
+
         DefaultUnits.radian,
         DefaultUnits.degree,
-        
+
         // MARK: Area
+
         DefaultUnits.acre,
         DefaultUnits.are,
         DefaultUnits.hectare,
-        
+
         // MARK: Capacitance
+
         DefaultUnits.farad,
-        
+
         // MARK: Charge
+
         DefaultUnits.coulomb,
-        
+
         // MARK: Current
+
         DefaultUnits.ampere,
         DefaultUnits.microampere,
         DefaultUnits.milliampere,
         DefaultUnits.kiloampere,
         DefaultUnits.megaampere,
-        
+
         // MARK: Data
+
         DefaultUnits.bit,
         DefaultUnits.byte,
         DefaultUnits.kilobyte,
         DefaultUnits.megabyte,
         DefaultUnits.gigabyte,
         DefaultUnits.petabyte,
-        
+
         // MARK: Electric Potential Difference
+
         DefaultUnits.volt,
         DefaultUnits.microvolt,
         DefaultUnits.millivolt,
         DefaultUnits.kilovolt,
         DefaultUnits.megavolt,
-        
+
         // MARK: Energy
+
         DefaultUnits.joule,
         DefaultUnits.kilojoule,
         DefaultUnits.calorie,
@@ -153,12 +162,14 @@ internal class UnitRegistry {
         DefaultUnits.megabtu,
         DefaultUnits.therm,
         DefaultUnits.electronVolt,
-        
+
         // MARK: Force
+
         DefaultUnits.newton,
         DefaultUnits.poundForce,
-        
+
         // MARK: Frequency
+
         DefaultUnits.hertz,
         DefaultUnits.nanohertz,
         DefaultUnits.microhertz,
@@ -167,16 +178,19 @@ internal class UnitRegistry {
         DefaultUnits.megahertz,
         DefaultUnits.gigahertz,
         DefaultUnits.terahertz,
-        
+
         // MARK: Illuminance
+
         DefaultUnits.lux,
         DefaultUnits.footCandle,
         DefaultUnits.phot,
-        
+
         // MARK: Inductance
+
         DefaultUnits.henry,
-        
+
         // MARK: Length
+
         DefaultUnits.meter,
         DefaultUnits.picometer,
         DefaultUnits.nanoometer,
@@ -198,17 +212,21 @@ internal class UnitRegistry {
         DefaultUnits.astronomicalUnit,
         DefaultUnits.lightyear,
         DefaultUnits.parsec,
-        
+
         // MARK: Luminous Intensity
+
         DefaultUnits.candela,
-        
+
         // MARK: Magnetic Flux
+
         DefaultUnits.weber,
-        
+
         // MARK: Magnetic Flux Density
+
         DefaultUnits.tesla,
-        
+
         // MARK: Mass
+
         DefaultUnits.kilogram,
         DefaultUnits.picogram,
         DefaultUnits.nanogram,
@@ -225,8 +243,9 @@ internal class UnitRegistry {
         DefaultUnits.shortTon,
         DefaultUnits.troyOunces,
         DefaultUnits.slug,
-        
+
         // MARK: Power
+
         DefaultUnits.watt,
         DefaultUnits.femptowatt,
         DefaultUnits.picowatt,
@@ -239,8 +258,9 @@ internal class UnitRegistry {
         DefaultUnits.terawatt,
         DefaultUnits.horsepower,
         DefaultUnits.tonRefrigeration,
-        
+
         // MARK: Pressure
+
         DefaultUnits.pascal,
         DefaultUnits.hectopascal,
         DefaultUnits.kilopascal,
@@ -254,36 +274,42 @@ internal class UnitRegistry {
         DefaultUnits.inchOfMercury,
         DefaultUnits.centimeterOfWater,
         DefaultUnits.inchOfWater,
-        
+
         // MARK: Resistance
+
         DefaultUnits.ohm,
         DefaultUnits.microohm,
         DefaultUnits.milliohm,
         DefaultUnits.kiloohm,
         DefaultUnits.megaohm,
-        
+
         // MARK: Solid Angle
+
         DefaultUnits.steradian,
-        
+
         // MARK: Temperature
+
         DefaultUnits.kelvin,
         DefaultUnits.celsius,
         DefaultUnits.fahrenheit,
         DefaultUnits.rankine,
-        
+
         // MARK: Time
+
         DefaultUnits.second,
         DefaultUnits.nanosecond,
         DefaultUnits.microsecond,
         DefaultUnits.millisecond,
         DefaultUnits.minute,
         DefaultUnits.hour,
-        
+
         // MARK: Velocity
+
         // Base unit is m/s
         DefaultUnits.knots,
-        
+
         // MARK: Volume
+
         // Base unit is meter^3
         DefaultUnits.liter,
         DefaultUnits.milliliter,
@@ -302,6 +328,6 @@ internal class UnitRegistry {
         DefaultUnits.imperialCup,
         DefaultUnits.imperialPint,
         DefaultUnits.imperialGallon,
-        DefaultUnits.metricCup
+        DefaultUnits.metricCup,
     ]
 }

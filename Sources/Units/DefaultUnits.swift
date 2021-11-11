@@ -1,9 +1,10 @@
 /// Static struct containing this package's pre-defined units
 enum DefaultUnits {
     // NOTE: If adding additional units to this list, they should get corresponding
-    // entries in the `Unit+DefinedUnits` and 
-    
+    // entries in the `Unit+DefinedUnits` and
+
     // MARK: Acceleration
+
     // Base unit is m/s^2
     static let standardGravity = try! DefinedUnit(
         name: "standardGravity",
@@ -11,8 +12,9 @@ enum DefaultUnits {
         dimension: [.Length: 1, .Time: -2],
         coefficient: 9.80665
     )
-    
+
     // MARK: Amount
+
     static let mole = try! DefinedUnit(
         name: "mole",
         symbol: "mol",
@@ -28,10 +30,11 @@ enum DefaultUnits {
         name: "particle",
         symbol: "particle",
         dimension: [.Amount: 1],
-        coefficient: 6.02214076E23
+        coefficient: 6.02214076e23
     )
-    
+
     // MARK: Angle
+
     static let radian = try! DefinedUnit(
         name: "radian",
         symbol: "rad",
@@ -43,8 +46,9 @@ enum DefaultUnits {
         dimension: [.Angle: 1],
         coefficient: 180 / Double.pi
     )
-    
+
     // MARK: Area
+
     // Base unit is m^2
     static let acre = try! DefinedUnit(
         name: "acre",
@@ -64,22 +68,25 @@ enum DefaultUnits {
         dimension: [.Length: 2],
         coefficient: 10000
     )
-    
+
     // MARK: Capacitance
+
     static let farad = try! DefinedUnit(
         name: "farad",
         symbol: "F",
         dimension: [.Current: 2, .Time: 4, .Length: -2, .Mass: -1]
     )
-    
+
     // MARK: Charge
+
     static let coulomb = try! DefinedUnit(
         name: "coulomb",
         symbol: "C",
         dimension: [.Current: 1, .Time: 1]
     )
-    
+
     // MARK: Current
+
     static let ampere = try! DefinedUnit(
         name: "ampere",
         symbol: "A",
@@ -109,8 +116,9 @@ enum DefaultUnits {
         dimension: [.Current: 1],
         coefficient: 1e6
     )
-    
+
     // MARK: Data
+
     static let bit = try! DefinedUnit(
         name: "bit",
         symbol: "bit",
@@ -146,8 +154,9 @@ enum DefaultUnits {
         dimension: [.Data: 1],
         coefficient: 8e12
     )
-    
+
     // MARK: Electric Potential Difference
+
     static let volt = try! DefinedUnit(
         name: "volt",
         symbol: "V",
@@ -177,8 +186,9 @@ enum DefaultUnits {
         dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -1],
         coefficient: 1e6
     )
-    
+
     // MARK: Energy
+
     static let joule = try! DefinedUnit(
         name: "joule",
         symbol: "J",
@@ -212,19 +222,19 @@ enum DefaultUnits {
         name: "kilobtu",
         symbol: "kBTU",
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
-        coefficient: 1.05435E6
+        coefficient: 1.05435e6
     )
     static let megabtu = try! DefinedUnit(
         name: "megabtu",
         symbol: "MBTU",
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
-        coefficient: 1.05435E9
+        coefficient: 1.05435e9
     )
     static let therm = try! DefinedUnit(
         name: "therm",
         symbol: "therm",
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
-        coefficient: 1.05435E8
+        coefficient: 1.05435e8
     )
     static let electronVolt = try! DefinedUnit(
         name: "electronVolt",
@@ -232,8 +242,9 @@ enum DefaultUnits {
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
         coefficient: 1.602176634e-19
     )
-    
+
     // MARK: Force
+
     static let newton = try! DefinedUnit(
         name: "newton",
         symbol: "N",
@@ -245,8 +256,9 @@ enum DefaultUnits {
         dimension: [.Mass: 1, .Length: 1, .Time: -2],
         coefficient: 4.448222
     )
-    
+
     // MARK: Frequency
+
     static let hertz = try! DefinedUnit(
         name: "hertz",
         symbol: "Hz",
@@ -294,8 +306,9 @@ enum DefaultUnits {
         dimension: [.Time: -1],
         coefficient: 1e12
     )
-    
+
     // MARK: Illuminance
+
     static let lux = try! DefinedUnit(
         name: "lux",
         symbol: "lx",
@@ -313,15 +326,17 @@ enum DefaultUnits {
         dimension: [.LuminousIntensity: 1, .Length: -2],
         coefficient: 10000
     )
-    
+
     // MARK: Inductance
+
     static let henry = try! DefinedUnit(
         name: "henry",
         symbol: "H",
         dimension: [.Length: 2, .Mass: 1, .Current: -2]
     )
-    
+
     // MARK: Length
+
     static let meter = try! DefinedUnit(
         name: "meter",
         symbol: "m",
@@ -447,29 +462,33 @@ enum DefaultUnits {
         dimension: [.Length: 1],
         coefficient: 3.0856775814913673e16
     )
-    
+
     // MARK: Luminous Intensity
+
     static let candela = try! DefinedUnit(
         name: "candela",
         symbol: "cd",
         dimension: [.LuminousIntensity: 1]
     )
-    
+
     // MARK: Magnetic Flux
+
     static let weber = try! DefinedUnit(
         name: "weber",
         symbol: "Wb",
         dimension: [.Mass: 1, .Length: 2, .Time: -2, .Current: -1]
     )
-    
+
     // MARK: Magnetic Flux Density
+
     static let tesla = try! DefinedUnit(
         name: "tesla",
         symbol: "T",
         dimension: [.Mass: 1, .Time: -2, .Current: -1]
     )
-    
+
     // MARK: Mass
+
     static let kilogram = try! DefinedUnit(
         name: "kilogram",
         symbol: "kg",
@@ -565,8 +584,9 @@ enum DefaultUnits {
         dimension: [.Mass: 1],
         coefficient: 14.5939
     )
-    
+
     // MARK: Power
+
     static let watt = try! DefinedUnit(
         name: "watt",
         symbol: "W",
@@ -638,8 +658,9 @@ enum DefaultUnits {
         dimension: [.Mass: 1, .Length: 2, .Time: -3],
         coefficient: 3500
     )
-    
+
     // MARK: Pressure
+
     static let pascal = try! DefinedUnit(
         name: "pascal",
         symbol: "Pa",
@@ -673,7 +694,7 @@ enum DefaultUnits {
         name: "bar",
         symbol: "bar",
         dimension: [.Mass: 1, .Length: -1, .Time: -2],
-        coefficient: 100000
+        coefficient: 100_000
     )
     static let millibar = try! DefinedUnit(
         name: "millibar",
@@ -685,7 +706,7 @@ enum DefaultUnits {
         name: "atmosphere",
         symbol: "atm",
         dimension: [.Mass: 1, .Length: -1, .Time: -2],
-        coefficient: 101317.1
+        coefficient: 101_317.1
     )
     static let millimeterOfMercury = try! DefinedUnit(
         name: "millimeterOfMercury",
@@ -717,8 +738,9 @@ enum DefaultUnits {
         dimension: [.Mass: 1, .Length: -1, .Time: -2],
         coefficient: 249.082
     )
-    
+
     // MARK: Resistance
+
     static let ohm = try! DefinedUnit(
         name: "ohm",
         symbol: "Ω",
@@ -748,15 +770,17 @@ enum DefaultUnits {
         dimension: [.Mass: 1, .Length: 2, .Time: -3, .Current: -2],
         coefficient: 1e6
     )
-    
+
     // MARK: Solid Angle
+
     static let steradian = try! DefinedUnit(
         name: "steradian",
         symbol: "sr",
         dimension: [.Angle: 2]
     )
-    
+
     // MARK: Temperature
+
     static let kelvin = try! DefinedUnit(
         name: "kelvin",
         symbol: "K",
@@ -772,17 +796,18 @@ enum DefaultUnits {
         name: "fahrenheit",
         symbol: "°F",
         dimension: [.Temperature: 1],
-        coefficient: 5.0/9.0,
-        constant: 273.15 - (32 * 5.0/9.0)
+        coefficient: 5.0 / 9.0,
+        constant: 273.15 - (32 * 5.0 / 9.0)
     )
     static let rankine = try! DefinedUnit(
         name: "rankine",
         symbol: "°R",
         dimension: [.Temperature: 1],
-        coefficient: 5.0/9.0
+        coefficient: 5.0 / 9.0
     )
-    
+
     // MARK: Time
+
     static let second = try! DefinedUnit(
         name: "second",
         symbol: "s",
@@ -792,13 +817,13 @@ enum DefaultUnits {
         name: "nanosecond",
         symbol: "ns",
         dimension: [.Time: 1],
-        coefficient: 1E-9
+        coefficient: 1e-9
     )
     static let microsecond = try! DefinedUnit(
         name: "microsecond",
         symbol: "μs",
         dimension: [.Time: 1],
-        coefficient: 1E-6
+        coefficient: 1e-6
     )
     static let millisecond = try! DefinedUnit(
         name: "millisecond",
@@ -818,8 +843,9 @@ enum DefaultUnits {
         dimension: [.Time: 1],
         coefficient: 3600
     )
-    
+
     // MARK: Velocity
+
     // Base unit is m/s
     static let knots = try! DefinedUnit(
         name: "knots",
@@ -827,8 +853,9 @@ enum DefaultUnits {
         dimension: [.Length: 1, .Time: -1],
         coefficient: 0.514444
     )
-    
+
     // MARK: Volume
+
     // Base unit is meter^3
     static let liter = try! DefinedUnit(
         name: "liter",
@@ -918,7 +945,7 @@ enum DefaultUnits {
         name: "imperialCup",
         symbol: "icup",
         dimension: [.Length: 3],
-        coefficient: 197.15686375-6
+        coefficient: 197.15686375 - 6
     )
     static let imperialPint = try! DefinedUnit(
         name: "imperialPint",

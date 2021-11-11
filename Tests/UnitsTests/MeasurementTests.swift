@@ -1,5 +1,5 @@
-import XCTest
 @testable import Units
+import XCTest
 
 final class MeasurementTests: XCTestCase {
     func testEquals() throws {
@@ -20,7 +20,7 @@ final class MeasurementTests: XCTestCase {
             2.measured(in: .second)
         )
     }
-    
+
     func testAdd() throws {
         let length1 = 5.measured(in: .meter)
         let length2 = 5.measured(in: .meter)
@@ -28,12 +28,12 @@ final class MeasurementTests: XCTestCase {
             try length1 + length2,
             10.measured(in: .meter)
         )
-        
+
         XCTAssertThrowsError(
             try 5.measured(in: .meter) + 5.measured(in: .second)
         )
     }
-    
+
     func testSubtract() throws {
         let length1 = 5.measured(in: .meter)
         let length2 = 3.measured(in: .meter)
@@ -41,12 +41,12 @@ final class MeasurementTests: XCTestCase {
             try length1 - length2,
             2.measured(in: .meter)
         )
-        
+
         XCTAssertThrowsError(
             try 5.measured(in: .meter) - 5.measured(in: .second)
         )
     }
-    
+
     func testMultiply() throws {
         // Test the same unit
         let length1 = 5.measured(in: .meter)
@@ -55,7 +55,7 @@ final class MeasurementTests: XCTestCase {
             length1 * length2,
             25.measured(in: .meter.pow(2))
         )
-        
+
         // Test mixed units
         let force = 2.measured(in: .newton)
         let time = 7.measured(in: .second)
@@ -63,7 +63,7 @@ final class MeasurementTests: XCTestCase {
             force * time,
             14.measured(in: .newton * .second)
         )
-        
+
         // Test composite units
         let work = 2.measured(in: .newton * .meter)
         XCTAssertEqual(
@@ -71,7 +71,7 @@ final class MeasurementTests: XCTestCase {
             [.Mass: 1, .Length: 2, .Time: -2]
         )
     }
-    
+
     func testDivide() throws {
         // Test the same unit
         let length = 8.measured(in: .meter)
@@ -81,7 +81,7 @@ final class MeasurementTests: XCTestCase {
             2.measured(in: .meter / .second)
         )
     }
-    
+
     func testPow() throws {
         XCTAssertEqual(
             2.measured(in: .meter).pow(2),
@@ -92,7 +92,7 @@ final class MeasurementTests: XCTestCase {
             8.measured(in: .meter.pow(3))
         )
     }
-    
+
     func testIsDimensionallyEquivalent() throws {
         XCTAssertTrue(
             2.measured(in: .meter)
@@ -107,7 +107,7 @@ final class MeasurementTests: XCTestCase {
                 .isDimensionallyEquivalent(to: 4.measured(in: .kilogram * .meter / .second.pow(2)))
         )
     }
-    
+
     func testConvert() throws {
         // Test defined unit conversion
         XCTAssertEqual(
@@ -118,16 +118,16 @@ final class MeasurementTests: XCTestCase {
             try 1.measured(in: .kilowatt).convert(to: .horsepower),
             1.3410220895950278.measured(in: .horsepower)
         )
-        
+
         // Test incompatible defined units error
         XCTAssertThrowsError(
             try 1.measured(in: .kilowatt).convert(to: .meter)
         )
-        
+
         // Test composite unit conversion
         XCTAssertEqual(
             try 1.measured(in: .kilometer.pow(2)).convert(to: .meter.pow(2)),
-            1000000.measured(in: .meter.pow(2))
+            1_000_000.measured(in: .meter.pow(2))
         )
         XCTAssertEqual(
             try 1.measured(in: .meter.pow(2)).convert(to: .kilometer.pow(2)),
@@ -141,18 +141,18 @@ final class MeasurementTests: XCTestCase {
             try 1.measured(in: .meter / .second.pow(2)).convert(to: .foot / .minute.pow(2)),
             11811.023622047243.measured(in: .foot / .minute.pow(2))
         )
-        
+
         // Test mixed unit conversion
         XCTAssertEqual(
             try 1.measured(in: .newton).convert(to: .foot * .pound / .minute.pow(2)),
             26038.849864355616.measured(in: .foot * .pound / .minute.pow(2))
         )
-        
+
         // Test incompatible composite units error
         XCTAssertThrowsError(
             try 1.measured(in: .meter / .second.pow(2)).convert(to: .foot / .minute)
         )
-        
+
         // Test conversion with constant
         XCTAssertEqual(
             try 25.measured(in: .celsius).convert(to: .kelvin),
@@ -166,14 +166,14 @@ final class MeasurementTests: XCTestCase {
             try 32.measured(in: .fahrenheit).convert(to: .celsius),
             0.measured(in: .celsius)
         )
-        
+
         // Test composite unit with constant cannot be converted
         XCTAssertThrowsError(
             try 25.measured(in: .meter * .celsius)
                 .convert(to: .meter * .fahrenheit)
         )
     }
-    
+
     func testNumericExtensions() throws {
         XCTAssertEqual(
             2.0.measured(in: .meter),
@@ -184,9 +184,8 @@ final class MeasurementTests: XCTestCase {
             2.measured(in: .meter)
         )
     }
-    
+
     func testCustomUnits() throws {
-        
         // Test custom defined unit
         let centifoot = try Unit.define(
             name: "centifoot",
@@ -194,23 +193,22 @@ final class MeasurementTests: XCTestCase {
             dimension: [.Length: 1],
             coefficient: 0.003048
         )
-        
+
         XCTAssertEqual(
             try 25.measured(in: centifoot).convert(to: .foot),
             0.25.measured(in: .foot)
         )
-        
-        
+
         // Test custom extended unit
         try Unit.define(
             name: "centiinch",
             symbol: "cin",
             dimension: [.Length: 1],
-            coefficient:  0.000254
+            coefficient: 0.000254
         )
         // Test referencing string before running the extension
         XCTAssertEqual(
-            try 25.measured(in: Unit.init(fromSymbol: "cin")).convert(to: .inch),
+            try 25.measured(in: Unit(fromSymbol: "cin")).convert(to: .inch),
             0.25.measured(in: .inch)
         )
         // Test typical usage
@@ -227,5 +225,5 @@ final class MeasurementTests: XCTestCase {
 }
 
 extension Units.Unit {
-    static let centiinch = try! Unit.init(fromSymbol: "cin")
+    static let centiinch = try! Unit(fromSymbol: "cin")
 }
