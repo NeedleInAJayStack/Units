@@ -16,14 +16,14 @@ public struct Unit {
     /// - Parameter symbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
     /// or a complex unit symbol that combines basic units with `*`, `/`, or `^`.
     public init(fromSymbol symbol: String) throws {
-        let symbolContainsOperator = Operator.allCases.contains { arithSymbol in
+        let symbolContainsOperator = OperatorSymbols.allCases.contains { arithSymbol in
             symbol.contains(arithSymbol.rawValue)
         }
         if symbolContainsOperator {
-            let compositeUnits = try UnitRegistry.instance.compositeUnitsFromSymbol(symbol: symbol)
+            let compositeUnits = try Registry.instance.compositeUnitsFromSymbol(symbol: symbol)
             self.init(composedOf: compositeUnits)
         } else {
-            let definedUnit = try UnitRegistry.instance.definedUnitFromSymbol(symbol: symbol)
+            let definedUnit = try Registry.instance.definedUnitFromSymbol(symbol: symbol)
             self.init(definedBy: definedUnit)
         }
     }
@@ -63,7 +63,7 @@ public struct Unit {
         coefficient: Double = 1,
         constant: Double = 0
     ) throws -> Unit {
-        try UnitRegistry.instance.addUnit(
+        try Registry.instance.addUnit(
             name: name,
             symbol: symbol,
             dimension: dimension,
@@ -76,7 +76,7 @@ public struct Unit {
     /// Get all defined units
     /// - Returns: A list of units representing all that are defined in the registry
     public static func allDefined() -> [Unit] {
-        UnitRegistry.instance.allUnits()
+        Registry.instance.allUnits()
     }
 
     /// The dimension of the unit in terms of base quanties
@@ -118,19 +118,19 @@ public struct Unit {
                     if exp >= 0 {
                         prefix = ""
                     } else {
-                        prefix = "1\(Operator.div.rawValue)"
+                        prefix = "1\(OperatorSymbols.div.rawValue)"
                     }
                 } else {
                     if exp >= 0 {
-                        prefix = Operator.mult.rawValue
+                        prefix = OperatorSymbols.mult.rawValue
                     } else {
-                        prefix = Operator.div.rawValue
+                        prefix = OperatorSymbols.div.rawValue
                     }
                 }
                 let symbol = subUnit.symbol
                 var expStr = ""
                 if abs(exp) > 1 {
-                    expStr = "\(Operator.exp.rawValue)\(abs(exp))"
+                    expStr = "\(OperatorSymbols.exp.rawValue)\(abs(exp))"
                 }
 
                 computedSymbol += "\(prefix)\(symbol)\(expStr)"
@@ -157,19 +157,19 @@ public struct Unit {
                     if exp >= 0 {
                         prefix = ""
                     } else {
-                        prefix = "1 \(Operator.div.rawValue) "
+                        prefix = "1 \(OperatorSymbols.div.rawValue) "
                     }
                 } else {
                     if exp >= 0 {
-                        prefix = " \(Operator.mult.rawValue) "
+                        prefix = " \(OperatorSymbols.mult.rawValue) "
                     } else {
-                        prefix = " \(Operator.div.rawValue) "
+                        prefix = " \(OperatorSymbols.div.rawValue) "
                     }
                 }
                 let name = subUnit.name
                 var expStr = ""
                 if abs(exp) > 1 {
-                    expStr = "\(Operator.exp.rawValue)\(abs(exp))"
+                    expStr = "\(OperatorSymbols.exp.rawValue)\(abs(exp))"
                 }
 
                 computedName += "\(prefix)\(name)\(expStr)"
@@ -347,12 +347,6 @@ public struct Unit {
     private enum UnitType {
         case defined(DefinedUnit)
         case composite([DefinedUnit: Int])
-    }
-
-    private enum Operator: String, CaseIterable {
-        case mult = "*"
-        case div = "/"
-        case exp = "^"
     }
 }
 

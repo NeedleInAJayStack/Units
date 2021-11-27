@@ -7,14 +7,10 @@ struct DefinedUnit: Hashable {
     let constant: Double
 
     init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) throws {
-        guard !symbol.contains("*") else {
-            throw UnitError.invalidSymbol(message: "Symbol cannot contain '*'")
-        }
-        guard !symbol.contains("/") else {
-            throw UnitError.invalidSymbol(message: "Symbol cannot contain '/'")
-        }
-        guard !symbol.contains("^") else {
-            throw UnitError.invalidSymbol(message: "Symbol cannot contain '^'")
+        for operatorSymbol in OperatorSymbols.allCases {
+            guard !symbol.contains(operatorSymbol.rawValue) else {
+                throw UnitError.invalidSymbol(message: "\(name) Symbol cannot contain '\(operatorSymbol.rawValue)'")
+            }
         }
 
         self.name = name
@@ -22,5 +18,11 @@ struct DefinedUnit: Hashable {
         self.dimension = dimension
         self.coefficient = coefficient
         self.constant = constant
+    }
+}
+
+extension DefinedUnit: Equatable {
+    public static func == (lhs: DefinedUnit, rhs: DefinedUnit) -> Bool {
+        return lhs.symbol == rhs.symbol
     }
 }

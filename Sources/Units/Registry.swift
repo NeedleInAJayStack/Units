@@ -1,15 +1,15 @@
 /// UnitRegistry defines a structure that contains all defined units. This ensures
 /// that we are able to parse to and from unit symbol representations.
-internal class UnitRegistry {
+internal class Registry {
     // TODO: Should we eliminate this singleton and make clients keep track?
-    internal static let instance = UnitRegistry()
+    internal static let instance = Registry()
 
     // Store units as a dictionary based on symbol for fast access
     // TODO: Change to Unit to avoid creating multiple Units in memory
     private var units: [String: DefinedUnit]
     private init() {
         units = [:]
-        for defaultUnit in UnitRegistry.defaultUnits {
+        for defaultUnit in Registry.defaultUnits {
             // Protect against double-defining symbols
             if units[defaultUnit.symbol] != nil {
                 fatalError("Duplicate symbol: \(defaultUnit.symbol)")
