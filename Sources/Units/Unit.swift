@@ -13,7 +13,7 @@ public struct Unit {
 
     /// Create a unit from the symbol. This symbol is compared to the global registry, decomposed if necessary,
     /// and the relevant unit is initialized.
-    /// - parameter fromSymbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
+    /// - Parameter symbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
     /// or a complex unit symbol that combines basic units with `*`, `/`, or `^`.
     public init(fromSymbol symbol: String) throws {
         let symbolContainsOperator = Operator.allCases.contains { arithSymbol in
@@ -29,14 +29,14 @@ public struct Unit {
     }
 
     /// Create a unit from the defined unit object.
-    /// - parameter definedBy: A defined unit to wrap
+    /// - Parameter definedBy: A defined unit to wrap
     internal init(definedBy: DefinedUnit) {
         type = .defined(definedBy)
     }
 
-    /// Create a new from the sub-unit map.
-    /// - parameter composedOf: A dictionary of defined units and exponents. If this dictionary only has one value with an exponent of one,
-    /// we return it as that defined unit.
+    /// Create a new from the sub-unit dictionary.
+    /// - Parameter subUnits: A dictionary of defined units and exponents. If this dictionary has only a single unit with an exponent of one,
+    /// we return that defined unit directly.
     internal init(composedOf subUnits: [DefinedUnit: Int]) {
         if subUnits.count == 1, let subUnit = subUnits.first, subUnit.value == 1 {
             type = .defined(subUnit.key)
@@ -45,13 +45,17 @@ public struct Unit {
         }
     }
 
-    /// Define a new unit to add to the registry
-    /// - parameter name: The string name of the unit.
-    /// - parameter symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
-    /// - parameter dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
-    /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
-    /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
     @discardableResult
+    /// Define a new unit to add to the registry
+    /// - Parameters:
+    ///   - name: The string name of the unit.
+    ///   - symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
+    ///   - dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
+    ///   - coefficient: The value to multiply a base unit of this dimension when converting it to this unit.
+    ///   For base units, this is 1.
+    ///   - constant: The value to add to a base unit when converting it to this unit. For units without scaling
+    ///   differences, this is 0. This is added after the coefficient is multiplied according to order-of-operations.
+    /// - Returns: The unit definition that now exists in the registry.
     public static func define(
         name: String,
         symbol: String,
@@ -69,12 +73,13 @@ public struct Unit {
         return try Unit(fromSymbol: symbol)
     }
 
-    /// Return a list of all currently defined units
+    /// Get all defined units
+    /// - Returns: A list of units representing all that are defined in the registry
     public static func allDefined() -> [Unit] {
         UnitRegistry.instance.allUnits()
     }
 
-    /// Return the dimension of the unit in terms of base quanties
+    /// The dimension of the unit in terms of base quanties
     public var dimension: [Quantity: Int] {
         switch type {
         case let .defined(definition):
@@ -95,7 +100,7 @@ public struct Unit {
         }
     }
 
-    /// Return a string symbol representing the unit
+    /// The string symbol of the unit
     public var symbol: String {
         switch type {
         case let .defined(definition):
@@ -134,7 +139,7 @@ public struct Unit {
         }
     }
 
-    /// Return a string name representing the unit
+    /// The string name of the unit
     public var name: String {
         switch type {
         case let .defined(definition):
@@ -175,7 +180,11 @@ public struct Unit {
 
     // MARK: - Arithmatic
 
-    /// Multiply one unit by another and return the resulting unit
+    /// Multiply the units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side unit
+    ///   - rhs: The right-hand-side unit
+    /// - Returns: A unit modeling the product of the left-hand-side and right-hand-side units
     public static func * (lhs: Unit, rhs: Unit) -> Unit {
         let lhsUnits = lhs.subUnits
         let rhsUnits = rhs.subUnits
@@ -191,7 +200,11 @@ public struct Unit {
         return Unit(composedOf: subUnits)
     }
 
-    /// Divide one unit by another and return the resulting unit
+    /// Divide the units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side unit
+    ///   - rhs: The right-hand-side unit
+    /// - Returns: A unit modeling the left-hand-side unit divided by the right-hand-side unit.
     public static func / (lhs: Unit, rhs: Unit) -> Unit {
         let lhsUnits = lhs.subUnits
         let rhsUnits = rhs.subUnits
@@ -211,30 +224,36 @@ public struct Unit {
         return Unit(composedOf: subUnits)
     }
 
-    /// Raise this unit to the given power
+    /// Exponentiate the unit. This is equavalent to multiple `*` operations.
+    /// - Parameter raiseTo: The exponent to raise the unit to
+    /// - Returns: A new unit modeling the original raised to the provided power
     public func pow(_ raiseTo: Int) -> Unit {
-        var newSubUnits: [DefinedUnit: Int] = [:]
-
         switch type {
         case let .defined(defined):
-            newSubUnits[defined] = raiseTo
+            return Unit(composedOf: [defined: raiseTo])
         case let .composite(subUnits):
-            newSubUnits = subUnits.mapValues { subExp in
+            let newSubUnits = subUnits.mapValues { subExp in
                 subExp * raiseTo
             }
+            return Unit(composedOf: newSubUnits)
         }
-
-        return Unit(composedOf: newSubUnits)
     }
 
     // MARK: - Conversions
 
-    /// Boolean indicating whether this unit and the input unit are of the same dimension
+    /// Tests that two units are of the same dimension
+    /// - Parameter to: The unit to compare this one to
+    /// - Returns: A bool indicating whether this unit and the input unit are of the same dimension
     public func isDimensionallyEquivalent(to: Unit) -> Bool {
         return dimension == to.dimension
     }
 
-    /// Convert a number to its base value, as defined by the coefficient and constant
+    /// Convert a provided amount of this unit to base dimensional units. This unit's conversion definition is used.
+    ///
+    /// For example, `Unit.kilometer.toBaseUnit(5)` will return `5000`, since `5km = 5000m`
+    ///
+    /// - Parameter number: The amount of this unit to convert to the base units.
+    /// - Returns: The equivalent amount in terms of the dimensional base units.
     func toBaseUnit(_ number: Double) throws -> Double {
         switch type {
         case let .defined(defined):
@@ -251,7 +270,12 @@ public struct Unit {
         }
     }
 
-    /// Convert a number from its base value, as defined by the coefficient and constant
+    /// Convert a provided amount of base dimensional units to this unit. This unit's conversion definition is used.
+    ///
+    /// For example, `Unit.kilometer.fromBaseUnit(5)` will return `0.005`, since `5m = 0.005km`
+    ///
+    /// - Parameter number: The amount of base units to conver to this unit.
+    /// - Returns: The equivalent amount in terms of this unit.
     func fromBaseUnit(_ number: Double) throws -> Double {
         switch type {
         case let .defined(defined):
@@ -281,8 +305,12 @@ public struct Unit {
         }
     }
 
-    /// Sort units into positive and negative groups, each going from smallest to largest exponent,
-    /// with each in alphabetical order by symbol
+    /// Sort units into a consistent order.
+    ///
+    /// The order is:
+    /// - Positive exponents, from smallest to largest
+    /// - Negative exponents, from smallest to largest
+    /// - For equal exponents, units are in alphabetical order by symbol
     private func sortedUnits() -> [(DefinedUnit, Int)] {
         switch type {
         case let .defined(defined):

@@ -1,11 +1,10 @@
-/// Static struct containing this package's pre-defined units
+/// Static type containing this package's pre-defined units
 enum DefaultUnits {
-    // NOTE: If adding additional units to this list, they should get corresponding
-    // entries in the `Unit+DefinedUnits` and
+    // MARK: If adding additional units to this list, add corresponding entries in the `Unit+DefinedUnits.swift` file
 
     // MARK: Acceleration
-
-    // Base unit is m/s^2
+    // Base unit: meter / second^2
+    
     static let standardGravity = try! DefinedUnit(
         name: "standardGravity",
         symbol: "ɡ",
@@ -14,6 +13,7 @@ enum DefaultUnits {
     )
 
     // MARK: Amount
+    // Base unit: mole
 
     static let mole = try! DefinedUnit(
         name: "mole",
@@ -34,6 +34,7 @@ enum DefaultUnits {
     )
 
     // MARK: Angle
+    // Base unit: radian
 
     static let radian = try! DefinedUnit(
         name: "radian",
@@ -48,8 +49,8 @@ enum DefaultUnits {
     )
 
     // MARK: Area
-
-    // Base unit is m^2
+    // Base unit: meter^2
+    
     static let acre = try! DefinedUnit(
         name: "acre",
         symbol: "ac",
@@ -70,7 +71,8 @@ enum DefaultUnits {
     )
 
     // MARK: Capacitance
-
+    // Base unit: farad
+    
     static let farad = try! DefinedUnit(
         name: "farad",
         symbol: "F",
@@ -78,6 +80,7 @@ enum DefaultUnits {
     )
 
     // MARK: Charge
+    // Base unit: coloumb
 
     static let coulomb = try! DefinedUnit(
         name: "coulomb",
@@ -86,6 +89,7 @@ enum DefaultUnits {
     )
 
     // MARK: Current
+    // Base unit: ampere
 
     static let ampere = try! DefinedUnit(
         name: "ampere",
@@ -118,6 +122,7 @@ enum DefaultUnits {
     )
 
     // MARK: Data
+    // Base unit: bit
 
     static let bit = try! DefinedUnit(
         name: "bit",
@@ -156,6 +161,7 @@ enum DefaultUnits {
     )
 
     // MARK: Electric Potential Difference
+    // Base unit: volt
 
     static let volt = try! DefinedUnit(
         name: "volt",
@@ -188,6 +194,7 @@ enum DefaultUnits {
     )
 
     // MARK: Energy
+    // Base unit: joule
 
     static let joule = try! DefinedUnit(
         name: "joule",
@@ -244,6 +251,7 @@ enum DefaultUnits {
     )
 
     // MARK: Force
+    // Base unit: newton
 
     static let newton = try! DefinedUnit(
         name: "newton",
@@ -258,6 +266,7 @@ enum DefaultUnits {
     )
 
     // MARK: Frequency
+    // Base unit: hertz
 
     static let hertz = try! DefinedUnit(
         name: "hertz",
@@ -308,6 +317,7 @@ enum DefaultUnits {
     )
 
     // MARK: Illuminance
+    // Base unit: lux
 
     static let lux = try! DefinedUnit(
         name: "lux",
@@ -328,6 +338,7 @@ enum DefaultUnits {
     )
 
     // MARK: Inductance
+    // Base unit: henry
 
     static let henry = try! DefinedUnit(
         name: "henry",
@@ -336,6 +347,7 @@ enum DefaultUnits {
     )
 
     // MARK: Length
+    // Base unit: meter
 
     static let meter = try! DefinedUnit(
         name: "meter",
@@ -464,6 +476,7 @@ enum DefaultUnits {
     )
 
     // MARK: Luminous Intensity
+    // Base unit: candela
 
     static let candela = try! DefinedUnit(
         name: "candela",
@@ -472,6 +485,7 @@ enum DefaultUnits {
     )
 
     // MARK: Magnetic Flux
+    // Base unit: weber
 
     static let weber = try! DefinedUnit(
         name: "weber",
@@ -480,6 +494,7 @@ enum DefaultUnits {
     )
 
     // MARK: Magnetic Flux Density
+    // Base unit: tesla
 
     static let tesla = try! DefinedUnit(
         name: "tesla",
@@ -488,6 +503,7 @@ enum DefaultUnits {
     )
 
     // MARK: Mass
+    // Base unit: kilogram
 
     static let kilogram = try! DefinedUnit(
         name: "kilogram",
@@ -586,6 +602,7 @@ enum DefaultUnits {
     )
 
     // MARK: Power
+    // Base unit: watt
 
     static let watt = try! DefinedUnit(
         name: "watt",
@@ -660,6 +677,7 @@ enum DefaultUnits {
     )
 
     // MARK: Pressure
+    // Base unit: pascal
 
     static let pascal = try! DefinedUnit(
         name: "pascal",
@@ -740,6 +758,7 @@ enum DefaultUnits {
     )
 
     // MARK: Resistance
+    // Base unit: ohm
 
     static let ohm = try! DefinedUnit(
         name: "ohm",
@@ -772,6 +791,7 @@ enum DefaultUnits {
     )
 
     // MARK: Solid Angle
+    // Base unit: steridian
 
     static let steradian = try! DefinedUnit(
         name: "steradian",
@@ -780,6 +800,7 @@ enum DefaultUnits {
     )
 
     // MARK: Temperature
+    // Base unit: kelvin
 
     static let kelvin = try! DefinedUnit(
         name: "kelvin",
@@ -807,6 +828,7 @@ enum DefaultUnits {
     )
 
     // MARK: Time
+    // Base unit: second
 
     static let second = try! DefinedUnit(
         name: "second",
@@ -845,8 +867,8 @@ enum DefaultUnits {
     )
 
     // MARK: Velocity
-
-    // Base unit is m/s
+    // Base unit: meter / second
+    
     static let knots = try! DefinedUnit(
         name: "knots",
         symbol: "knot",
@@ -855,8 +877,8 @@ enum DefaultUnits {
     )
 
     // MARK: Volume
-
-    // Base unit is meter^3
+    // Base unit: meter^3
+    
     static let liter = try! DefinedUnit(
         name: "liter",
         symbol: "L",

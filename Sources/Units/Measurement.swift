@@ -1,24 +1,30 @@
 import Foundation
 
-/// A numeric value with a unit of measure
+/// A numeric scalar value with a unit of measure
 public struct Measurement: Equatable, Codable {
     public let value: Double
     public let unit: Unit
 
     /// Indicates whether the measurement is dimensionally equivalent to the provided measurement.
     /// Note that measurements with different units can be dimensionally equivalent.
+    /// - Parameter to: The measurement to compare
+    /// - Returns: Bool indicating whether the units have the same dimensions
     public func isDimensionallyEquivalent(to: Measurement) -> Bool {
         return unit.isDimensionallyEquivalent(to: to.unit)
     }
 
-    /// Return a measurement of the same value, but with the provided unit. That is,
+    /// Force the measurement to have the provided unit, but the same scalar value. That is,
     /// the value **is not mathematically converted**.
+    /// - Parameter newUnit: The unit to apply to the measurement
+    /// - Returns: A new measurement with the same scalar value but the provided unit of measure
     public func declare(as newUnit: Unit) -> Measurement {
         return Measurement(value: value, unit: newUnit)
     }
 
-    /// Convert this unit to the provided one, and return the result. The provided unit must
-    /// be dimensionally equivalent to this measurement's unit.
+    /// Convert this measurement to the provided unit by adjusting the scalar value and unit of measure.
+    /// The provided unit must be dimensionally equivalent to this measurement's unit.
+    /// - Parameter newUnit: The unit to convert this measurement to
+    /// - Returns: A new measurement with the converted scalar value and provided unit of measure
     public func convert(to newUnit: Unit) throws -> Measurement {
         guard unit.isDimensionallyEquivalent(to: newUnit) else {
             throw UnitError.incompatibleUnits(message: "Cannot convert \(unit) to \(newUnit)")
@@ -28,8 +34,11 @@ public struct Measurement: Equatable, Codable {
         return Measurement(value: convertedValue, unit: newUnit)
     }
 
-    /// Add the left side measurement to the right side measurement. The measurements must have the
-    /// same unit.
+    /// Add the measurements. The measurements must have the same unit.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    /// - Returns: A new measurement with the summed scalar values and the same unit of measure
     public static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit == rhs.unit else {
             throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
@@ -41,8 +50,12 @@ public struct Measurement: Equatable, Codable {
         )
     }
 
-    /// Subtract the left side measurement from the right side measurement The measurements must have the
-    /// same unit.
+    /// Subtract one measurement from another. The measurements must have the same unit.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    /// - Returns: A new measurement with a scalar value of the left-hand-side value minus the right-hand-side value
+    /// and the same unit of measure
     public static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
         guard lhs.unit == rhs.unit else {
             throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
@@ -54,7 +67,11 @@ public struct Measurement: Equatable, Codable {
         )
     }
 
-    /// Multiply the left side measurement by the right side measurement.
+    /// Multiply the measurements. The measurements may have different units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    /// - Returns: A new measurement with the multiplied scalar values and a combined unit of measure
     public static func * (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
             value: lhs.value * rhs.value,
@@ -62,7 +79,12 @@ public struct Measurement: Equatable, Codable {
         )
     }
 
-    /// Divide the left side measurement by the right side measurement.
+    /// Divide the measurements. The measurements may have different units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    /// - Returns: A new measurement with a scalar value of the left-hand-side value divided by the right-hand-side value
+    /// and a combined unit of measure
     public static func / (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
             value: lhs.value / rhs.value,
@@ -70,8 +92,9 @@ public struct Measurement: Equatable, Codable {
         )
     }
 
-    /// Raise the measurement to an integer exponent. This will raise the unit
-    /// to the same exponent.
+    /// Exponentiate the measurement. This is equavalent to multiple `*` operations.
+    /// - Parameter raiseTo: The exponent to raise the measurement to
+    /// - Returns: A new measurement with an exponentiated scalar value and an exponentiated unit of measure
     public func pow(_ raiseTo: Int) -> Measurement {
         return Measurement(
             value: Foundation.pow(value, Double(raiseTo)),
@@ -84,19 +107,5 @@ extension Measurement: CustomStringConvertible {
     /// Displays the measurement as a string of the value and unit symbol
     public var description: String {
         return "\(value) \(unit)"
-    }
-}
-
-public extension Double {
-    /// Creates a measurement from the Double with the provided unit
-    func measured(in unit: Unit) -> Measurement {
-        return Measurement(value: self, unit: unit)
-    }
-}
-
-public extension Int {
-    /// Creates a measurement from the Int with the provided unit
-    func measured(in unit: Unit) -> Measurement {
-        return Measurement(value: Double(self), unit: unit)
     }
 }

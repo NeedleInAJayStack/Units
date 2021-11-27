@@ -1,9 +1,8 @@
-/// Defines the possible base quantities, as defined by the SI units:
-/// https://en.wikipedia.org/wiki/International_System_of_Units#Overview_of_the_units
+/// A dimension of measurement. These may be combined to form composite dimensions and measurements
 public enum Quantity {
     // TODO: Consider changing away from enum for extensibility
 
-    // Base SI quantities
+    // Base ISQ quantities: https://en.wikipedia.org/wiki/International_System_of_Quantities#Base_quantities
     case Amount
     case Current
     case Length

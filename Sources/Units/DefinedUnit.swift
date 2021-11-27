@@ -1,4 +1,4 @@
-/// A predefined unit, which has name, quantity, symbol, and conversion information.
+/// A predefined unit, which has an identifying symbol, defined quantity, and conversion information.
 struct DefinedUnit: Hashable {
     let name: String
     let symbol: String
