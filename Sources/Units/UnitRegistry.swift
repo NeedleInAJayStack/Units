@@ -1,6 +1,6 @@
 /// UnitRegistry defines a structure that contains all defined units. This ensures
 /// that we are able to parse to and from unit symbol representations.
-internal class Registry {
+internal class UnitRegistry {
     // TODO: Should we eliminate this singleton and make clients keep track?
     internal static let instance = Registry()
 
@@ -26,6 +26,20 @@ internal class Registry {
             nameMap[defaultUnit.name] = defaultUnit
         }
     }
+    
+    public func unit(fromSymbol symbol: String) throws -> Unit {
+        let symbolContainsOperator = OperatorSymbols.allCases.contains { arithSymbol in
+            symbol.contains(arithSymbol.rawValue)
+        }
+        if symbolContainsOperator {
+            let compositeUnits = try self.compositeUnitsFromSymbol(symbol: symbol)
+            return Unit(composedOf: compositeUnits)
+        } else {
+            let definedUnit = try self.definedUnitFromSymbol(symbol: symbol)
+            return Unit(definedBy: definedUnit)
+        }
+    }
+        
 
     /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
     /// verified that this is a composite unit.
@@ -50,6 +64,35 @@ internal class Registry {
             throw UnitError.unitNotFound(message: "Symbol '\(symbol)' not recognized")
         }
         return definedUnit
+    }
+    
+
+    @discardableResult
+    /// Define a new unit to add to the registry
+    /// - Parameters:
+    ///   - name: The string name of the unit.
+    ///   - symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
+    ///   - dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
+    ///   - coefficient: The value to multiply a base unit of this dimension when converting it to this unit.
+    ///   For base units, this is 1.
+    ///   - constant: The value to add to a base unit when converting it to this unit. For units without scaling
+    ///   differences, this is 0. This is added after the coefficient is multiplied according to order-of-operations.
+    /// - Returns: The unit definition that now exists in the registry.
+    public func define(
+        name: String,
+        symbol: String,
+        dimension: [Quantity: Int],
+        coefficient: Double = 1,
+        constant: Double = 0
+    ) throws -> Unit {
+        try self.addUnit(
+            name: name,
+            symbol: symbol,
+            dimension: dimension,
+            coefficient: coefficient,
+            constant: constant
+        )
+        return try self.unit(fromSymbol: symbol)
     }
 
     /// Returns a defined unit given a defined unit name. It is expected that the caller has
@@ -95,7 +138,7 @@ internal class Registry {
     }
 
     /// Returns all units currently defined by the registry
-    internal func allUnits() -> [Unit] {
+    public func allUnits() -> [Unit] {
         var allUnits = [Unit]()
         for (_, unit) in symbolMap {
             allUnits.append(Unit(definedBy: unit))

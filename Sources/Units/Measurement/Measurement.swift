@@ -1,7 +1,7 @@
 import Foundation
 
 /// A numeric scalar value with a unit of measure
-public struct Measurement: Equatable, Codable {
+public struct Measurement: Equatable { //, Codable {
     public private(set) var value: Double
     public private(set) var unit: Unit
 

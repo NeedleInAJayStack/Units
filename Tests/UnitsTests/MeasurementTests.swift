@@ -352,7 +352,7 @@ final class MeasurementTests: XCTestCase {
         let centifoot = try Unit.define(
             name: "centifoot",
             symbol: "cft",
-            dimension: [.Length: 1],
+            dimension: [Quantity.Length: 1],
             coefficient: 0.003048
         )
 
@@ -365,6 +365,8 @@ final class MeasurementTests: XCTestCase {
 
         // Test conversion to custom unit
         XCTAssertEqual(
+            try 25.measured(in: centifoot).convert(to: .foot),
+            0.25.measured(in: .foot)
             try 1.measured(in: .foot).convert(to: centifoot),
             100.measured(in: centifoot),
             accuracy: accuracy
@@ -535,6 +537,6 @@ final class MeasurementTests: XCTestCase {
     }
 }
 
-extension Units.Unit {
-    static let centiinch = try! Unit(fromSymbol: "cin")
-}
+//extension UnitRegistry {
+//    var centiinch = try self.unit(fromSymbol: "cin")
+//}

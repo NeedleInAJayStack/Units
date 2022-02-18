@@ -20,19 +20,19 @@ public struct Unit {
     /// and the relevant unit is initialized.
     /// - Parameter symbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
     /// or a complex unit symbol that combines basic units with `*`, `/`, or `^`.
-    public init(fromSymbol symbol: String) throws {
+    public init(fromSymbol symbol: String, registry: UnitRegistry) throws {
         let symbolContainsOperator = OperatorSymbols.allCases.contains { arithSymbol in
             symbol.contains(arithSymbol.rawValue)
         }
         if symbolContainsOperator {
-            let compositeUnits = try Registry.instance.compositeUnitsFromSymbol(symbol: symbol)
+            let compositeUnits = try registry.compositeUnitsFromSymbol(symbol: symbol)
             if compositeUnits.isEmpty {
                 self = .none
             } else {
                 self.init(composedOf: compositeUnits)
             }
         } else {
-            let definedUnit = try Registry.instance.getUnit(bySymbol: symbol)
+            let definedUnit = try registry.getUnit(bySymbol: symbol)
             self.init(definedBy: definedUnit)
         }
     }
@@ -41,8 +41,8 @@ public struct Unit {
     /// Only defined units are returned - complex unit name equations are not supported.
     ///
     /// - Parameter symbol: A string name of the unit to retrieve. This cannot be a complex equation of names.
-    public init(fromName name: String) throws {
-        let definedUnit = try Registry.instance.getUnit(byName: name)
+    public init(fromName name: String, registry: UnitRegistry) throws {
+        let definedUnit = try registry.getUnit(byName: name)
         self.init(definedBy: definedUnit)
     }
 
@@ -139,8 +139,8 @@ public struct Unit {
 
     /// Get all defined units
     /// - Returns: A list of units representing all that are defined in the registry
-    public static func allDefined() -> [Unit] {
-        Registry.instance.allUnits()
+    public static func allDefined(registry: UnitRegistry) -> [Unit] {
+        registry.allUnits()
     }
 
     /// The dimension of the unit in terms of base quanties
@@ -400,16 +400,16 @@ extension Unit: LosslessStringConvertible {
     }
 }
 
-extension Unit: Codable {
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(symbol)
-    }
-
-    public init(from: Decoder) throws {
-        let symbol = try from.singleValueContainer().decode(String.self)
-        try self.init(fromSymbol: symbol)
-    }
-}
+//extension Unit: Codable {
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.singleValueContainer()
+//        try container.encode(symbol)
+//    }
+//
+//    public init(from: Decoder) throws {
+//        let symbol = try from.singleValueContainer().decode(String.self)
+//        try self.init(fromSymbol: symbol)
+//    }
+//}
 
 extension Unit: Sendable {}
