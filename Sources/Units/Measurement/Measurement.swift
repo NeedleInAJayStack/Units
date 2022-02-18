@@ -4,6 +4,18 @@ import Foundation
 public struct Measurement: Equatable, Codable {
     public let value: Double
     public let unit: Unit
+    
+    /// Create a new measurement
+    /// - Parameters:
+    ///   - value: The magnitude of the measurement
+    ///   - unit: The unit of measure
+    public init(
+        value: Double,
+        unit: Unit
+    ) {
+        self.value = value
+        self.unit = unit
+    }
 
     /// Indicates whether the measurement is dimensionally equivalent to the provided measurement.
     /// Note that measurements with different units can be dimensionally equivalent.
