@@ -47,6 +47,13 @@ enum DefaultUnits {
         dimension: [.Angle: 1],
         coefficient: 180 / Double.pi
     )
+    static let revolution = try! DefinedUnit(
+        name: "revolution",
+        symbol: "rev",
+        dimension: [.Angle: 1],
+        coefficient: 2 * Double.pi
+    )
+
 
     // MARK: Area
     // Base unit: meter^2
@@ -206,6 +213,12 @@ enum DefaultUnits {
         symbol: "kJ",
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
         coefficient: 1000
+    )
+    static let megajoule = try! DefinedUnit(
+        name: "megajoule",
+        symbol: "MJ",
+        dimension: [.Mass: 1, .Length: 2, .Time: -2],
+        coefficient: 1000000
     )
     static let calorie = try! DefinedUnit(
         name: "calorie",
@@ -483,6 +496,16 @@ enum DefaultUnits {
         symbol: "cd",
         dimension: [.LuminousIntensity: 1]
     )
+
+    // MARK: Luminous Flux
+    // Base unit: lumen
+
+    static let lumen = try! DefinedUnit(
+        name: "lumen",
+        symbol: "lm",
+        dimension: [.Angle:2, .LuminousIntensity: 1]
+    )
+
 
     // MARK: Magnetic Flux
     // Base unit: weber
@@ -864,6 +887,25 @@ enum DefaultUnits {
         symbol: "hr",
         dimension: [.Time: 1],
         coefficient: 3600
+    )
+    static let day = try! DefinedUnit(
+        name: "day",
+        symbol: "d",
+        dimension: [.Time: 1],
+        coefficient: 86400
+    )
+    static let week = try! DefinedUnit(
+        name: "week",
+        symbol: "week",
+        dimension: [.Time: 1],
+        coefficient: 604800
+    )
+    // Julian year
+    static let year = try! DefinedUnit(
+        name: "year",
+        symbol: "yr",
+        dimension: [.Time: 1],
+        coefficient: 31557600
     )
 
     // MARK: Velocity

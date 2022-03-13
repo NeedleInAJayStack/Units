@@ -20,6 +20,7 @@ public extension Unit {
 
     static let radian = Unit(definedBy: DefaultUnits.radian)
     static let degree = Unit(definedBy: DefaultUnits.degree)
+    static let revolution = Unit(definedBy: DefaultUnits.revolution)
 
     // MARK: Area
 
@@ -64,6 +65,7 @@ public extension Unit {
 
     static let joule = Unit(definedBy: DefaultUnits.joule)
     static let kilojoule = Unit(definedBy: DefaultUnits.kilojoule)
+    static let megajoule = Unit(definedBy: DefaultUnits.megajoule)
     static let calorie = Unit(definedBy: DefaultUnits.calorie)
     static let kilocalorie = Unit(definedBy: DefaultUnits.kilocalorie)
     static let btu = Unit(definedBy: DefaultUnits.btu)
@@ -125,6 +127,10 @@ public extension Unit {
     // MARK: Luminous Intensity
 
     static let candela = Unit(definedBy: DefaultUnits.candela)
+
+   // MARK: Luminous Flux
+
+    static let lumen = Unit(definedBy: DefaultUnits.lumen)
 
     // MARK: Magnetic Flux
 
@@ -211,6 +217,9 @@ public extension Unit {
     static let millisecond = Unit(definedBy: DefaultUnits.millisecond)
     static let minute = Unit(definedBy: DefaultUnits.minute)
     static let hour = Unit(definedBy: DefaultUnits.hour)
+    static let day = Unit(definedBy: DefaultUnits.day)
+    static let week = Unit(definedBy: DefaultUnits.week)
+    static let year = Unit(definedBy: DefaultUnits.year)
 
     // MARK: Velocity
 
