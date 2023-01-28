@@ -185,22 +185,44 @@ final class MeasurementTests: XCTestCase {
         )
     }
 
-    func testCustomUnits() throws {
-        // Test custom defined unit
+    func testUnitDefine() throws {
         let centifoot = try Unit.define(
             name: "centifoot",
             symbol: "cft",
             dimension: [.Length: 1],
             coefficient: 0.003048
         )
-
+        
+        // Test conversion from custom unit
         XCTAssertEqual(
-            try 25.measured(in: centifoot).convert(to: .foot),
-            0.25.measured(in: .foot)
+            try 100.measured(in: centifoot).convert(to: .foot),
+            1.measured(in: .foot)
         )
-
-        // Test custom extended unit
-        try Unit.define(
+        
+        // Test conversion to custom unit
+        XCTAssertEqual(
+            try 1.measured(in: .foot).convert(to: centifoot).value,
+            100.measured(in: centifoot).value,
+            accuracy: 0.01
+        )
+        
+        
+        let centiinch = try Unit.define(
+            name: "centiinch",
+            symbol: "cin",
+            dimension: [.Length: 1],
+            coefficient: 0.000254
+        )
+        
+        // Test conversion from a custom unit to a different custom unit
+        XCTAssertEqual(
+            try 12.measured(in: centiinch).convert(to: centifoot),
+            1.measured(in: centifoot)
+        )
+    }
+    
+    func testUnitRegister() throws {
+        try Unit.register(
             name: "centiinch",
             symbol: "cin",
             dimension: [.Length: 1],

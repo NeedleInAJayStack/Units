@@ -17,6 +17,17 @@ internal class Registry {
             units[defaultUnit.symbol] = defaultUnit
         }
     }
+    
+    init(inputUnits: [DefinedUnit]) {
+        units = [:]
+        for inputUnit in inputUnits {
+            // Protect against double-defining symbols
+            if units[inputUnit.symbol] != nil {
+                fatalError("Duplicate symbol: \(inputUnit.symbol)")
+            }
+            units[inputUnit.symbol] = inputUnit
+        }
+    }
 
     /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
     /// verified that this is a composite unit.
