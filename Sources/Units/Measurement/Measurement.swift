@@ -137,3 +137,5 @@ extension Measurement: LosslessStringConvertible {
         self.unit = unit
     }
 }
+
+extension Measurement: Hashable {}

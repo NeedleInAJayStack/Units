@@ -413,6 +413,12 @@ extension Unit: Equatable {
     }
 }
 
+extension Unit: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(symbol)
+    }
+}
+
 extension Unit: CustomStringConvertible {
     public var description: String {
         return symbol
