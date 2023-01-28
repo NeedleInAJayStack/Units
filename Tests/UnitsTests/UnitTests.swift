@@ -247,4 +247,8 @@ final class UnitTests: XCTestCase {
             try Unit(fromSymbol: "m/2")
         )
     }
+    
+    func testDefine() {
+        print(Unit.registry.allUnits())
+    }
 }

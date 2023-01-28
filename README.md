@@ -65,19 +65,18 @@ conversions.
 
 ### Constants
 
-Units that include a constant value, such as Fahrenheit, cannot be used within composite unit convertions. For example,
+Units that include a constant value, such as Fahrenheit, cannot be used within composite unit conversions. For example,
 you may not convert `5m/°F` to `m/°C` because its unclear how to handle their shifted scale. Instead use the 
 non-shifted Kelvin and Rankine temperature units to refer to temperature differentials.
 
-## Codability
+## Serialization
 
-Each defined unit must have a unique symbol, which is used to identify and encode/decode it. These symbols are not allowed to
+Each defined unit must have a unique symbol, which is used to identify and serialize/deserialize it. These symbols are not allowed to
 contain the `*`, `/`, or `^` characters because those are used in the symbol representation of complex units.
 
 ## Custom Units
 
-To support serialization, Unit is backed by a global registry which is populated with many units by default. However,
-you may add your own custom units to this registry using the `Unit.define` function.
+To extend this package, users can define their own custom units using `Unit.define`:
 
 ```swift
 let centifoot = try Unit.define(
@@ -88,20 +87,47 @@ let centifoot = try Unit.define(
 )
 
 let measurement = Measurement(value: 5, unit: centifoot)
+print(5.measured(in: .foot).convert(to: centifoot))
 ```
 
-Note that you can only define the unit once globally, and afterwards it should be accessed using `Unit(fromSymbol: String)`. 
-If desired, you can simplify access by extending `Unit` with a static property:
+This returns a Unit object that can be used in arithmetic, conversions, and serialization.
+
+### Adding custom units to the Registry
+
+To support deserialization and runtime querying of available units, this package keeps a global
+registry of the default units. The `Unit.define` method does not insert new definitions into this
+registry. While this avoids conflicts and prevents race conditions, it also means that units created
+using `Unit.define` cannot be deserialized correctly or looked up using `Unit(fromSymbol:)` 
+
+If these features are absolutely needed, and the implications are understood, custom units can be
+added to the registry using `Unit.register`:
+
+```swift
+let centifoot = try Unit.register(
+    name: "centifoot",
+    symbol: "cft",
+    dimension: [.Length: 1],
+    coefficient: 0.003048 // This is the conversion to meters
+)
+```
+
+Note that you may only register the unit once globally, and afterwards it should be accessed 
+either by the assigned variable or using `Unit(fromSymbol: String)`.
+
+To simplify access, `Unit` may be extended with a static property:
 
 ```swift
 extension Unit {
-    public static var centifoot = Unit.fromSymbol("cft")
+    public static var centifoot = try! Unit.fromSymbol("cft")
 }
 
 let measurement = 5.measured(in: .centifoot)
 ```
 
-## Future Development Tasks:
+Again, unless strictly necessary, `Unit.define` is preferred over `Unit.register`.
 
-- Add more defined units
-- Allow user-defined quantities
+## Contributing
+
+Contributions are absolutely welcome! If you find yourself using a custom unit a lot, feel free
+to stick it in an MR, and we can add it to the default list!
+

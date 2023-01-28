@@ -45,8 +45,49 @@ public struct Unit {
         }
     }
 
-    @discardableResult
-    /// Define a new unit to add to the registry
+    /// Define a unit extension without adding it to the registry. The resulting unit object should be retained
+    /// and passed to the callers that may want to use it.
+    ///
+    /// This unit can be used for arithmatic, conversions, and is encoded correctly. However, since it is
+    /// not part of the global registry it will not be decoded, will not be included in the `allDefined()`
+    /// method, and cannot not be retrieved using `Unit(fromSymbol:)`.
+    ///
+    /// This method is considered "safe" because it does not modify the global unit registry.
+    ///
+    /// - Parameters:
+    ///   - name: The string name of the unit.
+    ///   - symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
+    ///   - dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
+    ///   - coefficient: The value to multiply a base unit of this dimension when converting it to this unit.
+    ///   For base units, this is 1.
+    ///   - constant: The value to add to a base unit when converting it to this unit. For units without scaling
+    ///   differences, this is 0. This is added after the coefficient is multiplied according to order-of-operations.
+    /// - Returns: The unit that was defined.
+    public static func define(
+        name: String,
+        symbol: String,
+        dimension: [Quantity: Int],
+        coefficient: Double = 1,
+        constant: Double = 0
+    ) throws -> Unit {
+        return try Unit(
+            definedBy: .init(
+                name: name,
+                symbol: symbol,
+                dimension: dimension,
+                coefficient: coefficient,
+                constant: constant
+            )
+        )
+    }
+    
+    /// **Careful!** Register a new unit to the global registry. Unless you need deserialization support for this unit,
+    /// or support to look up this unit from a different memory-space, we suggest that `define` is used instead.
+    ///
+    /// By using this method, the unit is added to the global registry so it will be deserialized correctly, will be included
+    /// in the `allDefined()` and `Unit(fromSymbol)` methods, and will be available to everyone accessing
+    /// this package in your runtime environment.
+    ///
     /// - Parameters:
     ///   - name: The string name of the unit.
     ///   - symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
@@ -56,7 +97,8 @@ public struct Unit {
     ///   - constant: The value to add to a base unit when converting it to this unit. For units without scaling
     ///   differences, this is 0. This is added after the coefficient is multiplied according to order-of-operations.
     /// - Returns: The unit definition that now exists in the registry.
-    public static func define(
+    @discardableResult
+    public static func register(
         name: String,
         symbol: String,
         dimension: [Quantity: Int],
@@ -347,6 +389,25 @@ public struct Unit {
     private enum UnitType {
         case defined(DefinedUnit)
         case composite([DefinedUnit: Int])
+    }
+    
+    /// Registry singleton that is built up from all Unit static vars and extensions
+    static var registry: Registry {
+        let mirror = Mirror(reflecting: Unit.meter)
+        var units = [DefinedUnit]()
+        print(mirror.children.count)
+        for child in mirror.children {
+            print(child.label)
+            if let unit = child.value as? Unit {
+                switch unit.type {
+                case .defined(let definedUnit):
+                    units.append(definedUnit)
+                case .composite:
+                    break
+                }
+            }
+        }
+        return Registry(inputUnits: units)
     }
 }
 
