@@ -386,7 +386,7 @@ public struct Unit {
     }
 
     /// The two possible types of unit - defined or composite
-    private enum UnitType {
+    private enum UnitType: Sendable {
         case defined(DefinedUnit)
         case composite([DefinedUnit: Int])
     }
@@ -447,3 +447,5 @@ extension Unit: Codable {
         try self.init(fromSymbol: symbol)
     }
 }
+
+extension Unit: Sendable {}

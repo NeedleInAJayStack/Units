@@ -1,5 +1,5 @@
 /// A predefined unit, which has an identifying symbol, defined quantity, and conversion information.
-struct DefinedUnit: Hashable {
+struct DefinedUnit: Hashable, Sendable {
     let name: String
     let symbol: String
     let dimension: [Quantity: Int]

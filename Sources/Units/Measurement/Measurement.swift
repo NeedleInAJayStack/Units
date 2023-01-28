@@ -139,3 +139,5 @@ extension Measurement: LosslessStringConvertible {
 }
 
 extension Measurement: Hashable {}
+
+extension Measurement: Sendable {}
