@@ -419,6 +419,17 @@ extension Unit: CustomStringConvertible {
     }
 }
 
+extension Unit: LosslessStringConvertible {
+    /// Initialize a unit from the provided string. This checks the input against the symbols stored
+    /// in the registry. If no match is found, nil is returned.
+    public init?(_ description: String) {
+        guard let unit = try? Unit(fromSymbol: description) else {
+            return nil
+        }
+        self = unit
+    }
+}
+
 extension Unit: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()

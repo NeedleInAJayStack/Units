@@ -121,3 +121,19 @@ extension Measurement: CustomStringConvertible {
         return "\(value) \(unit)"
     }
 }
+
+extension Measurement: LosslessStringConvertible {
+    public init?(_ description: String) {
+        guard
+            let spaceIndex = description.firstIndex(of: " "),
+            let value = Double(description[..<spaceIndex]),
+            let unit = Unit(String(
+                description[description.index(after: spaceIndex)..<description.endIndex]
+            ))
+        else {
+            return nil
+        }
+        self.value = value
+        self.unit = unit
+    }
+}

@@ -244,6 +244,39 @@ final class MeasurementTests: XCTestCase {
             1.measured(in: .inch)
         )
     }
+    
+    func testCustomStringConvertible() throws {
+        XCTAssertEqual(
+            5.measured(in: .meter).description,
+            "5.0 m"
+        )
+
+        XCTAssertEqual(
+            5.measured(in: .meter / .second).description,
+            "5.0 m/s"
+        )
+    }
+    
+    func testLosslessStringConvertible() throws {
+        XCTAssertEqual(
+            Measurement("5.0 m"),
+            5.measured(in: .meter)
+        )
+        
+        XCTAssertEqual(
+            Measurement("5 m"),
+            5.measured(in: .meter)
+        )
+
+        XCTAssertEqual(
+            Measurement("5 m/s"),
+            5.measured(in: .meter / .second)
+        )
+        
+        XCTAssertNil(
+            Measurement("5 notAUnit")
+        )
+    }
 }
 
 extension Units.Unit {

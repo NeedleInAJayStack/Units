@@ -247,4 +247,20 @@ final class UnitTests: XCTestCase {
             try Unit(fromSymbol: "m/2")
         )
     }
+    
+    func testLosslessStringConvertible() throws {
+        XCTAssertEqual(
+            Unit("m"),
+            Unit.meter
+        )
+
+        XCTAssertEqual(
+            Unit("m*s"),
+            Unit.meter * .second
+        )
+        
+        XCTAssertNil(
+            Unit("notAUnit")
+        )
+    }
 }
