@@ -390,25 +390,6 @@ public struct Unit {
         case defined(DefinedUnit)
         case composite([DefinedUnit: Int])
     }
-    
-    /// Registry singleton that is built up from all Unit static vars and extensions
-    static var registry: Registry {
-        let mirror = Mirror(reflecting: Unit.meter)
-        var units = [DefinedUnit]()
-        print(mirror.children.count)
-        for child in mirror.children {
-            print(child.label)
-            if let unit = child.value as? Unit {
-                switch unit.type {
-                case .defined(let definedUnit):
-                    units.append(definedUnit)
-                case .composite:
-                    break
-                }
-            }
-        }
-        return Registry(inputUnits: units)
-    }
 }
 
 extension Unit: Equatable {
