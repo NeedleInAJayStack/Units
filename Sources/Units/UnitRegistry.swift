@@ -380,4 +380,9 @@ internal class UnitRegistry {
         DefaultUnits.imperialGallon,
         DefaultUnits.metricCup,
     ]
+    
+    /// Singleton unit registry for easy default behavior
+    public static var global: UnitRegistry {
+        return UnitRegistry.init()
+    }
 }
