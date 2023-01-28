@@ -86,6 +86,15 @@ final class MeasurementTests: XCTestCase {
             work.unit.dimension,
             [.Mass: 1, .Length: 2, .Time: -2]
         )
+        
+        // Test *=
+        var value = 2.measured(in: .meter)
+        value *= length1
+        
+        XCTAssertEqual(
+            value,
+            10.measured(in: .meter.pow(2))
+        )
     }
 
     func testDivide() throws {
@@ -95,6 +104,15 @@ final class MeasurementTests: XCTestCase {
         XCTAssertEqual(
             length / time,
             2.measured(in: .meter / .second)
+        )
+        
+        // Test /=
+        var value = 10.measured(in: .meter.pow(2))
+        value /= 2.measured(in: .meter)
+        
+        XCTAssertEqual(
+            value,
+            5.measured(in: .meter)
         )
     }
 

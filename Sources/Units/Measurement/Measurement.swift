@@ -3,7 +3,7 @@ import Foundation
 /// A numeric scalar value with a unit of measure
 public struct Measurement: Equatable, Codable {
     public private(set) var value: Double
-    public let unit: Unit
+    public private(set) var unit: Unit
     
     /// Create a new measurement
     /// - Parameters:
@@ -102,18 +102,35 @@ public struct Measurement: Equatable, Codable {
             unit: lhs.unit * rhs.unit
         )
     }
+    
+    /// Multiplies the measurements and stores the result in the left-hand-side variable. The measurements may have different units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    public static func *= (lhs: inout Measurement, rhs: Measurement) {
+        lhs.value = lhs.value * rhs.value
+        lhs.unit = lhs.unit * rhs.unit
+    }
 
     /// Divide the measurements. The measurements may have different units.
     /// - Parameters:
     ///   - lhs: The left-hand-side measurement
     ///   - rhs: The right-hand-side measurement
-    /// - Returns: A new measurement with a scalar value of the left-hand-side value divided by the right-hand-side value
-    /// and a combined unit of measure
+    /// - Returns: A new measurement with the divided scalar value and a combined unit of measure
     public static func / (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
             value: lhs.value / rhs.value,
             unit: lhs.unit / rhs.unit
         )
+    }
+    
+    /// Divide the measurements and stores the result in the left-hand-side variable. The measurements may have different units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    public static func /= (lhs: inout Measurement, rhs: Measurement) {
+        lhs.value = lhs.value / rhs.value
+        lhs.unit = lhs.unit / rhs.unit
     }
 
     /// Exponentiate the measurement. This is equavalent to multiple `*` operations.
