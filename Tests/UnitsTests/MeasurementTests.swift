@@ -32,6 +32,14 @@ final class MeasurementTests: XCTestCase {
         XCTAssertThrowsError(
             try 5.measured(in: .meter) + 5.measured(in: .second)
         )
+        
+        var length3 = 3.measured(in: .meter)
+        try length3 += length1
+        
+        XCTAssertEqual(
+            length3,
+            8.measured(in: .meter)
+        )
     }
 
     func testSubtract() throws {
@@ -44,6 +52,14 @@ final class MeasurementTests: XCTestCase {
 
         XCTAssertThrowsError(
             try 5.measured(in: .meter) - 5.measured(in: .second)
+        )
+        
+        var length3 = 8.measured(in: .meter)
+        try length3 -= length1
+        
+        XCTAssertEqual(
+            length3,
+            3.measured(in: .meter)
         )
     }
 
