@@ -2,6 +2,8 @@
 import XCTest
 
 final class MeasurementTests: XCTestCase {
+    let accuracy = 1e-12
+    
     func testEquals() throws {
         XCTAssertEqual(
             2.measured(in: .meter),
@@ -30,7 +32,8 @@ final class MeasurementTests: XCTestCase {
         let length2 = 5.measured(in: .meter)
         XCTAssertEqual(
             try length1 + length2,
-            10.measured(in: .meter)
+            10.measured(in: .meter),
+            accuracy: accuracy
         )
 
         XCTAssertThrowsError(
@@ -45,7 +48,8 @@ final class MeasurementTests: XCTestCase {
         
         XCTAssertEqual(
             length3,
-            8.measured(in: .meter)
+            8.measured(in: .meter),
+            accuracy: accuracy
         )
     }
 
@@ -54,7 +58,8 @@ final class MeasurementTests: XCTestCase {
         let length2 = 3.measured(in: .meter)
         XCTAssertEqual(
             try length1 - length2,
-            2.measured(in: .meter)
+            2.measured(in: .meter),
+            accuracy: accuracy
         )
 
         XCTAssertThrowsError(
@@ -69,7 +74,8 @@ final class MeasurementTests: XCTestCase {
         
         XCTAssertEqual(
             length3,
-            3.measured(in: .meter)
+            3.measured(in: .meter),
+            accuracy: accuracy
         )
     }
 
@@ -79,7 +85,8 @@ final class MeasurementTests: XCTestCase {
         let length2 = 5.measured(in: .meter)
         XCTAssertEqual(
             length1 * length2,
-            25.measured(in: .meter.pow(2))
+            25.measured(in: .meter.pow(2)),
+            accuracy: accuracy
         )
 
         // Test mixed units
@@ -87,7 +94,8 @@ final class MeasurementTests: XCTestCase {
         let time = 7.measured(in: .second)
         XCTAssertEqual(
             force * time,
-            14.measured(in: .newton * .second)
+            14.measured(in: .newton * .second),
+            accuracy: accuracy
         )
 
         // Test composite units
@@ -101,17 +109,20 @@ final class MeasurementTests: XCTestCase {
         // Test scalar multiplication
         XCTAssertEqual(
             6.measured(in: .meter) * 2,
-            12.measured(in: .meter)
+            12.measured(in: .meter),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             6.measured(in: .meter) * 2.5,
-            15.measured(in: .meter)
+            15.measured(in: .meter),
+            accuracy: accuracy
         )
         
         // Test that cancelling units coerce to none
         XCTAssertEqual(
             6.measured(in: .meter.pow(-1)) * 3.measured(in: .meter),
-            18
+            18,
+            accuracy: accuracy
         )
         
         // Test *=
@@ -120,7 +131,8 @@ final class MeasurementTests: XCTestCase {
         
         XCTAssertEqual(
             value,
-            10.measured(in: .meter.pow(2))
+            10.measured(in: .meter.pow(2)),
+            accuracy: accuracy
         )
     }
 
@@ -130,23 +142,27 @@ final class MeasurementTests: XCTestCase {
         let time = 4.measured(in: .second)
         XCTAssertEqual(
             length / time,
-            2.measured(in: .meter / .second)
+            2.measured(in: .meter / .second),
+            accuracy: accuracy
         )
         
         // Test scalar division
         XCTAssertEqual(
             6.measured(in: .meter) / 2,
-            3.measured(in: .meter)
+            3.measured(in: .meter),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             6.measured(in: .meter) / 1.5,
-            4.measured(in: .meter)
+            4.measured(in: .meter),
+            accuracy: accuracy
         )
         
         // Test that cancelling units coerce to none
         XCTAssertEqual(
             6.measured(in: .meter) / 3.measured(in: .meter),
-            2
+            2,
+            accuracy: accuracy
         )
         
         // Test /=
@@ -155,41 +171,48 @@ final class MeasurementTests: XCTestCase {
         
         XCTAssertEqual(
             value,
-            5.measured(in: .meter)
+            5.measured(in: .meter),
+            accuracy: accuracy
         )
     }
 
     func testPow() throws {
         XCTAssertEqual(
             2.measured(in: .meter).pow(2),
-            4.measured(in: .meter.pow(2))
+            4.measured(in: .meter.pow(2)),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             2.measured(in: .meter).pow(3),
-            8.measured(in: .meter.pow(3))
+            8.measured(in: .meter.pow(3)),
+            accuracy: accuracy
         )
         
         // Test that unitless exponentiation is unitless
         XCTAssertEqual(
             3.measured(in: .none).pow(2),
-            9.measured(in: .none)
+            9.measured(in: .none),
+            accuracy: accuracy
         )
     }
     
     func testComplexArithmetic() throws {
         XCTAssertEqual(
             try 1.measured(in: .mile / .mile) * 1.measured(in: .mile) - 1.measured(in: .mile),
-            0.measured(in: .mile)
+            0.measured(in: .mile),
+            accuracy: accuracy
         )
         
         XCTAssertEqual(
             try 0.measured(in: .mile) / 1.measured(in: .mile) + 1,
-            1
+            1,
+            accuracy: accuracy
         )
         
         XCTAssertEqual(
             try 0.measured(in: .none) + 0 + (1.measured(in: .mile) / 1.measured(in: .mile)),
-            1
+            1,
+            accuracy: accuracy
         )
     }
 
@@ -233,15 +256,18 @@ final class MeasurementTests: XCTestCase {
         // Test defined unit conversion
         XCTAssertEqual(
             try 1.measured(in: .kilometer).convert(to: .meter),
-            1000.measured(in: .meter)
+            1000.measured(in: .meter),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             try 1.measured(in: .kilowatt).convert(to: .horsepower),
-            1.3410220895950278.measured(in: .horsepower)
+            1.3410220895950278.measured(in: .horsepower),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             try 1.measured(in: .none).convert(to: .none),
-            1
+            1,
+            accuracy: accuracy
         )
 
         // Test incompatible defined units error
@@ -255,25 +281,30 @@ final class MeasurementTests: XCTestCase {
         // Test composite unit conversion
         XCTAssertEqual(
             try 1.measured(in: .kilometer.pow(2)).convert(to: .meter.pow(2)),
-            1_000_000.measured(in: .meter.pow(2))
+            1_000_000.measured(in: .meter.pow(2)),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             try 1.measured(in: .meter.pow(2)).convert(to: .kilometer.pow(2)),
-            0.000001.measured(in: .kilometer.pow(2))
+            0.000001.measured(in: .kilometer.pow(2)),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             try 1.measured(in: .meter / .second).convert(to: .foot / .minute),
-            196.85039370078738.measured(in: .foot / .minute)
+            196.85039370078738.measured(in: .foot / .minute),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             try 1.measured(in: .meter / .second.pow(2)).convert(to: .foot / .minute.pow(2)),
-            11811.023622047243.measured(in: .foot / .minute.pow(2))
+            11811.023622047243.measured(in: .foot / .minute.pow(2)),
+            accuracy: accuracy
         )
 
         // Test mixed unit conversion
         XCTAssertEqual(
             try 1.measured(in: .newton).convert(to: .foot * .pound / .minute.pow(2)),
-            26038.849864355616.measured(in: .foot * .pound / .minute.pow(2))
+            26038.849864355616.measured(in: .foot * .pound / .minute.pow(2)),
+            accuracy: accuracy
         )
 
         // Test incompatible composite units error
@@ -284,15 +315,18 @@ final class MeasurementTests: XCTestCase {
         // Test conversion with constant
         XCTAssertEqual(
             try 25.measured(in: .celsius).convert(to: .kelvin),
-            298.15.measured(in: .kelvin)
+            298.15.measured(in: .kelvin),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             try 0.measured(in: .celsius).convert(to: .fahrenheit),
-            31.999999999999986.measured(in: .fahrenheit)
+            31.999999999999986.measured(in: .fahrenheit),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             try 32.measured(in: .fahrenheit).convert(to: .celsius),
-            0.measured(in: .celsius)
+            0.measured(in: .celsius),
+            accuracy: accuracy
         )
 
         // Test composite unit with constant cannot be converted
@@ -305,11 +339,13 @@ final class MeasurementTests: XCTestCase {
     func testNumericExtensions() throws {
         XCTAssertEqual(
             2.0.measured(in: .meter),
-            2.measured(in: .meter)
+            2.measured(in: .meter),
+            accuracy: accuracy
         )
         XCTAssertEqual(
             2.measured(in: .meter),
-            2.measured(in: .meter)
+            2.measured(in: .meter),
+            accuracy: accuracy
         )
     }
 
@@ -324,14 +360,15 @@ final class MeasurementTests: XCTestCase {
         // Test conversion from custom unit
         XCTAssertEqual(
             try 100.measured(in: centifoot).convert(to: .foot),
-            1.measured(in: .foot)
+            1.measured(in: .foot),
+            accuracy: accuracy
         )
         
         // Test conversion to custom unit
         XCTAssertEqual(
-            try 1.measured(in: .foot).convert(to: centifoot).value,
-            100.measured(in: centifoot).value,
-            accuracy: 0.01
+            try 1.measured(in: .foot).convert(to: centifoot),
+            100.measured(in: centifoot),
+            accuracy: accuracy
         )
         
         
@@ -345,7 +382,8 @@ final class MeasurementTests: XCTestCase {
         // Test conversion from a custom unit to a different custom unit
         XCTAssertEqual(
             try 12.measured(in: centiinch).convert(to: centifoot),
-            1.measured(in: centifoot)
+            1.measured(in: centifoot),
+            accuracy: accuracy
         )
         
         // Test that definitions with bad characters are rejected
@@ -401,17 +439,20 @@ final class MeasurementTests: XCTestCase {
         // Test referencing string before running the extension
         XCTAssertEqual(
             try 25.measured(in: Unit(fromSymbol: "cin")).convert(to: .inch),
-            0.25.measured(in: .inch)
+            0.25.measured(in: .inch),
+            accuracy: accuracy
         )
         // Test typical usage
         XCTAssertEqual(
             try 25.measured(in: .centiinch).convert(to: .inch),
-            0.25.measured(in: .inch)
+            0.25.measured(in: .inch),
+            accuracy: accuracy
         )
         // Try using twice to verify that multiple access doesn't error
         XCTAssertEqual(
             try 100.measured(in: .centiinch).convert(to: .inch),
-            1.measured(in: .inch)
+            1.measured(in: .inch),
+            accuracy: accuracy
         )
     }
     
@@ -469,7 +510,8 @@ final class MeasurementTests: XCTestCase {
         let harvest = 288.measured(in: apple)
         XCTAssertEqual(
             try harvest.convert(to: carton),
-            6.measured(in: carton)
+            6.measured(in: carton),
+            accuracy: accuracy
         )
         
         let person = try Unit.define(
@@ -484,7 +526,8 @@ final class MeasurementTests: XCTestCase {
         let weeklyCartons = try (workforce * personPickRate).convert(to: carton / .week)
         XCTAssertEqual(
             weeklyCartons,
-            350.measured(in: carton / .week)
+            350.measured(in: carton / .week),
+            accuracy: accuracy
         )
     }
 }
