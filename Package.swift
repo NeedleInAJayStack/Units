@@ -20,5 +20,9 @@ let package = Package(
             name: "UnitsTests",
             dependencies: ["Units"]
         ),
+        .testTarget(
+            name: "PerformanceTests",
+            dependencies: ["Units"]
+        ),
     ]
 )
