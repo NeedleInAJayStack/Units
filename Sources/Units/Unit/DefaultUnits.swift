@@ -1,7 +1,7 @@
 /// Static type containing this package's pre-defined units
 enum DefaultUnits {
-    // MARK: If adding additional units to this list, add corresponding entries in the `Unit+DefinedUnits.swift` file
-
+    // MARK: If adding additional units to this list, add corresponding entries in the `Unit+DefaultUnits.swift` file
+    
     // MARK: Acceleration
     // Base unit: meter / second^2
     
