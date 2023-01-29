@@ -29,13 +29,34 @@ final class UnitTests: XCTestCase {
             (Unit.newton).isDimensionallyEquivalent(to: Unit.kilogram * Unit.meter / Unit.second.pow(2))
         )
     }
+    
+    func testMultiply() throws {
+        XCTAssertEqual(
+            Unit.meter * Unit.meter,
+            Unit.meter.pow(2)
+        )
+        
+        // Test that cancelling units give nil
+        XCTAssertEqual(
+            Unit.meter.pow(-1) * Unit.meter,
+            .none
+        )
+    }
+    
+    func testDivide() throws {
+        XCTAssertEqual(
+            Unit.meter.pow(2) / Unit.meter,
+            Unit.meter
+        )
+        
+        // Test that cancelling units give nil
+        XCTAssertEqual(
+            Unit.meter / Unit.meter,
+            .none
+        )
+    }
 
     func testPow() throws {
-        XCTAssertEqual(
-            Unit.meter.pow(2),
-            Unit.meter * Unit.meter
-        )
-
         XCTAssertEqual(
             Unit.meter.pow(3),
             Unit.meter * Unit.meter * Unit.meter
@@ -93,6 +114,11 @@ final class UnitTests: XCTestCase {
         XCTAssertEqual(
             (Unit.meter / Unit.second.pow(2)).symbol,
             "m/s^2"
+        )
+        
+        XCTAssertEqual(
+            (Unit.none).symbol,
+            "none"
         )
     }
 
@@ -250,13 +276,18 @@ final class UnitTests: XCTestCase {
     
     func testLosslessStringConvertible() throws {
         XCTAssertEqual(
-            Unit("m"),
+            Unit(Unit.meter.description),
             Unit.meter
         )
 
         XCTAssertEqual(
-            Unit("m*s"),
+            Unit((Unit.meter * .second).description),
             Unit.meter * .second
+        )
+        
+        XCTAssertEqual(
+            Unit(Unit.none.description),
+            Unit.none
         )
         
         XCTAssertNil(

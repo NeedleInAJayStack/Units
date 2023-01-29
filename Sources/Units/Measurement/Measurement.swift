@@ -153,26 +153,51 @@ public struct Measurement: Equatable, Codable {
 extension Measurement: CustomStringConvertible {
     /// Displays the measurement as a string of the value and unit symbol
     public var description: String {
-        return "\(value) \(unit)"
+        if unit == .none {
+            return "\(value)"
+        } else {
+            return "\(value) \(unit)"
+        }
     }
 }
 
 extension Measurement: LosslessStringConvertible {
     public init?(_ description: String) {
-        guard
-            let spaceIndex = description.firstIndex(of: " "),
-            let value = Double(description[..<spaceIndex]),
-            let unit = Unit(String(
-                description[description.index(after: spaceIndex)..<description.endIndex]
-            ))
-        else {
+        let valueEndIndex = description.firstIndex(of: " ") ?? description.endIndex
+        guard let value = Double(description[..<valueEndIndex]) else {
             return nil
         }
         self.value = value
-        self.unit = unit
+        
+        if valueEndIndex != description.endIndex {
+            guard let unit = Unit(String(
+                description[description.index(after: valueEndIndex)..<description.endIndex]
+            )) else {
+                return nil
+            }
+            self.unit = unit
+        } else {
+            self.unit = .none
+        }
     }
 }
 
 extension Measurement: Hashable {}
+
+extension Measurement: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int64) {
+        self = Self.init(value: Double(value), unit: .none)
+    }
+    
+    public typealias IntegerLiteralType = Int64
+}
+
+extension Measurement: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Double) {
+        self = Self.init(value: value, unit: .none)
+    }
+    
+    public typealias FloatLiteralType = Double
+}
 
 extension Measurement: Sendable {}

@@ -19,6 +19,10 @@ final class MeasurementTests: XCTestCase {
             2.measured(in: .meter),
             2.measured(in: .second)
         )
+        XCTAssertNotEqual(
+            2.measured(in: .meter),
+            2
+        )
     }
 
     func testAdd() throws {
@@ -31,6 +35,9 @@ final class MeasurementTests: XCTestCase {
 
         XCTAssertThrowsError(
             try 5.measured(in: .meter) + 5.measured(in: .second)
+        )
+        XCTAssertThrowsError(
+            try 5.measured(in: .meter) + 5
         )
         
         var length3 = 3.measured(in: .meter)
@@ -52,6 +59,9 @@ final class MeasurementTests: XCTestCase {
 
         XCTAssertThrowsError(
             try 5.measured(in: .meter) - 5.measured(in: .second)
+        )
+        XCTAssertThrowsError(
+            try 5.measured(in: .meter) - 5
         )
         
         var length3 = 8.measured(in: .meter)
@@ -82,9 +92,26 @@ final class MeasurementTests: XCTestCase {
 
         // Test composite units
         let work = 2.measured(in: .newton * .meter)
+        let workUnit = try XCTUnwrap(work.unit)
         XCTAssertEqual(
-            work.unit.dimension,
+            workUnit.dimension,
             [.Mass: 1, .Length: 2, .Time: -2]
+        )
+
+        // Test scalar multiplication
+        XCTAssertEqual(
+            6.measured(in: .meter) * 2,
+            12.measured(in: .meter)
+        )
+        XCTAssertEqual(
+            6.measured(in: .meter) * 2.5,
+            15.measured(in: .meter)
+        )
+        
+        // Test that cancelling units coerce to none
+        XCTAssertEqual(
+            6.measured(in: .meter.pow(-1)) * 3.measured(in: .meter),
+            18
         )
         
         // Test *=
@@ -106,6 +133,22 @@ final class MeasurementTests: XCTestCase {
             2.measured(in: .meter / .second)
         )
         
+        // Test scalar division
+        XCTAssertEqual(
+            6.measured(in: .meter) / 2,
+            3.measured(in: .meter)
+        )
+        XCTAssertEqual(
+            6.measured(in: .meter) / 1.5,
+            4.measured(in: .meter)
+        )
+        
+        // Test that cancelling units coerce to none
+        XCTAssertEqual(
+            6.measured(in: .meter) / 3.measured(in: .meter),
+            2
+        )
+        
         // Test /=
         var value = 10.measured(in: .meter.pow(2))
         value /= 2.measured(in: .meter)
@@ -125,20 +168,64 @@ final class MeasurementTests: XCTestCase {
             2.measured(in: .meter).pow(3),
             8.measured(in: .meter.pow(3))
         )
+        
+        // Test that unitless exponentiation is unitless
+        XCTAssertEqual(
+            3.measured(in: .none).pow(2),
+            9.measured(in: .none)
+        )
     }
+    
+    func testComplexArithmetic() throws {
+        XCTAssertEqual(
+            try 1.measured(in: .mile / .mile) * 1.measured(in: .mile) - 1.measured(in: .mile),
+            0.measured(in: .mile)
+        )
+        
+        XCTAssertEqual(
+            try 0.measured(in: .mile) / 1.measured(in: .mile) + 1,
+            1
+        )
+        
+        XCTAssertEqual(
+            try 0.measured(in: .none) + 0 + (1.measured(in: .mile) / 1.measured(in: .mile)),
+            1
+        )
+    }
+
 
     func testIsDimensionallyEquivalent() throws {
         XCTAssertTrue(
-            2.measured(in: .meter)
-                .isDimensionallyEquivalent(to: 2.measured(in: .meter))
+            2.measured(in: .meter).isDimensionallyEquivalent(
+                to: 2.measured(in: .meter)
+            )
         )
         XCTAssertTrue(
-            2.measured(in: .meter)
-                .isDimensionallyEquivalent(to: 4.measured(in: .meter))
+            2.measured(in: .meter).isDimensionallyEquivalent(
+                to: 4.measured(in: .meter)
+            )
         )
         XCTAssertTrue(
-            2.measured(in: .newton)
-                .isDimensionallyEquivalent(to: 4.measured(in: .kilogram * .meter / .second.pow(2)))
+            2.measured(in: .newton).isDimensionallyEquivalent(
+                to: 4.measured(in: .kilogram * .meter / .second.pow(2))
+            )
+        )
+        
+        // Test none comparisons
+        XCTAssertTrue(
+            2.measured(in: .none).isDimensionallyEquivalent(
+                to: 4
+            )
+        )
+        XCTAssertFalse(
+            2.measured(in: .meter).isDimensionallyEquivalent(
+                to: 4
+            )
+        )
+        XCTAssertFalse(
+            2.measured(in: .none).isDimensionallyEquivalent(
+                to: 4.measured(in: .meter)
+            )
         )
     }
 
@@ -152,10 +239,17 @@ final class MeasurementTests: XCTestCase {
             try 1.measured(in: .kilowatt).convert(to: .horsepower),
             1.3410220895950278.measured(in: .horsepower)
         )
+        XCTAssertEqual(
+            try 1.measured(in: .none).convert(to: .none),
+            1
+        )
 
         // Test incompatible defined units error
         XCTAssertThrowsError(
             try 1.measured(in: .kilowatt).convert(to: .meter)
+        )
+        XCTAssertThrowsError(
+            try 1.measured(in: .none).convert(to: .meter)
         )
 
         // Test composite unit conversion
@@ -292,19 +386,22 @@ final class MeasurementTests: XCTestCase {
     }
     
     func testLosslessStringConvertible() throws {
+        let length = 5.measured(in: .meter)
         XCTAssertEqual(
-            Measurement("5.0 m"),
-            5.measured(in: .meter)
+            Measurement(length.description),
+            length
         )
         
+        let velocity = 5.measured(in: .meter / .second)
         XCTAssertEqual(
-            Measurement("5 m"),
-            5.measured(in: .meter)
+            Measurement(velocity.description),
+            velocity
         )
-
+        
+        let scalar = 5.measured(in: .none)
         XCTAssertEqual(
-            Measurement("5 m/s"),
-            5.measured(in: .meter / .second)
+            Measurement(scalar.description),
+            scalar
         )
         
         XCTAssertNil(
