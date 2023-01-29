@@ -347,6 +347,48 @@ final class MeasurementTests: XCTestCase {
             try 12.measured(in: centiinch).convert(to: centifoot),
             1.measured(in: centifoot)
         )
+        
+        // Test that definitions with bad characters are rejected
+        XCTAssertThrowsError(
+            try Unit.define(
+                name: "no name",
+                symbol: "",
+                dimension: [.Amount: 1],
+                coefficient:1
+            )
+        )
+        XCTAssertThrowsError(
+            try Unit.define(
+                name: "unit with space",
+                symbol: "unit with space",
+                dimension: [.Amount: 1],
+                coefficient:1
+            )
+        )
+        XCTAssertThrowsError(
+            try Unit.define(
+                name: "slash",
+                symbol: "/",
+                dimension: [.Amount: 1],
+                coefficient:1
+            )
+        )
+        XCTAssertThrowsError(
+            try Unit.define(
+                name: "star",
+                symbol: "*",
+                dimension: [.Amount: 1],
+                coefficient:1
+            )
+        )
+        XCTAssertThrowsError(
+            try Unit.define(
+                name: "carrot",
+                symbol: "^",
+                dimension: [.Amount: 1],
+                coefficient:1
+            )
+        )
     }
     
     func testUnitRegister() throws {

@@ -7,10 +7,16 @@ struct DefinedUnit: Hashable, Sendable {
     let constant: Double
 
     init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) throws {
+        guard !symbol.isEmpty else {
+            throw UnitError.invalidSymbol(message: "Symbol cannot be empty")
+        }
         for operatorSymbol in OperatorSymbols.allCases {
             guard !symbol.contains(operatorSymbol.rawValue) else {
-                throw UnitError.invalidSymbol(message: "\(name) Symbol cannot contain '\(operatorSymbol.rawValue)'")
+                throw UnitError.invalidSymbol(message: "'\(name)' Symbol cannot contain '\(operatorSymbol.rawValue)'")
             }
+        }
+        guard !symbol.contains(" ") else {
+            throw UnitError.invalidSymbol(message: "'\(name)' Symbol cannot contain spaces")
         }
 
         self.name = name
