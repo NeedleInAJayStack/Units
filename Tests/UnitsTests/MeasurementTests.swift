@@ -3,7 +3,7 @@ import XCTest
 
 final class MeasurementTests: XCTestCase {
     let accuracy = 1e-12
-    
+
     func testEquals() throws {
         XCTAssertEqual(
             2.measured(in: .meter),
@@ -42,10 +42,10 @@ final class MeasurementTests: XCTestCase {
         XCTAssertThrowsError(
             try 5.measured(in: .meter) + 5
         )
-        
+
         var length3 = 3.measured(in: .meter)
         try length3 += length1
-        
+
         XCTAssertEqual(
             length3,
             8.measured(in: .meter),
@@ -68,10 +68,10 @@ final class MeasurementTests: XCTestCase {
         XCTAssertThrowsError(
             try 5.measured(in: .meter) - 5
         )
-        
+
         var length3 = 8.measured(in: .meter)
         try length3 -= length1
-        
+
         XCTAssertEqual(
             length3,
             3.measured(in: .meter),
@@ -117,18 +117,18 @@ final class MeasurementTests: XCTestCase {
             15.measured(in: .meter),
             accuracy: accuracy
         )
-        
+
         // Test that cancelling units coerce to none
         XCTAssertEqual(
             6.measured(in: .meter.pow(-1)) * 3.measured(in: .meter),
             18,
             accuracy: accuracy
         )
-        
+
         // Test *=
         var value = 2.measured(in: .meter)
         value *= length1
-        
+
         XCTAssertEqual(
             value,
             10.measured(in: .meter.pow(2)),
@@ -145,7 +145,7 @@ final class MeasurementTests: XCTestCase {
             2.measured(in: .meter / .second),
             accuracy: accuracy
         )
-        
+
         // Test scalar division
         XCTAssertEqual(
             6.measured(in: .meter) / 2,
@@ -157,18 +157,18 @@ final class MeasurementTests: XCTestCase {
             4.measured(in: .meter),
             accuracy: accuracy
         )
-        
+
         // Test that cancelling units coerce to none
         XCTAssertEqual(
             6.measured(in: .meter) / 3.measured(in: .meter),
             2,
             accuracy: accuracy
         )
-        
+
         // Test /=
         var value = 10.measured(in: .meter.pow(2))
         value /= 2.measured(in: .meter)
-        
+
         XCTAssertEqual(
             value,
             5.measured(in: .meter),
@@ -187,7 +187,7 @@ final class MeasurementTests: XCTestCase {
             8.measured(in: .meter.pow(3)),
             accuracy: accuracy
         )
-        
+
         // Test that unitless exponentiation is unitless
         XCTAssertEqual(
             3.measured(in: .none).pow(2),
@@ -195,27 +195,26 @@ final class MeasurementTests: XCTestCase {
             accuracy: accuracy
         )
     }
-    
+
     func testComplexArithmetic() throws {
         XCTAssertEqual(
             try 1.measured(in: .mile / .mile) * 1.measured(in: .mile) - 1.measured(in: .mile),
             0.measured(in: .mile),
             accuracy: accuracy
         )
-        
+
         XCTAssertEqual(
             try 0.measured(in: .mile) / 1.measured(in: .mile) + 1,
             1,
             accuracy: accuracy
         )
-        
+
         XCTAssertEqual(
             try 0.measured(in: .none) + 0 + (1.measured(in: .mile) / 1.measured(in: .mile)),
             1,
             accuracy: accuracy
         )
     }
-
 
     func testIsDimensionallyEquivalent() throws {
         XCTAssertTrue(
@@ -233,7 +232,7 @@ final class MeasurementTests: XCTestCase {
                 to: 4.measured(in: .kilogram * .meter / .second.pow(2))
             )
         )
-        
+
         // Test none comparisons
         XCTAssertTrue(
             2.measured(in: .none).isDimensionallyEquivalent(
@@ -356,43 +355,42 @@ final class MeasurementTests: XCTestCase {
             dimension: [.Length: 1],
             coefficient: 0.003048
         )
-        
+
         // Test conversion from custom unit
         XCTAssertEqual(
             try 100.measured(in: centifoot).convert(to: .foot),
             1.measured(in: .foot),
             accuracy: accuracy
         )
-        
+
         // Test conversion to custom unit
         XCTAssertEqual(
             try 1.measured(in: .foot).convert(to: centifoot),
             100.measured(in: centifoot),
             accuracy: accuracy
         )
-        
-        
+
         let centiinch = try Unit.define(
             name: "centiinch",
             symbol: "cin",
             dimension: [.Length: 1],
             coefficient: 0.000254
         )
-        
+
         // Test conversion from a custom unit to a different custom unit
         XCTAssertEqual(
             try 12.measured(in: centiinch).convert(to: centifoot),
             1.measured(in: centifoot),
             accuracy: accuracy
         )
-        
+
         // Test that definitions with bad characters are rejected
         XCTAssertThrowsError(
             try Unit.define(
                 name: "no name",
                 symbol: "",
                 dimension: [.Amount: 1],
-                coefficient:1
+                coefficient: 1
             )
         )
         XCTAssertThrowsError(
@@ -400,7 +398,7 @@ final class MeasurementTests: XCTestCase {
                 name: "unit with space",
                 symbol: "unit with space",
                 dimension: [.Amount: 1],
-                coefficient:1
+                coefficient: 1
             )
         )
         XCTAssertThrowsError(
@@ -408,7 +406,7 @@ final class MeasurementTests: XCTestCase {
                 name: "slash",
                 symbol: "/",
                 dimension: [.Amount: 1],
-                coefficient:1
+                coefficient: 1
             )
         )
         XCTAssertThrowsError(
@@ -416,7 +414,7 @@ final class MeasurementTests: XCTestCase {
                 name: "star",
                 symbol: "*",
                 dimension: [.Amount: 1],
-                coefficient:1
+                coefficient: 1
             )
         )
         XCTAssertThrowsError(
@@ -424,11 +422,11 @@ final class MeasurementTests: XCTestCase {
                 name: "carrot",
                 symbol: "^",
                 dimension: [.Amount: 1],
-                coefficient:1
+                coefficient: 1
             )
         )
     }
-    
+
     func testUnitRegister() throws {
         try Unit.register(
             name: "centiinch",
@@ -455,7 +453,7 @@ final class MeasurementTests: XCTestCase {
             accuracy: accuracy
         )
     }
-    
+
     func testCustomStringConvertible() throws {
         XCTAssertEqual(
             5.measured(in: .meter).description,
@@ -467,31 +465,31 @@ final class MeasurementTests: XCTestCase {
             "5.0 m/s"
         )
     }
-    
+
     func testLosslessStringConvertible() throws {
         let length = 5.measured(in: .meter)
         XCTAssertEqual(
             Measurement(length.description),
             length
         )
-        
+
         let velocity = 5.measured(in: .meter / .second)
         XCTAssertEqual(
             Measurement(velocity.description),
             velocity
         )
-        
+
         let scalar = 5.measured(in: .none)
         XCTAssertEqual(
             Measurement(scalar.description),
             scalar
         )
-        
+
         XCTAssertNil(
             Measurement("5 notAUnit")
         )
     }
-    
+
     func testCustomUnitSystemExample() throws {
         let apple = try Unit.define(
             name: "apple",
@@ -513,7 +511,7 @@ final class MeasurementTests: XCTestCase {
             6.measured(in: carton),
             accuracy: accuracy
         )
-        
+
         let person = try Unit.define(
             name: "person",
             symbol: "person",

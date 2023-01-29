@@ -10,7 +10,7 @@ import Foundation
 /// It also is given a large number of static members for easy access to this package's predefined units.
 public struct Unit {
     private let type: UnitType
-    
+
     /// Singleton representing the lack of a unit
     public static var none: Unit {
         Unit(type: .none)
@@ -49,7 +49,7 @@ public struct Unit {
             type = .composite(subUnits)
         }
     }
-    
+
     private init(type: UnitType) {
         self.type = type
     }
@@ -89,7 +89,7 @@ public struct Unit {
             )
         )
     }
-    
+
     /// **Careful!** Register a new unit to the global registry. Unless you need deserialization support for this unit,
     /// or support to look up this unit from a different memory-space, we suggest that `define` is used instead.
     ///

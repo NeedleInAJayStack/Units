@@ -4,7 +4,7 @@ import Foundation
 public struct Measurement: Equatable, Codable {
     public private(set) var value: Double
     public private(set) var unit: Unit
-    
+
     /// Create a new measurement
     /// - Parameters:
     ///   - value: The magnitude of the measurement
@@ -58,7 +58,7 @@ public struct Measurement: Equatable, Codable {
             unit: lhs.unit
         )
     }
-    
+
     /// Adds the measurements and stores the result in the left-hand-side variable. The measurements must have the same unit.
     /// - Parameters:
     ///   - lhs: The left-hand-side measurement
@@ -81,7 +81,7 @@ public struct Measurement: Equatable, Codable {
             unit: lhs.unit
         )
     }
-    
+
     /// Subtracts the measurements and stores the result in the left-hand-side variable. The measurements must have the same unit.
     /// - Parameters:
     ///   - lhs: The left-hand-side measurement
@@ -102,7 +102,7 @@ public struct Measurement: Equatable, Codable {
             unit: lhs.unit * rhs.unit
         )
     }
-    
+
     /// Multiplies the measurements and stores the result in the left-hand-side variable. The measurements may have different units.
     /// - Parameters:
     ///   - lhs: The left-hand-side measurement
@@ -123,7 +123,7 @@ public struct Measurement: Equatable, Codable {
             unit: lhs.unit / rhs.unit
         )
     }
-    
+
     /// Divide the measurements and stores the result in the left-hand-side variable. The measurements may have different units.
     /// - Parameters:
     ///   - lhs: The left-hand-side measurement
@@ -142,7 +142,7 @@ public struct Measurement: Equatable, Codable {
             unit: unit.pow(raiseTo)
         )
     }
-    
+
     private static func checkSameUnit(_ lhs: Measurement, _ rhs: Measurement) throws {
         guard lhs.unit == rhs.unit else {
             throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
@@ -168,16 +168,16 @@ extension Measurement: LosslessStringConvertible {
             return nil
         }
         self.value = value
-        
+
         if valueEndIndex != description.endIndex {
             guard let unit = Unit(String(
-                description[description.index(after: valueEndIndex)..<description.endIndex]
+                description[description.index(after: valueEndIndex) ..< description.endIndex]
             )) else {
                 return nil
             }
             self.unit = unit
         } else {
-            self.unit = .none
+            unit = .none
         }
     }
 }
@@ -186,17 +186,17 @@ extension Measurement: Hashable {}
 
 extension Measurement: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int64) {
-        self = Self.init(value: Double(value), unit: .none)
+        self = Self(value: Double(value), unit: .none)
     }
-    
+
     public typealias IntegerLiteralType = Int64
 }
 
 extension Measurement: ExpressibleByFloatLiteral {
     public init(floatLiteral value: Double) {
-        self = Self.init(value: value, unit: .none)
+        self = Self(value: value, unit: .none)
     }
-    
+
     public typealias FloatLiteralType = Double
 }
 

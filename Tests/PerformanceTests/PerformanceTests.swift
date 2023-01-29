@@ -7,7 +7,7 @@ final class PerformanceTests: XCTestCase {
             _ = 5.3.measured(in: .meter)
         }
     }
-    
+
     func testAdd() throws {
         let measurement1 = 5.measured(in: .meter)
         let measurement2 = 2.measured(in: .meter)
@@ -15,7 +15,7 @@ final class PerformanceTests: XCTestCase {
             _ = try? measurement1 + measurement2
         }
     }
-    
+
     func testMultiply() throws {
         let measurement1 = 5.measured(in: .meter)
         let measurement2 = 2.measured(in: .second)
@@ -23,14 +23,14 @@ final class PerformanceTests: XCTestCase {
             _ = measurement1 / measurement2
         }
     }
-    
+
     func testConvert() throws {
         let measurement = 5.measured(in: .meter)
         measure {
             _ = try? measurement.convert(to: .foot)
         }
     }
-    
+
     func testCompare() throws {
         let measurement1 = 5.measured(in: .meter)
         let measurement2 = 5.measured(in: .foot)
