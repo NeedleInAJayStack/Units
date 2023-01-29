@@ -11,6 +11,11 @@ import Foundation
 public struct Unit {
     private let type: UnitType
 
+    /// Singleton representing the lack of a unit
+    public static var none: Unit {
+        Unit(type: .none)
+    }
+
     /// Create a unit from the symbol. This symbol is compared to the global registry, decomposed if necessary,
     /// and the relevant unit is initialized.
     /// - Parameter symbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
@@ -43,6 +48,10 @@ public struct Unit {
         } else {
             type = .composite(subUnits)
         }
+    }
+
+    private init(type: UnitType) {
+        self.type = type
     }
 
     /// Define a unit extension without adding it to the registry. The resulting unit object should be retained
@@ -80,7 +89,7 @@ public struct Unit {
             )
         )
     }
-    
+
     /// **Careful!** Register a new unit to the global registry. Unless you need deserialization support for this unit,
     /// or support to look up this unit from a different memory-space, we suggest that `define` is used instead.
     ///
@@ -124,6 +133,8 @@ public struct Unit {
     /// The dimension of the unit in terms of base quanties
     public var dimension: [Quantity: Int] {
         switch type {
+        case .none:
+            return [:]
         case let .defined(definition):
             return definition.dimension
         case let .composite(subUnits):
@@ -145,6 +156,8 @@ public struct Unit {
     /// The string symbol of the unit
     public var symbol: String {
         switch type {
+        case .none:
+            return "none"
         case let .defined(definition):
             return definition.symbol
         case .composite:
@@ -184,6 +197,8 @@ public struct Unit {
     /// The string name of the unit
     public var name: String {
         switch type {
+        case .none:
+            return "no unit"
         case let .defined(definition):
             return definition.name
         case .composite:
@@ -238,8 +253,11 @@ public struct Unit {
         subUnits = subUnits.filter { _, value in
             value != 0
         }
-
-        return Unit(composedOf: subUnits)
+        if subUnits.isEmpty {
+            return Unit.none
+        } else {
+            return Unit(composedOf: subUnits)
+        }
     }
 
     /// Divide the units.
@@ -262,8 +280,11 @@ public struct Unit {
         subUnits = subUnits.filter { _, value in
             value != 0
         }
-
-        return Unit(composedOf: subUnits)
+        if subUnits.isEmpty {
+            return Unit.none
+        } else {
+            return Unit(composedOf: subUnits)
+        }
     }
 
     /// Exponentiate the unit. This is equavalent to multiple `*` operations.
@@ -271,6 +292,8 @@ public struct Unit {
     /// - Returns: A new unit modeling the original raised to the provided power
     public func pow(_ raiseTo: Int) -> Unit {
         switch type {
+        case .none:
+            return .none
         case let .defined(defined):
             return Unit(composedOf: [defined: raiseTo])
         case let .composite(subUnits):
@@ -298,6 +321,8 @@ public struct Unit {
     /// - Returns: The equivalent amount in terms of the dimensional base units.
     func toBaseUnit(_ number: Double) throws -> Double {
         switch type {
+        case .none:
+            return number
         case let .defined(defined):
             return number * defined.coefficient + defined.constant
         case let .composite(subUnits):
@@ -320,6 +345,8 @@ public struct Unit {
     /// - Returns: The equivalent amount in terms of this unit.
     func fromBaseUnit(_ number: Double) throws -> Double {
         switch type {
+        case .none:
+            return number
         case let .defined(defined):
             return (number - defined.constant) / defined.coefficient
         case let .composite(subUnits):
@@ -340,6 +367,8 @@ public struct Unit {
     /// composite unit, this is simply the `subUnits`, but for a defined unit, this is `[self: 1]`
     private var subUnits: [DefinedUnit: Int] {
         switch type {
+        case .none:
+            return [:]
         case let .defined(defined):
             return [defined: 1]
         case let .composite(subUnits):
@@ -355,6 +384,8 @@ public struct Unit {
     /// - For equal exponents, units are in alphabetical order by symbol
     private func sortedUnits() -> [(DefinedUnit, Int)] {
         switch type {
+        case .none:
+            return []
         case let .defined(defined):
             return [(defined, 1)]
         case let .composite(subUnits):
@@ -386,7 +417,8 @@ public struct Unit {
     }
 
     /// The two possible types of unit - defined or composite
-    private enum UnitType {
+    private enum UnitType: Sendable {
+        case none
         case defined(DefinedUnit)
         case composite([DefinedUnit: Int])
     }
@@ -394,28 +426,48 @@ public struct Unit {
 
 extension Unit: Equatable {
     public static func == (lhs: Unit, rhs: Unit) -> Bool {
-        switch lhs.type {
-        case let .defined(lhsDefined):
-            switch rhs.type {
-            case let .defined(rhsDefined):
-                return lhsDefined == rhsDefined
-            case .composite:
-                return false
-            }
-        case let .composite(lhsSubUnits):
-            switch rhs.type {
-            case .defined:
-                return false
-            case let .composite(rhsSubUnits):
-                return lhsSubUnits == rhsSubUnits
-            }
+        switch (lhs.type, rhs.type) {
+        case (.none, .none):
+            return true
+        case let (.defined(lhsDefined), .defined(rhsDefined)):
+            return lhsDefined == rhsDefined
+        case let (.composite(lhsSubUnits), .composite(rhsSubUnits)):
+            return lhsSubUnits == rhsSubUnits
+        default:
+            return false
         }
+    }
+}
+
+extension Unit: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(symbol)
     }
 }
 
 extension Unit: CustomStringConvertible {
     public var description: String {
-        return symbol
+        switch type {
+        case .none:
+            return "none"
+        default:
+            return symbol
+        }
+    }
+}
+
+extension Unit: LosslessStringConvertible {
+    /// Initialize a unit from the provided string. This checks the input against the symbols stored
+    /// in the registry. If no match is found, nil is returned.
+    public init?(_ description: String) {
+        if description == "none" {
+            self = .none
+        } else {
+            guard let unit = try? Unit(fromSymbol: description) else {
+                return nil
+            }
+            self = unit
+        }
     }
 }
 
@@ -430,3 +482,5 @@ extension Unit: Codable {
         try self.init(fromSymbol: symbol)
     }
 }
+
+extension Unit: Sendable {}

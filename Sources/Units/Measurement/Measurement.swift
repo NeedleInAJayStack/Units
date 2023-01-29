@@ -2,9 +2,9 @@ import Foundation
 
 /// A numeric scalar value with a unit of measure
 public struct Measurement: Equatable, Codable {
-    public let value: Double
-    public let unit: Unit
-    
+    public private(set) var value: Double
+    public private(set) var unit: Unit
+
     /// Create a new measurement
     /// - Parameters:
     ///   - value: The magnitude of the measurement
@@ -52,31 +52,43 @@ public struct Measurement: Equatable, Codable {
     ///   - rhs: The right-hand-side measurement
     /// - Returns: A new measurement with the summed scalar values and the same unit of measure
     public static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
-        guard lhs.unit == rhs.unit else {
-            throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
-        }
-
+        try checkSameUnit(lhs, rhs)
         return Measurement(
             value: lhs.value + rhs.value,
             unit: lhs.unit
         )
     }
 
+    /// Adds the measurements and stores the result in the left-hand-side variable. The measurements must have the same unit.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    public static func += (lhs: inout Measurement, rhs: Measurement) throws {
+        try checkSameUnit(lhs, rhs)
+        lhs.value = lhs.value + rhs.value
+    }
+
     /// Subtract one measurement from another. The measurements must have the same unit.
     /// - Parameters:
     ///   - lhs: The left-hand-side measurement
     ///   - rhs: The right-hand-side measurement
-    /// - Returns: A new measurement with a scalar value of the left-hand-side value minus the right-hand-side value
+    /// - Returns: A new measurement with the subtracted scalar values and the same unit of measure
     /// and the same unit of measure
     public static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
-        guard lhs.unit == rhs.unit else {
-            throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
-        }
-
+        try checkSameUnit(lhs, rhs)
         return Measurement(
             value: lhs.value - rhs.value,
             unit: lhs.unit
         )
+    }
+
+    /// Subtracts the measurements and stores the result in the left-hand-side variable. The measurements must have the same unit.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    public static func -= (lhs: inout Measurement, rhs: Measurement) throws {
+        try checkSameUnit(lhs, rhs)
+        lhs.value = lhs.value - rhs.value
     }
 
     /// Multiply the measurements. The measurements may have different units.
@@ -91,17 +103,34 @@ public struct Measurement: Equatable, Codable {
         )
     }
 
+    /// Multiplies the measurements and stores the result in the left-hand-side variable. The measurements may have different units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    public static func *= (lhs: inout Measurement, rhs: Measurement) {
+        lhs.value = lhs.value * rhs.value
+        lhs.unit = lhs.unit * rhs.unit
+    }
+
     /// Divide the measurements. The measurements may have different units.
     /// - Parameters:
     ///   - lhs: The left-hand-side measurement
     ///   - rhs: The right-hand-side measurement
-    /// - Returns: A new measurement with a scalar value of the left-hand-side value divided by the right-hand-side value
-    /// and a combined unit of measure
+    /// - Returns: A new measurement with the divided scalar value and a combined unit of measure
     public static func / (lhs: Measurement, rhs: Measurement) -> Measurement {
         return Measurement(
             value: lhs.value / rhs.value,
             unit: lhs.unit / rhs.unit
         )
+    }
+
+    /// Divide the measurements and stores the result in the left-hand-side variable. The measurements may have different units.
+    /// - Parameters:
+    ///   - lhs: The left-hand-side measurement
+    ///   - rhs: The right-hand-side measurement
+    public static func /= (lhs: inout Measurement, rhs: Measurement) {
+        lhs.value = lhs.value / rhs.value
+        lhs.unit = lhs.unit / rhs.unit
     }
 
     /// Exponentiate the measurement. This is equavalent to multiple `*` operations.
@@ -113,11 +142,62 @@ public struct Measurement: Equatable, Codable {
             unit: unit.pow(raiseTo)
         )
     }
+
+    private static func checkSameUnit(_ lhs: Measurement, _ rhs: Measurement) throws {
+        guard lhs.unit == rhs.unit else {
+            throw UnitError.incompatibleUnits(message: "Incompatible units: \(lhs.unit) != \(rhs.unit)")
+        }
+    }
 }
 
 extension Measurement: CustomStringConvertible {
     /// Displays the measurement as a string of the value and unit symbol
     public var description: String {
-        return "\(value) \(unit)"
+        if unit == .none {
+            return "\(value)"
+        } else {
+            return "\(value) \(unit)"
+        }
     }
 }
+
+extension Measurement: LosslessStringConvertible {
+    public init?(_ description: String) {
+        let valueEndIndex = description.firstIndex(of: " ") ?? description.endIndex
+        guard let value = Double(description[..<valueEndIndex]) else {
+            return nil
+        }
+        self.value = value
+
+        if valueEndIndex != description.endIndex {
+            guard let unit = Unit(String(
+                description[description.index(after: valueEndIndex) ..< description.endIndex]
+            )) else {
+                return nil
+            }
+            self.unit = unit
+        } else {
+            unit = .none
+        }
+    }
+}
+
+extension Measurement: Hashable {}
+
+extension Measurement: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int64) {
+        self = Self(value: Double(value), unit: .none)
+    }
+
+    public typealias IntegerLiteralType = Int64
+}
+
+extension Measurement: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Double) {
+        self = Self(value: value, unit: .none)
+    }
+
+    public typealias FloatLiteralType = Double
+}
+
+extension Measurement: Sendable {}

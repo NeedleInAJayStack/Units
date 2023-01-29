@@ -1,0 +1,1 @@
+echo "./Scripts/git_commit_hook.sh" > .git/hooks/pre-commit
