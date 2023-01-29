@@ -408,6 +408,43 @@ final class MeasurementTests: XCTestCase {
             Measurement("5 notAUnit")
         )
     }
+    
+    func testCustomUnitSystemExample() throws {
+        let apple = try Unit.define(
+            name: "apple",
+            symbol: "apple",
+            dimension: [.Amount: 1],
+            coefficient: 1
+        )
+
+        let carton = try Unit.define(
+            name: "carton",
+            symbol: "carton",
+            dimension: [.Amount: 1],
+            coefficient: 48
+        )
+
+        let harvest = 288.measured(in: apple)
+        XCTAssertEqual(
+            try harvest.convert(to: carton),
+            6.measured(in: carton)
+        )
+        
+        let person = try Unit.define(
+            name: "person",
+            symbol: "person",
+            dimension: [.Amount: 1],
+            coefficient: 1
+        )
+
+        let personPickRate = 600.measured(in: apple / .day / person)
+        let workforce = 4.measured(in: person)
+        let weeklyCartons = try (workforce * personPickRate).convert(to: carton / .week)
+        XCTAssertEqual(
+            weeklyCartons,
+            350.measured(in: carton / .week)
+        )
+    }
 }
 
 extension Units.Unit {

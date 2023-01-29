@@ -38,7 +38,35 @@ and `Foundation` are imported as much as possible. However, if an issue arises, 
 
 ```swift
 let measurement = Units.Measurement(value: 5, unit: .mile)
-``` 
+```
+
+## Scalars
+
+This package provides a special `none` unit that represents a unitless scalar measurement:
+
+```swift
+let unitless = 5.measured(in: .none)
+```
+
+Measurements whose arithmetic has cancelled out units are also represented as unitless:
+
+```swift
+let a = 6.measured(in: .meter) / 2.measured(in: .meter)
+print(a.unit)  // Prints 'none'
+```
+
+Measurements are also representible through `Int` or `Float` scalars, which are automatically interpreted as unitless:
+
+```swift
+let m: Measurement = 6  // Has unit of 'none'
+```
+
+This allows including scalar values directly in arithmetic equations:
+
+```swift
+let distance: 5.measured(in: .meter) * 3 / 1.measured(in: .second)
+print(distance)  // Prints '15 m/s'
+```
 
 ## Conversion
 
@@ -91,6 +119,46 @@ print(5.measured(in: .foot).convert(to: centifoot))
 ```
 
 This returns a Unit object that can be used in arithmetic, conversions, and serialization.
+
+### Non-scientific Units
+
+For "non-scientific" units, it is typically appropriate to use the `Amount` quantity. Through this
+approach, you can easily build up an impromptu conversion system on the fly. For example:
+
+```swift
+let apple = try Unit.define(
+    name: "apple",
+    symbol: "apple",
+    dimension: [.Amount: 1],
+    coefficient: 1
+)
+
+let carton = try Unit.define(
+    name: "carton",
+    symbol: "carton",
+    dimension: [.Amount: 1],
+    coefficient: 48
+)
+
+let harvest = 288.measured(in: apple)
+print(harvest.convert(to: carton)) // Prints '6.0 carton'
+```
+
+We can extend this example to determine how many cartons a group of people can pick in a week:
+
+```swift
+let person = try Unit.define(
+    name: "person",
+    symbol: "person",
+    dimension: [.Amount: 1],
+    coefficient: 1
+)
+
+let personPickRate = 600.measured(in: apple / .day / person)
+let workforce = 4.measured(in: person)
+let weeklyCartons = try (workforce * personPickRate).convert(to: carton / .week)
+print(weeklyCartons)  // Prints '350.0 carton/week'
+```
 
 ### Adding custom units to the Registry
 
