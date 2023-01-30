@@ -26,7 +26,11 @@ public struct Unit {
         }
         if symbolContainsOperator {
             let compositeUnits = try Registry.instance.compositeUnitsFromSymbol(symbol: symbol)
-            self.init(composedOf: compositeUnits)
+            if compositeUnits.isEmpty {
+                self = .none
+            } else {
+                self.init(composedOf: compositeUnits)
+            }
         } else {
             let definedUnit = try Registry.instance.definedUnitFromSymbol(symbol: symbol)
             self.init(definedBy: definedUnit)

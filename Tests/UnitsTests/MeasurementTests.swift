@@ -488,6 +488,11 @@ final class MeasurementTests: XCTestCase {
         XCTAssertNil(
             Measurement("5 notAUnit")
         )
+
+        XCTAssertEqual(
+            try XCTUnwrap(Measurement("5 m/m")),
+            5
+        )
     }
 
     func testCustomUnitSystemExample() throws {

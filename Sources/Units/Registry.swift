@@ -25,6 +25,9 @@ internal class Registry {
 
         var compositeUnits = [DefinedUnit: Int]()
         for (definedUnitSymbol, exponent) in symbolsAndExponents {
+            guard exponent != 0 else {
+                continue
+            }
             let definedUnit = try definedUnitFromSymbol(symbol: definedUnitSymbol)
             compositeUnits[definedUnit] = exponent
         }
