@@ -32,7 +32,7 @@ enum DefaultUnits {
         name: "particle",
         symbol: "particle",
         dimension: [.Amount: 1],
-        coefficient: 6.02214076e23
+        coefficient: 6.02214076e-23
     )
 
     // MARK: Angle
