@@ -8,6 +8,8 @@ different units, perform arithmetic operations, check dimensionality, or seriali
 This approach allows us to easily handle any permutation of units. You want to convert `12 km³/hr/N` to 
 `ft²*s/lb`? We've got you covered!
 
+Included is a convenient command-line tool for performing quick unit conversions. See the [CLI section](#cli) for details.
+
 ## Getting Started
 
 To start using Units, import it to your project via the `Package.swift` file:
@@ -99,8 +101,23 @@ non-shifted Kelvin and Rankine temperature units to refer to temperature differe
 
 ## Serialization
 
-Each defined unit must have a unique symbol, which is used to identify and serialize/deserialize it. These symbols are not allowed to
-contain the `*`, `/`, or `^` characters because those are used in the symbol representation of complex units.
+Each defined unit must have a unique symbol, which is used to identify and serialize/deserialize it. Defined unit symbols are not
+allowed to contain the `*`, `/`, `^`, or ` ` characters because those are used in the symbol representation of complex units.
+Complex units are represented by their arithmetic combination of simple units using `*` for multiplication, `/` for division,
+and `^` for exponentiation. Order of operations treats exponentiation first, and multiplication and division equally, from left-
+to-right. This means that, unless negatively exponentiated, units following a `*` can always be considered to be "in the numerator",
+and those following `/` can always be considered to be "in the denominator".
+
+Here are a few examples:
+
+- `kW*hr`: kilowatt-hours
+- `m/s`: meters per second
+- `m^2/s^2`: square meters per square seconds
+- `kg*m/s`: kilogram-meters per second.
+- `m/s*kg`: equivalent to `kg*m/s`
+- `m^1*s^-1*kg^1`: equivalent to `kg*m/s`
+
+Measurements are represented as the numeric value followed by a space, then the serialized unit. For example, `5 m/s`
 
 ## Custom Units
 
@@ -193,6 +210,31 @@ let measurement = 5.measured(in: .centifoot)
 ```
 
 Again, unless strictly necessary, `Unit.define` is preferred over `Unit.register`.
+
+## CLI
+
+The command-line interface can be built and installed by running the command below. Note that 
+[swift](https://www.swift.org/download/) must be installed.
+
+```bash
+./install.sh
+```
+
+You can then perform unit conversions using the `convertunit` command:
+
+```bash
+convertunit 5_m/s mi/hr  # Returns 11.184681460272012 mi/hr
+```
+
+This command uses the unit and measurement [serialization format](#serialization). Note that for
+convenience, you may use an underscore `_` to represent the normally serialized space. Also,
+`*` characters may need to be escaped.
+
+To uninstall, run:
+
+```bash
+./uninstall.sh
+```
 
 ## Contributing
 
