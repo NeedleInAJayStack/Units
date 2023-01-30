@@ -184,6 +184,13 @@ public struct Unit {
         }
     }
 
+    public func dimensionDescription() -> String {
+        return serializeSymbolicEquation(
+            of: dimension,
+            symbolPath: \Quantity.rawValue
+        )
+    }
+
     // MARK: - Arithmatic
 
     /// Multiply the units.

@@ -1,12 +1,12 @@
 import ArgumentParser
 import Units
 
-struct ConvertUnit: ParsableCommand {
+struct Convert: ParsableCommand {
     @Argument(help: "The measurement to convert from")
     var from: Measurement
 
     @Argument(help: "The unit to convert from")
-    var to: Unit
+    var to: Units.Unit
 
     func run() throws {
         try print(from.convert(to: to))
@@ -23,4 +23,4 @@ extension Measurement: ExpressibleByArgument {
     }
 }
 
-extension Unit: ExpressibleByArgument {}
+extension Units.Unit: ExpressibleByArgument {}
