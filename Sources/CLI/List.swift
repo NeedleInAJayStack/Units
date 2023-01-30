@@ -2,6 +2,10 @@ import ArgumentParser
 import Units
 
 struct List: ParsableCommand {
+    static var configuration = CommandConfiguration(
+        abstract: "Print a table of the available units, their symbols, and their dimensionality."
+    )
+
     func run() throws {
         let units = Units.Unit.allDefined().sorted { u1, u2 in
             u1.name <= u2.name
