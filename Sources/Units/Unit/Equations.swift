@@ -119,7 +119,12 @@ func deserializeSymbolicEquation(
             guard subSymbol != "" else {
                 throw UnitError.unitNotFound(message: "Expected subsymbol missing")
             }
-            result[subSymbol] = exp
+
+            if let existingExp = result[subSymbol] {
+                result[subSymbol] = existingExp + exp
+            } else {
+                result[subSymbol] = exp
+            }
         }
     }
     return result
