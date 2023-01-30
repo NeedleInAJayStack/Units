@@ -26,7 +26,11 @@ public struct Unit {
         }
         if symbolContainsOperator {
             let compositeUnits = try Registry.instance.compositeUnitsFromSymbol(symbol: symbol)
-            self.init(composedOf: compositeUnits)
+            if compositeUnits.isEmpty {
+                self = .none
+            } else {
+                self.init(composedOf: compositeUnits)
+            }
         } else {
             let definedUnit = try Registry.instance.definedUnitFromSymbol(symbol: symbol)
             self.init(definedBy: definedUnit)
@@ -160,37 +164,11 @@ public struct Unit {
             return "none"
         case let .defined(definition):
             return definition.symbol
-        case .composite:
-            let unitList = sortedUnits()
-            var computedSymbol = ""
-            for (subUnit, exp) in unitList {
-                guard exp != 0 else {
-                    break
-                }
-
-                var prefix = ""
-                if computedSymbol == "" { // first symbol
-                    if exp >= 0 {
-                        prefix = ""
-                    } else {
-                        prefix = "1\(OperatorSymbols.div.rawValue)"
-                    }
-                } else {
-                    if exp >= 0 {
-                        prefix = OperatorSymbols.mult.rawValue
-                    } else {
-                        prefix = OperatorSymbols.div.rawValue
-                    }
-                }
-                let symbol = subUnit.symbol
-                var expStr = ""
-                if abs(exp) > 1 {
-                    expStr = "\(OperatorSymbols.exp.rawValue)\(abs(exp))"
-                }
-
-                computedSymbol += "\(prefix)\(symbol)\(expStr)"
-            }
-            return computedSymbol
+        case let .composite(subUnits):
+            return serializeSymbolicEquation(
+                of: subUnits,
+                symbolPath: \DefinedUnit.symbol
+            )
         }
     }
 
@@ -201,38 +179,20 @@ public struct Unit {
             return "no unit"
         case let .defined(definition):
             return definition.name
-        case .composite:
-            let unitList = sortedUnits()
-            var computedName = ""
-            for (subUnit, exp) in unitList {
-                guard exp != 0 else {
-                    break
-                }
-
-                var prefix = ""
-                if computedName == "" { // first name
-                    if exp >= 0 {
-                        prefix = ""
-                    } else {
-                        prefix = "1 \(OperatorSymbols.div.rawValue) "
-                    }
-                } else {
-                    if exp >= 0 {
-                        prefix = " \(OperatorSymbols.mult.rawValue) "
-                    } else {
-                        prefix = " \(OperatorSymbols.div.rawValue) "
-                    }
-                }
-                let name = subUnit.name
-                var expStr = ""
-                if abs(exp) > 1 {
-                    expStr = "\(OperatorSymbols.exp.rawValue)\(abs(exp))"
-                }
-
-                computedName += "\(prefix)\(name)\(expStr)"
-            }
-            return computedName
+        case let .composite(subUnits):
+            return serializeSymbolicEquation(
+                of: subUnits,
+                symbolPath: \DefinedUnit.name,
+                spaceAroundOperators: true
+            )
         }
+    }
+
+    public func dimensionDescription() -> String {
+        return serializeSymbolicEquation(
+            of: dimension,
+            symbolPath: \Quantity.rawValue
+        )
     }
 
     // MARK: - Arithmatic
@@ -373,46 +333,6 @@ public struct Unit {
             return [defined: 1]
         case let .composite(subUnits):
             return subUnits
-        }
-    }
-
-    /// Sort units into a consistent order.
-    ///
-    /// The order is:
-    /// - Positive exponents, from smallest to largest
-    /// - Negative exponents, from smallest to largest
-    /// - For equal exponents, units are in alphabetical order by symbol
-    private func sortedUnits() -> [(DefinedUnit, Int)] {
-        switch type {
-        case .none:
-            return []
-        case let .defined(defined):
-            return [(defined, 1)]
-        case let .composite(subUnits):
-            var unitList = [(DefinedUnit, Int)]()
-            for (subUnit, exp) in subUnits {
-                unitList.append((subUnit, exp))
-            }
-            unitList.sort { lhs, rhs in
-                if lhs.1 > 0, rhs.1 > 0 {
-                    if lhs.1 == rhs.1 {
-                        return lhs.0.symbol < rhs.0.symbol
-                    } else {
-                        return lhs.1 < rhs.1
-                    }
-                } else if lhs.1 > 0, rhs.1 < 0 {
-                    return true
-                } else if lhs.1 < 0, rhs.1 > 0 {
-                    return false
-                } else { // lhs.1 < 0 && rhs.1 > 0
-                    if lhs.1 == rhs.1 {
-                        return lhs.0.symbol < rhs.0.symbol
-                    } else {
-                        return lhs.1 > rhs.1
-                    }
-                }
-            }
-            return unitList
         }
     }
 

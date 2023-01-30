@@ -10,7 +10,7 @@ let package = Package(
             targets: ["Units"]
         ),
         .executable(
-            name: "convertunit",
+            name: "unit",
             targets: ["CLI"]
         ),
     ],

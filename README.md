@@ -220,20 +220,30 @@ The command-line interface can be built and installed by running the command bel
 ./install.sh
 ```
 
-You can then perform unit conversions using the `convertunit` command:
+To uninstall, run:
 
 ```bash
-convertunit 5_m/s mi/hr  # Returns 11.184681460272012 mi/hr
+./uninstall.sh
+```
+
+### Convert
+
+You can then perform unit conversions using the `unit convert` command:
+
+```bash
+unit convert 5_m/s mi/hr  # Returns 11.184681460272012 mi/hr
 ```
 
 This command uses the unit and measurement [serialization format](#serialization). Note that for
 convenience, you may use an underscore `_` to represent the normally serialized space. Also,
 `*` characters may need to be escaped.
 
-To uninstall, run:
+### List
+
+To list the available units, use the `unit list` command:
 
 ```bash
-./uninstall.sh
+unit list
 ```
 
 ## Contributing

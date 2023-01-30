@@ -1,2 +1,2 @@
 #!/bin/sh
-rm /usr/local/bin/convertunit
+rm /usr/local/bin/unit

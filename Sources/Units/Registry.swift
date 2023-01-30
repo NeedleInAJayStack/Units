@@ -21,32 +21,15 @@ internal class Registry {
     /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
     /// verified that this is a composite unit.
     internal func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
-        var compositeUnits: [DefinedUnit: Int] = [:]
-        for multSymbol in symbol.split(separator: "*", omittingEmptySubsequences: false) {
-            for (index, divSymbol) in multSymbol.split(separator: "/", omittingEmptySubsequences: false).enumerated() {
-                let symbolSplit = divSymbol.split(separator: "^", omittingEmptySubsequences: false)
-                let subSymbol = String(symbolSplit[0])
-                var exp = 1
-                if symbolSplit.count == 2 {
-                    guard let expInt = Int(String(symbolSplit[1])) else {
-                        throw UnitError.invalidSymbol(message: "Symbol '^' must be followed by an integer: \(symbol)")
-                    }
-                    exp = expInt
-                }
-                if index > 0 {
-                    exp = -1 * exp
-                }
-                guard subSymbol != "1" else {
-                    continue
-                }
-                guard subSymbol != "" else {
-                    throw UnitError.unitNotFound(message: "Expected subsymbol missing")
-                }
-                guard let subUnit = units[subSymbol] else {
-                    throw UnitError.unitNotFound(message: "Symbol '\(subSymbol)' not recognized")
-                }
-                compositeUnits[subUnit] = exp
+        let symbolsAndExponents = try deserializeSymbolicEquation(symbol)
+
+        var compositeUnits = [DefinedUnit: Int]()
+        for (definedUnitSymbol, exponent) in symbolsAndExponents {
+            guard exponent != 0 else {
+                continue
             }
+            let definedUnit = try definedUnitFromSymbol(symbol: definedUnitSymbol)
+            compositeUnits[definedUnit] = exponent
         }
         return compositeUnits
     }
