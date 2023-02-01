@@ -4,17 +4,26 @@ internal class Registry {
     // TODO: Should we eliminate this singleton and make clients keep track?
     internal static let instance = Registry()
 
-    // Store units as a dictionary based on symbol for fast access
-    // TODO: Change to Unit to avoid creating multiple Units in memory
-    private var units: [String: DefinedUnit]
+    // Quick access based on symbol
+    private var symbolMap: [String: DefinedUnit]
+    // Quick access based on name
+    private var nameMap: [String: DefinedUnit]
+
     private init() {
-        units = [:]
+        symbolMap = [:]
+        nameMap = [:]
         for defaultUnit in Registry.defaultUnits {
             // Protect against double-defining symbols
-            if units[defaultUnit.symbol] != nil {
+            if symbolMap[defaultUnit.symbol] != nil {
                 fatalError("Duplicate symbol: \(defaultUnit.symbol)")
             }
-            units[defaultUnit.symbol] = defaultUnit
+            symbolMap[defaultUnit.symbol] = defaultUnit
+
+            // Protect against double-defining names
+            if nameMap[defaultUnit.name] != nil {
+                fatalError("Duplicate name: \(defaultUnit.name)")
+            }
+            nameMap[defaultUnit.name] = defaultUnit
         }
     }
 
@@ -28,7 +37,7 @@ internal class Registry {
             guard exponent != 0 else {
                 continue
             }
-            let definedUnit = try definedUnitFromSymbol(symbol: definedUnitSymbol)
+            let definedUnit = try getUnit(bySymbol: definedUnitSymbol)
             compositeUnits[definedUnit] = exponent
         }
         return compositeUnits
@@ -36,9 +45,18 @@ internal class Registry {
 
     /// Returns a defined unit given a defined unit symbol. It is expected that the caller has
     /// verified that this is not a composite unit.
-    internal func definedUnitFromSymbol(symbol: String) throws -> DefinedUnit {
-        guard let definedUnit = units[symbol] else {
+    internal func getUnit(bySymbol symbol: String) throws -> DefinedUnit {
+        guard let definedUnit = symbolMap[symbol] else {
             throw UnitError.unitNotFound(message: "Symbol '\(symbol)' not recognized")
+        }
+        return definedUnit
+    }
+
+    /// Returns a defined unit given a defined unit name. It is expected that the caller has
+    /// verified that this is not a composite unit.
+    internal func getUnit(byName name: String) throws -> DefinedUnit {
+        guard let definedUnit = nameMap[name] else {
+            throw UnitError.unitNotFound(message: "Name '\(name)' not recognized")
         }
         return definedUnit
     }
@@ -64,16 +82,22 @@ internal class Registry {
             constant: constant
         )
         // Protect against double-defining symbols
-        if units[symbol] != nil {
+        if symbolMap[symbol] != nil {
             throw UnitError.invalidSymbol(message: "Duplicate symbol: \(symbol)")
         }
-        units[symbol] = newUnit
+        symbolMap[symbol] = newUnit
+
+        // Protect against double-defining names
+        if nameMap[name] != nil {
+            fatalError("Duplicate name: \(name)")
+        }
+        nameMap[name] = newUnit
     }
 
     /// Returns all units currently defined by the registry
     internal func allUnits() -> [Unit] {
         var allUnits = [Unit]()
-        for (_, unit) in units {
+        for (_, unit) in symbolMap {
             allUnits.append(Unit(definedBy: unit))
         }
         return allUnits

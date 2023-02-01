@@ -32,7 +32,7 @@ public struct Unit {
                 self.init(composedOf: compositeUnits)
             }
         } else {
-            let definedUnit = try Registry.instance.definedUnitFromSymbol(symbol: symbol)
+            let definedUnit = try Registry.instance.getUnit(bySymbol: symbol)
             self.init(definedBy: definedUnit)
         }
     }

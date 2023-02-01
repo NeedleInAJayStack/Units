@@ -274,6 +274,17 @@ final class UnitTests: XCTestCase {
         )
     }
 
+    func testFromName() throws {
+        XCTAssertEqual(
+            try Unit(fromName: "meter"),
+            Unit.meter
+        )
+
+        XCTAssertThrowsError(
+            try Unit(fromSymbol: "notAUnit")
+        )
+    }
+
     func testLosslessStringConvertible() throws {
         XCTAssertEqual(
             Unit(Unit.meter.description),
