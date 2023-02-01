@@ -37,6 +37,15 @@ public struct Unit {
         }
     }
 
+    /// Retrieve a unit by name. This name is compared to the global registry and the relevant unit is initialized.
+    /// Only defined units are returned - complex unit name equations are not supported.
+    ///
+    /// - Parameter symbol: A string name of the unit to retrieve. This cannot be a complex equation of names.
+    public init(fromName name: String) throws {
+        let definedUnit = try Registry.instance.getUnit(byName: name)
+        self.init(definedBy: definedUnit)
+    }
+
     /// Create a unit from the defined unit object.
     /// - Parameter definedBy: A defined unit to wrap
     internal init(definedBy: DefinedUnit) {
