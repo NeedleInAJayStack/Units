@@ -426,6 +426,56 @@ final class MeasurementTests: XCTestCase {
             )
         )
     }
+    
+
+    func testCompositeUnitDefine() throws {
+        let ampereHour = try Unit.define(
+            name: "ampereHour",
+            symbol: "Ah",
+            composedOf: [Unit.ampere: 1, Unit.hour: 1],
+            coefficient: 3600
+        )
+
+        // Test conversion from custom unit
+        XCTAssertEqual(
+            try 1.measured(in: ampereHour).convert(to: .coulomb),
+            3600.measured(in: .coulomb),
+            accuracy: accuracy
+        )
+
+        // Test conversion to custom unit
+        XCTAssertEqual(
+            try 3600.measured(in: .coulomb).convert(to: ampereHour),
+            1.measured(in: ampereHour),
+            accuracy: accuracy
+        )
+
+        let ampereSquareMeters = try Unit.define(
+            name: "ampereSquareMeters",
+            symbol: "Am²",
+            composedOf: [Unit.ampere: 1, Unit.meter: 2]
+        )
+
+        let joulePerTesla = try Unit.define(
+            name: "ampereSquareMeters",
+            symbol: "JT⁻¹",
+            composedOf: [Unit.joule: 1, Unit.tesla: -1]
+        )
+
+        // Test conversion from custom unit
+        XCTAssertEqual(
+            try 1.measured(in: ampereSquareMeters).convert(to: joulePerTesla),
+            1.measured(in: joulePerTesla),
+            accuracy: accuracy
+        )
+
+        // Test conversion to custom unit
+        XCTAssertEqual(
+            try 1.measured(in: joulePerTesla).convert(to: ampereSquareMeters),
+            1.measured(in: ampereSquareMeters),
+            accuracy: accuracy
+        )
+    }
 
     func testUnitRegister() throws {
         try Unit.register(

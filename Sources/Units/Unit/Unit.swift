@@ -70,7 +70,7 @@ public struct Unit {
     /// Define a unit extension without adding it to the registry. The resulting unit object should be retained
     /// and passed to the callers that may want to use it.
     ///
-    /// This unit can be used for arithmatic, conversions, and is encoded correctly. However, since it is
+    /// This unit can be used for arithmetic, conversions, and is encoded correctly. However, since it is
     /// not part of the global registry it will not be decoded, will not be included in the `allDefined()`
     /// method, and cannot not be retrieved using `Unit(fromSymbol:)`.
     ///
@@ -100,6 +100,46 @@ public struct Unit {
                 coefficient: coefficient,
                 constant: constant
             )
+        )
+    }
+
+    /// Define a unit extension without adding it to the registry. The resulting unit object should be retained
+    /// and passed to the callers that may want to use it.
+    ///
+    /// This unit can be used for arithmetic, conversions, and is encoded correctly. However, since it is
+    /// not part of the global registry it will not be decoded, will not be included in the `allDefined()`
+    /// method, and cannot not be retrieved using `Unit(fromSymbol:)`.
+    ///
+    /// This method is considered "safe" because it does not modify the global unit registry.
+    ///
+    /// - Parameters:
+    ///   - name: The string name of the unit.
+    ///   - symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
+    ///   - composedOf: The unit dimensionality as a dictionary of ``Unit`` and their respective exponents.
+    ///   - coefficient: The value to multiply a base unit of this dimension when converting it to this unit.
+    ///   For base units, this is 1.
+    ///   - constant: The value to add to a base unit when converting it to this unit. For units without scaling
+    ///   differences, this is 0. This is added after the coefficient is multiplied according to order-of-operations.
+    /// - Returns: The unit that was defined.
+    public static func define(
+        name: String,
+        symbol: String,
+        composedOf subUnits: [Unit: Int],
+        coefficient: Double = 1,
+        constant: Double = 0
+    ) throws -> Unit {
+        try Unit.define(
+            name: name,
+            symbol: symbol,
+            dimension: subUnits.reduce(into: [Quantity: Int](), { quantities, pair in
+                let (unit, unitExponent) = pair
+                for (quantity, quantityExponent) in unit.dimension {
+                    quantities[quantity, default: 0] += quantityExponent * unitExponent
+                    if quantities[quantity] == 0 { quantities.removeValue(forKey: quantity) }
+                }
+            }),
+            coefficient: coefficient,
+            constant: constant
         )
     }
 
@@ -204,7 +244,7 @@ public struct Unit {
         )
     }
 
-    // MARK: - Arithmatic
+    // MARK: - Arithmetic
 
     /// Multiply the units.
     /// - Parameters:
