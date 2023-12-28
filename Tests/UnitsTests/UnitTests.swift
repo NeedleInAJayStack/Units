@@ -2,117 +2,119 @@
 import XCTest
 
 final class UnitTests: XCTestCase {
+    let registry = UnitRegistry()
+
     func testEqual() throws {
-        XCTAssertEqual(Unit.meter, Unit.meter)
-        XCTAssertNotEqual(Unit.meter, Unit.foot)
-        XCTAssertEqual(Unit.meter * Unit.second / Unit.second, Unit.meter)
-        XCTAssertNotEqual(Unit.newton, Unit.kilogram * Unit.meter / Unit.second.pow(2))
+        XCTAssertEqual(registry.meter, registry.meter)
+        XCTAssertNotEqual(registry.meter, registry.foot)
+        XCTAssertEqual(registry.meter * registry.second / registry.second, registry.meter)
+        XCTAssertNotEqual(registry.newton, registry.kilogram * registry.meter / registry.second.pow(2))
     }
 
     func testIsDimensionallyEquivalent() throws {
         XCTAssertTrue(
-            Unit.meter.isDimensionallyEquivalent(to: .meter)
+            registry.meter.isDimensionallyEquivalent(to: registry.meter)
         )
         XCTAssertTrue(
-            Unit.meter.isDimensionallyEquivalent(to: .foot)
+            registry.meter.isDimensionallyEquivalent(to: registry.foot)
         )
         XCTAssertFalse(
-            Unit.meter.pow(2).isDimensionallyEquivalent(to: .foot)
+            registry.meter.pow(2).isDimensionallyEquivalent(to: registry.foot)
         )
         XCTAssertTrue(
-            Unit.meter.pow(2).isDimensionallyEquivalent(to: .foot.pow(2))
+            registry.meter.pow(2).isDimensionallyEquivalent(to: registry.foot.pow(2))
         )
         XCTAssertTrue(
-            (Unit.meter / Unit.second).isDimensionallyEquivalent(to: Unit.foot / Unit.second)
+            (registry.meter / registry.second).isDimensionallyEquivalent(to: registry.foot / registry.second)
         )
         XCTAssertTrue(
-            (Unit.newton).isDimensionallyEquivalent(to: Unit.kilogram * Unit.meter / Unit.second.pow(2))
+            (registry.newton).isDimensionallyEquivalent(to: registry.kilogram * registry.meter / registry.second.pow(2))
         )
     }
 
     func testMultiply() throws {
         XCTAssertEqual(
-            Unit.meter * Unit.meter,
-            Unit.meter.pow(2)
+            registry.meter * registry.meter,
+            registry.meter.pow(2)
         )
 
         // Test that cancelling units give nil
         XCTAssertEqual(
-            Unit.meter.pow(-1) * Unit.meter,
+            registry.meter.pow(-1) * registry.meter,
             .none
         )
     }
 
     func testDivide() throws {
         XCTAssertEqual(
-            Unit.meter.pow(2) / Unit.meter,
-            Unit.meter
+            registry.meter.pow(2) / registry.meter,
+            registry.meter
         )
 
         // Test that cancelling units give nil
         XCTAssertEqual(
-            Unit.meter / Unit.meter,
+            registry.meter / registry.meter,
             .none
         )
     }
 
     func testPow() throws {
         XCTAssertEqual(
-            Unit.meter.pow(3),
-            Unit.meter * Unit.meter * Unit.meter
+            registry.meter.pow(3),
+            registry.meter * registry.meter * registry.meter
         )
 
         // Test dividing by powers works (order of operations is preserved)
         XCTAssertEqual(
-            Unit.meter / Unit.second.pow(2),
-            Unit.meter / Unit.second / Unit.second
+            registry.meter / registry.second.pow(2),
+            registry.meter / registry.second / registry.second
         )
 
         XCTAssertEqual(
-            Unit.meter / Unit.second.pow(2),
-            Unit.meter / (Unit.second * Unit.second)
+            registry.meter / registry.second.pow(2),
+            registry.meter / (registry.second * registry.second)
         )
 
         // Test negative powers is the same as dividing by powers
         XCTAssertEqual(
-            Unit.meter * Unit.second.pow(-2),
-            Unit.meter / (Unit.second * Unit.second)
+            registry.meter * registry.second.pow(-2),
+            registry.meter / (registry.second * registry.second)
         )
     }
 
     func testSymbol() throws {
         XCTAssertEqual(
-            Unit.meter.symbol,
+            registry.meter.symbol,
             "m"
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second).symbol,
+            (registry.meter / registry.second).symbol,
             "m/s"
         )
 
         XCTAssertEqual(
-            (Unit.meter * Unit.foot / Unit.second).symbol,
+            (registry.meter * registry.foot / registry.second).symbol,
             "ft*m/s"
         )
 
         XCTAssertEqual(
-            (Unit.meter * Unit.meter / Unit.second).symbol,
+            (registry.meter * registry.meter / registry.second).symbol,
             "m^2/s"
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second / Unit.foot).symbol,
+            (registry.meter / registry.second / registry.foot).symbol,
             "m/ft/s"
         )
 
         XCTAssertEqual(
-            (Unit.meter / (Unit.second * Unit.foot)).symbol,
+            (registry.meter / (registry.second * registry.foot)).symbol,
             "m/ft/s"
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second.pow(2)).symbol,
+            (registry.meter / registry.second.pow(2)).symbol,
             "m/s^2"
         )
 
@@ -124,74 +126,74 @@ final class UnitTests: XCTestCase {
 
     func testName() throws {
         XCTAssertEqual(
-            Unit.meter.name,
+            registry.meter.name,
             "meter"
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second).name,
+            (registry.meter / registry.second).name,
             "meter / second"
         )
 
         XCTAssertEqual(
-            (Unit.meter * Unit.foot / Unit.second).name,
+            (registry.meter * registry.foot / registry.second).name,
             "foot * meter / second"
         )
 
         XCTAssertEqual(
-            (Unit.meter * Unit.meter / Unit.second).name,
+            (registry.meter * registry.meter / registry.second).name,
             "meter^2 / second"
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second / Unit.foot).name,
+            (registry.meter / registry.second / registry.foot).name,
             "meter / foot / second"
         )
 
         XCTAssertEqual(
-            (Unit.meter / (Unit.second * Unit.foot)).name,
+            (registry.meter / (registry.second * registry.foot)).name,
             "meter / foot / second"
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second.pow(2)).name,
+            (registry.meter / registry.second.pow(2)).name,
             "meter / second^2"
         )
     }
 
     func testDimension() throws {
         XCTAssertEqual(
-            Unit.meter.dimension,
+            registry.meter.dimension,
             [.Length: 1]
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second).dimension,
+            (registry.meter / registry.second).dimension,
             [.Length: 1, .Time: -1]
         )
 
         XCTAssertEqual(
-            (Unit.meter * Unit.foot / Unit.second).dimension,
+            (registry.meter * registry.foot / registry.second).dimension,
             [.Length: 2, .Time: -1]
         )
 
         XCTAssertEqual(
-            (Unit.meter * Unit.meter / Unit.second).dimension,
+            (registry.meter * registry.meter / registry.second).dimension,
             [.Length: 2, .Time: -1]
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second / Unit.foot).dimension,
+            (registry.meter / registry.second / registry.foot).dimension,
             [.Time: -1]
         )
 
         XCTAssertEqual(
-            (Unit.meter / (Unit.second * Unit.foot)).dimension,
+            (registry.meter / (registry.second * registry.foot)).dimension,
             [.Time: -1]
         )
 
         XCTAssertEqual(
-            (Unit.meter / Unit.second.pow(2)).dimension,
+            (registry.meter / registry.second.pow(2)).dimension,
             [.Length: 1, .Time: -2]
         )
     }
@@ -200,7 +202,7 @@ final class UnitTests: XCTestCase {
 //        let encoder = JSONEncoder()
 //
 //        XCTAssertEqual(
-//            try String(data: encoder.encode(Unit.meter / .second), encoding: .utf8),
+//            try String(data: encoder.encode(registry.meter / .second), encoding: .utf8),
 //            "\"m\\/s\""
 //        )
 //    }
@@ -209,42 +211,40 @@ final class UnitTests: XCTestCase {
 //        let decoder = JSONDecoder()
 //
 //        XCTAssertEqual(
-//            try decoder.decode(Unit.self, from: "\"m\\/s\"".data(using: .utf8)!),
-//            Unit.meter / .second
+//            try decoder.decode(registry.self, from: "\"m\\/s\"".data(using: .utf8)!),
+//            registry.meter / .second
 //        )
 //    }
 
     func testFromSymbol() throws {
-        let registry = UnitRegistry()
-        
         XCTAssertEqual(
             try registry.unit(fromSymbol: "m"),
-            Unit.meter
+            registry.meter
         )
 
         XCTAssertEqual(
             try registry.unit(fromSymbol: "m*s"),
-            Unit.meter * .second
+            registry.meter * registry.second
         )
 
         XCTAssertEqual(
             try registry.unit(fromSymbol: "m/s"),
-            Unit.meter / .second
+            registry.meter / registry.second
         )
 
         XCTAssertEqual(
             try registry.unit(fromSymbol: "m^2"),
-            Unit.meter.pow(2)
+            registry.meter.pow(2)
         )
 
         XCTAssertEqual(
             try registry.unit(fromSymbol: "1/s"),
-            Unit.second.pow(-1)
+            registry.second.pow(-1)
         )
 
         XCTAssertEqual(
             try registry.unit(fromSymbol: "m*s/ft^2/N"),
-            Unit.meter * .second / .foot.pow(2) / .newton
+            registry.meter * registry.second / registry.foot.pow(2) / registry.newton
         )
 
         XCTAssertThrowsError(
@@ -278,33 +278,33 @@ final class UnitTests: XCTestCase {
 
     func testFromName() throws {
         XCTAssertEqual(
-            try Unit(fromName: "meter"),
-            Unit.meter
+            try Unit(fromName: "meter", registry: registry),
+            registry.meter
         )
 
         XCTAssertThrowsError(
-            try Unit(fromSymbol: "notAUnit")
+            try Unit(fromSymbol: "notAUnit", registry: registry)
         )
     }
 
     func testLosslessStringConvertible() throws {
         XCTAssertEqual(
-            Unit(Unit.meter.description),
-            Unit.meter
+            try Unit(fromSymbol: registry.meter.description, registry: registry),
+            registry.meter
         )
 
         XCTAssertEqual(
-            Unit((Unit.meter * .second).description),
-            Unit.meter * .second
+            try Unit(fromSymbol: (registry.meter * registry.second).description, registry: registry),
+            registry.meter * registry.second
         )
 
         XCTAssertEqual(
-            Unit(Unit.none.description),
+            try Unit(fromSymbol: Unit.none.description, registry: registry),
             Unit.none
         )
 
-        XCTAssertNil(
-            Unit("notAUnit")
+        XCTAssertThrowsError(
+            try Unit(fromSymbol: "notAUnit", registry: registry)
         )
     }
 }

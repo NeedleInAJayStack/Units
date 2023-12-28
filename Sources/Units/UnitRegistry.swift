@@ -1,18 +1,18 @@
 /// UnitRegistry defines a structure that contains all defined units. This ensures
 /// that we are able to parse to and from unit symbol representations.
-internal class UnitRegistry {
-    // TODO: Should we eliminate this singleton and make clients keep track?
-    internal static let instance = Registry()
+public class UnitRegistry {
+    @available(*, deprecated, message: "Use and maintain instance instead")
+    public static let instance = UnitRegistry()
 
     // Quick access based on symbol
     private var symbolMap: [String: DefinedUnit]
     // Quick access based on name
     private var nameMap: [String: DefinedUnit]
 
-    private init() {
+    public init() {
         symbolMap = [:]
         nameMap = [:]
-        for defaultUnit in Registry.defaultUnits {
+        for defaultUnit in UnitRegistry.defaultUnits {
             // Protect against double-defining symbols
             if symbolMap[defaultUnit.symbol] != nil {
                 fatalError("Duplicate symbol: \(defaultUnit.symbol)")
@@ -26,24 +26,23 @@ internal class UnitRegistry {
             nameMap[defaultUnit.name] = defaultUnit
         }
     }
-    
+
     public func unit(fromSymbol symbol: String) throws -> Unit {
         let symbolContainsOperator = OperatorSymbols.allCases.contains { arithSymbol in
             symbol.contains(arithSymbol.rawValue)
         }
         if symbolContainsOperator {
-            let compositeUnits = try self.compositeUnitsFromSymbol(symbol: symbol)
+            let compositeUnits = try compositeUnitsFromSymbol(symbol: symbol)
             return Unit(composedOf: compositeUnits)
         } else {
-            let definedUnit = try self.definedUnitFromSymbol(symbol: symbol)
+            let definedUnit = try getUnit(bySymbol: symbol)
             return Unit(definedBy: definedUnit)
         }
     }
-        
 
     /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
     /// verified that this is a composite unit.
-    internal func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
+    func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
         let symbolsAndExponents = try deserializeSymbolicEquation(symbol)
 
         var compositeUnits = [DefinedUnit: Int]()
@@ -59,13 +58,12 @@ internal class UnitRegistry {
 
     /// Returns a defined unit given a defined unit symbol. It is expected that the caller has
     /// verified that this is not a composite unit.
-    internal func getUnit(bySymbol symbol: String) throws -> DefinedUnit {
+    func getUnit(bySymbol symbol: String) throws -> DefinedUnit {
         guard let definedUnit = symbolMap[symbol] else {
             throw UnitError.unitNotFound(message: "Symbol '\(symbol)' not recognized")
         }
         return definedUnit
     }
-    
 
     @discardableResult
     /// Define a new unit to add to the registry
@@ -85,19 +83,19 @@ internal class UnitRegistry {
         coefficient: Double = 1,
         constant: Double = 0
     ) throws -> Unit {
-        try self.addUnit(
+        try addUnit(
             name: name,
             symbol: symbol,
             dimension: dimension,
             coefficient: coefficient,
             constant: constant
         )
-        return try self.unit(fromSymbol: symbol)
+        return try unit(fromSymbol: symbol)
     }
 
     /// Returns a defined unit given a defined unit name. It is expected that the caller has
     /// verified that this is not a composite unit.
-    internal func getUnit(byName name: String) throws -> DefinedUnit {
+    func getUnit(byName name: String) throws -> DefinedUnit {
         guard let definedUnit = nameMap[name] else {
             throw UnitError.unitNotFound(message: "Name '\(name)' not recognized")
         }
@@ -110,7 +108,7 @@ internal class UnitRegistry {
     /// - parameter dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
     /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
     /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
-    internal func addUnit(
+    func addUnit(
         name: String,
         symbol: String,
         dimension: [Quantity: Int],
@@ -380,9 +378,10 @@ internal class UnitRegistry {
         DefaultUnits.imperialGallon,
         DefaultUnits.metricCup,
     ]
-    
+
     /// Singleton unit registry for easy default behavior
+    @available(*, deprecated, message: "Use and maintain instance instead")
     public static var global: UnitRegistry {
-        return UnitRegistry.init()
+        return UnitRegistry()
     }
 }

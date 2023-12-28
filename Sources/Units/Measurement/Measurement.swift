@@ -1,7 +1,7 @@
 import Foundation
 
 /// A numeric scalar value with a unit of measure
-public struct Measurement: Equatable { //, Codable {
+public struct Measurement: Equatable { // , Codable {
     public private(set) var value: Double
     public private(set) var unit: Unit
 
@@ -170,9 +170,12 @@ extension Measurement: LosslessStringConvertible {
         self.value = value
 
         if valueEndIndex != description.endIndex {
-            guard let unit = Unit(String(
-                description[description.index(after: valueEndIndex) ..< description.endIndex]
-            )) else {
+            guard let unit = try? Unit(
+                fromSymbol: String(
+                    description[description.index(after: valueEndIndex) ..< description.endIndex]
+                ),
+                registry: .instance
+            ) else {
                 return nil
             }
             self.unit = unit

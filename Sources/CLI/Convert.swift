@@ -50,9 +50,9 @@ extension Measurement: ExpressibleByArgument {
 
 extension Units.Unit: ExpressibleByArgument {
     public init?(argument: String) {
-        if let unit = try? Self(fromName: argument) {
+        if let unit = try? Self(fromName: argument, registry: .instance) {
             self = unit
-        } else if let unit = try? Self(fromSymbol: argument) {
+        } else if let unit = try? Self(fromSymbol: argument, registry: .instance) {
             self = unit
         } else {
             return nil

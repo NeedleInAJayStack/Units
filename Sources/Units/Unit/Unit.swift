@@ -20,7 +20,7 @@ public struct Unit {
     /// and the relevant unit is initialized.
     /// - Parameter symbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
     /// or a complex unit symbol that combines basic units with `*`, `/`, or `^`.
-    public init(fromSymbol symbol: String, registry: UnitRegistry) throws {
+    public init(fromSymbol symbol: String, registry: UnitRegistry = .instance) throws {
         let symbolContainsOperator = OperatorSymbols.allCases.contains { arithSymbol in
             symbol.contains(arithSymbol.rawValue)
         }
@@ -41,21 +41,21 @@ public struct Unit {
     /// Only defined units are returned - complex unit name equations are not supported.
     ///
     /// - Parameter symbol: A string name of the unit to retrieve. This cannot be a complex equation of names.
-    public init(fromName name: String, registry: UnitRegistry) throws {
+    public init(fromName name: String, registry: UnitRegistry = .instance) throws {
         let definedUnit = try registry.getUnit(byName: name)
         self.init(definedBy: definedUnit)
     }
 
     /// Create a unit from the defined unit object.
     /// - Parameter definedBy: A defined unit to wrap
-    internal init(definedBy: DefinedUnit) {
+    init(definedBy: DefinedUnit) {
         type = .defined(definedBy)
     }
 
     /// Create a new from the sub-unit dictionary.
     /// - Parameter subUnits: A dictionary of defined units and exponents. If this dictionary has only a single unit with an exponent of one,
     /// we return that defined unit directly.
-    internal init(composedOf subUnits: [DefinedUnit: Int]) {
+    init(composedOf subUnits: [DefinedUnit: Int]) {
         if subUnits.count == 1, let subUnit = subUnits.first, subUnit.value == 1 {
             type = .defined(subUnit.key)
         } else {
@@ -127,14 +127,14 @@ public struct Unit {
         coefficient: Double = 1,
         constant: Double = 0
     ) throws -> Unit {
-        try Registry.instance.addUnit(
+        try UnitRegistry.instance.addUnit(
             name: name,
             symbol: symbol,
             dimension: dimension,
             coefficient: coefficient,
             constant: constant
         )
-        return try Unit(fromSymbol: symbol)
+        return try Unit(fromSymbol: symbol, registry: UnitRegistry.instance)
     }
 
     /// Get all defined units
@@ -385,22 +385,22 @@ extension Unit: CustomStringConvertible {
     }
 }
 
-extension Unit: LosslessStringConvertible {
-    /// Initialize a unit from the provided string. This checks the input against the symbols stored
-    /// in the registry. If no match is found, nil is returned.
-    public init?(_ description: String) {
-        if description == "none" {
-            self = .none
-        } else {
-            guard let unit = try? Unit(fromSymbol: description) else {
-                return nil
-            }
-            self = unit
-        }
-    }
-}
+// extension Unit: LosslessStringConvertible {
+//    /// Initialize a unit from the provided string. This checks the input against the symbols stored
+//    /// in the registry. If no match is found, nil is returned.
+//    public init?(_ description: String) {
+//        if description == "none" {
+//            self = .none
+//        } else {
+//            guard let unit = try? Unit(fromSymbol: description, registry: registry) else {
+//                return nil
+//            }
+//            self = unit
+//        }
+//    }
+// }
 
-//extension Unit: Codable {
+// extension Unit: Codable {
 //    public func encode(to encoder: Encoder) throws {
 //        var container = encoder.singleValueContainer()
 //        try container.encode(symbol)
@@ -410,6 +410,6 @@ extension Unit: LosslessStringConvertible {
 //        let symbol = try from.singleValueContainer().decode(String.self)
 //        try self.init(fromSymbol: symbol)
 //    }
-//}
+// }
 
 extension Unit: Sendable {}
