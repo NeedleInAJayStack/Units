@@ -14,7 +14,7 @@
 ///   - spaceAroundOperators: Whether to include space characters before and after multiplication and division characters.
 /// - Returns: A string that represents the equation of the object symbols and their respective exponentiation.
 func serializeSymbolicEquation<T>(
-    of dict: [T: Int],
+    of dict: [T: Fraction],
     symbolPath: KeyPath<T, String>,
     spaceAroundOperators: Bool = false
 ) -> String {
@@ -76,7 +76,7 @@ func serializeSymbolicEquation<T>(
         }
         let symbol = object[keyPath: symbolPath]
         var expStr = ""
-        if abs(exp) > 1 {
+        if abs(exp) != 0, abs(exp) != 1 {
             expStr = "\(expSymbol)\(abs(exp))"
         }
 
@@ -93,19 +93,19 @@ func serializeSymbolicEquation<T>(
 /// - Returns: A dictionary containing object symbols and exponents
 func deserializeSymbolicEquation(
     _ equation: String
-) throws -> [String: Int] {
+) throws -> [String: Fraction] {
     let expSymbol = OperatorSymbols.exp.rawValue
     let multSymbol = OperatorSymbols.mult.rawValue
     let divSymbol = OperatorSymbols.div.rawValue
 
-    var result = [String: Int]()
+    var result = [String: Fraction]()
     for multChunks in equation.split(separator: multSymbol, omittingEmptySubsequences: false) {
         for (index, divChunks) in multChunks.split(separator: divSymbol, omittingEmptySubsequences: false).enumerated() {
             let symbolChunks = divChunks.split(separator: expSymbol, omittingEmptySubsequences: false)
             let subSymbol = String(symbolChunks[0]).trimmingCharacters(in: .whitespaces)
-            var exp = 1
+            var exp: Fraction = 1
             if symbolChunks.count == 2 {
-                guard let expInt = Int(String(symbolChunks[1])) else {
+                guard let expInt = Fraction(String(symbolChunks[1])) else {
                     throw UnitError.invalidSymbol(message: "Symbol '^' must be followed by an integer: \(equation)")
                 }
                 exp = expInt
