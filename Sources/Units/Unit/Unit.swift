@@ -55,7 +55,7 @@ public struct Unit {
     /// Create a new from the sub-unit dictionary.
     /// - Parameter subUnits: A dictionary of defined units and exponents. If this dictionary has only a single unit with an exponent of one,
     /// we return that defined unit directly.
-    internal init(composedOf subUnits: [DefinedUnit: Int]) {
+    internal init(composedOf subUnits: [DefinedUnit: Fraction]) {
         if subUnits.count == 1, let subUnit = subUnits.first, subUnit.value == 1 {
             type = .defined(subUnit.key)
         } else {
@@ -88,7 +88,7 @@ public struct Unit {
     public static func define(
         name: String,
         symbol: String,
-        dimension: [Quantity: Int],
+        dimension: [Quantity: Fraction],
         coefficient: Double = 1,
         constant: Double = 0
     ) throws -> Unit {
@@ -123,7 +123,7 @@ public struct Unit {
     public static func register(
         name: String,
         symbol: String,
-        dimension: [Quantity: Int],
+        dimension: [Quantity: Fraction],
         coefficient: Double = 1,
         constant: Double = 0
     ) throws -> Unit {
@@ -144,14 +144,14 @@ public struct Unit {
     }
 
     /// The dimension of the unit in terms of base quanties
-    public var dimension: [Quantity: Int] {
+    public var dimension: [Quantity: Fraction] {
         switch type {
         case .none:
             return [:]
         case let .defined(definition):
             return definition.dimension
         case let .composite(subUnits):
-            var dimensions: [Quantity: Int] = [:]
+            var dimensions: [Quantity: Fraction] = [:]
             for (subUnit, exp) in subUnits {
                 let subDimensions = subUnit.dimension.mapValues { value in
                     exp * value
@@ -259,7 +259,7 @@ public struct Unit {
     /// Exponentiate the unit. This is equavalent to multiple `*` operations.
     /// - Parameter raiseTo: The exponent to raise the unit to
     /// - Returns: A new unit modeling the original raised to the provided power
-    public func pow(_ raiseTo: Int) -> Unit {
+    public func pow(_ raiseTo: Fraction) -> Unit {
         switch type {
         case .none:
             return .none
@@ -300,7 +300,7 @@ public struct Unit {
                 guard subUnit.constant == 0 else { // subUnit must not have constant
                     throw UnitError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                totalCoefficient *= Foundation.pow(subUnit.coefficient, Double(exponent))
+                totalCoefficient *= Foundation.pow(subUnit.coefficient, exponent.asDouble)
             }
             return number * totalCoefficient
         }
@@ -324,7 +324,7 @@ public struct Unit {
                 guard subUnit.constant == 0 else { // subUnit must not have constant
                     throw UnitError.invalidCompositeUnit(message: "Nonlinear unit prevents conversion: \(subUnit)")
                 }
-                totalCoefficient *= Foundation.pow(subUnit.coefficient, Double(exponent))
+                totalCoefficient *= Foundation.pow(subUnit.coefficient, exponent.asDouble)
             }
             return number / totalCoefficient
         }
@@ -334,7 +334,7 @@ public struct Unit {
 
     /// Returns a dictionary that represents the unique defined units and their exponents. For a
     /// composite unit, this is simply the `subUnits`, but for a defined unit, this is `[self: 1]`
-    private var subUnits: [DefinedUnit: Int] {
+    private var subUnits: [DefinedUnit: Fraction] {
         switch type {
         case .none:
             return [:]
@@ -349,7 +349,7 @@ public struct Unit {
     private enum UnitType: Sendable {
         case none
         case defined(DefinedUnit)
-        case composite([DefinedUnit: Int])
+        case composite([DefinedUnit: Fraction])
     }
 }
 
