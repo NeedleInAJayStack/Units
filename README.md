@@ -119,6 +119,11 @@ Here are a few examples:
 
 Measurements are represented as the numeric value followed by a space, then the serialized unit. For example, `5 m/s`
 
+## Default Units
+
+For a list of the default units and their conversion factors, see the
+[`DefaultUnits.swift file`](https://github.com/NeedleInAJayStack/Units/blob/main/Sources/Units/Unit/DefaultUnits.swift)
+
 ## Custom Units
 
 To extend this package, users can define their own custom units using `Unit.define`:
