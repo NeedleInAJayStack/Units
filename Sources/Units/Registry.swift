@@ -29,10 +29,10 @@ internal class Registry {
 
     /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
     /// verified that this is a composite unit.
-    internal func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
+    internal func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Fraction] {
         let symbolsAndExponents = try deserializeSymbolicEquation(symbol)
 
-        var compositeUnits = [DefinedUnit: Int]()
+        var compositeUnits = [DefinedUnit: Fraction]()
         for (definedUnitSymbol, exponent) in symbolsAndExponents {
             guard exponent != 0 else {
                 continue
@@ -70,7 +70,7 @@ internal class Registry {
     internal func addUnit(
         name: String,
         symbol: String,
-        dimension: [Quantity: Int],
+        dimension: [Quantity: Fraction],
         coefficient: Double = 1,
         constant: Double = 0
     ) throws {

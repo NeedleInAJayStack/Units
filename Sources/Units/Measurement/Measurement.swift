@@ -136,9 +136,9 @@ public struct Measurement: Equatable, Codable {
     /// Exponentiate the measurement. This is equavalent to multiple `*` operations.
     /// - Parameter raiseTo: The exponent to raise the measurement to
     /// - Returns: A new measurement with an exponentiated scalar value and an exponentiated unit of measure
-    public func pow(_ raiseTo: Int) -> Measurement {
+    public func pow(_ raiseTo: Fraction) -> Measurement {
         return Measurement(
-            value: Foundation.pow(value, Double(raiseTo)),
+            value: Foundation.pow(value, raiseTo.asDouble),
             unit: unit.pow(raiseTo)
         )
     }

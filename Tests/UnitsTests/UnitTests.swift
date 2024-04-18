@@ -7,6 +7,8 @@ final class UnitTests: XCTestCase {
         XCTAssertNotEqual(Unit.meter, Unit.foot)
         XCTAssertEqual(Unit.meter * Unit.second / Unit.second, Unit.meter)
         XCTAssertNotEqual(Unit.newton, Unit.kilogram * Unit.meter / Unit.second.pow(2))
+        XCTAssertNotEqual(Unit.meter.pow(1.over(2)), Unit.kilogram * Unit.meter / Unit.second.pow(2))
+        XCTAssertEqual(Unit.meter.pow(1.over(6)), Unit.meter.pow(1.over(2)).pow(1.over(3)) )
     }
 
     func testIsDimensionallyEquivalent() throws {
@@ -28,12 +30,21 @@ final class UnitTests: XCTestCase {
         XCTAssertTrue(
             (Unit.newton).isDimensionallyEquivalent(to: Unit.kilogram * Unit.meter / Unit.second.pow(2))
         )
+        XCTAssertTrue(
+            Unit.meter.pow(1.over(6)).isDimensionallyEquivalent(to: Unit.meter.pow(1.over(2)).pow(1.over(3)))
+        )
+
     }
 
     func testMultiply() throws {
         XCTAssertEqual(
             Unit.meter * Unit.meter,
             Unit.meter.pow(2)
+        )
+
+        XCTAssertEqual(
+            Unit.meter.pow(2) * Unit.meter.pow(1.over(2)),
+            Unit.meter.pow(5.over(2))
         )
 
         // Test that cancelling units give nil
@@ -49,6 +60,11 @@ final class UnitTests: XCTestCase {
             Unit.meter
         )
 
+        XCTAssertEqual(
+            Unit.meter.pow(2) / Unit.meter.pow(1.over(2)),
+            Unit.meter.pow(3.over(2))
+        )
+
         // Test that cancelling units give nil
         XCTAssertEqual(
             Unit.meter / Unit.meter,
@@ -60,6 +76,21 @@ final class UnitTests: XCTestCase {
         XCTAssertEqual(
             Unit.meter.pow(3),
             Unit.meter * Unit.meter * Unit.meter
+        )
+
+        XCTAssertEqual(
+            Unit.meter.pow(2).pow(1.over(2)),
+            Unit.meter
+        )
+
+        XCTAssertEqual(
+            Unit.meter.pow(3).pow(1.over(2)),
+            Unit.meter.pow(3.over(2))
+        )
+
+        XCTAssertEqual(
+            Unit.meter.pow(2).pow(3),
+            Unit.meter.pow(6)
         )
 
         // Test dividing by powers works (order of operations is preserved)
@@ -117,6 +148,11 @@ final class UnitTests: XCTestCase {
         )
 
         XCTAssertEqual(
+            (Unit.meter / Unit.second.pow(2.over(5))).symbol,
+            "m/s^(2|5)"
+        )
+
+        XCTAssertEqual(
             (Unit.none).symbol,
             "none"
         )
@@ -156,6 +192,11 @@ final class UnitTests: XCTestCase {
         XCTAssertEqual(
             (Unit.meter / Unit.second.pow(2)).name,
             "meter / second^2"
+        )
+
+        XCTAssertEqual(
+            (Unit.meter / Unit.second.pow(2.over(5))).name,
+            "meter / second^(2|5)"
         )
     }
 
@@ -233,6 +274,11 @@ final class UnitTests: XCTestCase {
         XCTAssertEqual(
             try Unit(fromSymbol: "m^2"),
             Unit.meter.pow(2)
+        )
+
+        XCTAssertEqual(
+            try Unit(fromSymbol: "m^(2|5)"),
+            Unit.meter.pow(2.over(5))
         )
 
         XCTAssertEqual(
