@@ -986,12 +986,7 @@ enum DefaultUnits {
         dimension: [.Length: 3],
         coefficient: 1000
     )
-    static let bushel = try! DefinedUnit(
-        name: "bushel",
-        symbol: "bushel",
-        dimension: [.Length: 3],
-        coefficient: 0.03523907
-    )
+    // Liquid measures
     static let teaspoon = try! DefinedUnit(
         name: "teaspoon",
         symbol: "tsp",
@@ -1022,7 +1017,6 @@ enum DefaultUnits {
         dimension: [.Length: 3],
         coefficient: 473.176473e-6
     )
-    // Liquid quart: https://en.wikipedia.org/wiki/Quart#US_liquid_quart
     static let quart = try! DefinedUnit(
         name: "quart",
         symbol: "qt",
@@ -1035,6 +1029,14 @@ enum DefaultUnits {
         dimension: [.Length: 3],
         coefficient: 0.003785411784
     )
+    // Dry measures
+    static let bushel = try! DefinedUnit(
+        name: "bushel",
+        symbol: "bushel",
+        dimension: [.Length: 3],
+        coefficient: 0.03523907
+    )
+    // Imperial measures
     static let imperialFluidOunce = try! DefinedUnit(
         name: "imperialFluidOunce",
         symbol: "ifl_oz",
