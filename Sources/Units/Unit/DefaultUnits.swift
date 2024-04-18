@@ -1029,12 +1029,30 @@ enum DefaultUnits {
         dimension: [.Length: 3],
         coefficient: 0.003785411784
     )
-    // Dry measures
+    // Dry measures: https://en.wikipedia.org/wiki/Dry_measure
+    static let dryPint: DefinedUnit = try! DefinedUnit(
+        name: "dryPint",
+        symbol: "drypt",
+        dimension: [.Length: 3],
+        coefficient: 5.506104713575e-4
+    )
+    static let dryQuart: DefinedUnit = try! DefinedUnit(
+        name: "dryQuart",
+        symbol: "dryqt",
+        dimension: [.Length: 3],
+        coefficient: 1.101220942715e-3
+    )
+    static let peck: DefinedUnit = try! DefinedUnit(
+        name: "peck",
+        symbol: "pk",
+        dimension: [.Length: 3],
+        coefficient: 8.80976754172e-3
+    )
     static let bushel = try! DefinedUnit(
         name: "bushel",
-        symbol: "bushel",
+        symbol: "bu",
         dimension: [.Length: 3],
-        coefficient: 0.03523907
+        coefficient: 0.035239070167
     )
     // Imperial measures
     static let imperialFluidOunce = try! DefinedUnit(
@@ -1066,6 +1084,12 @@ enum DefaultUnits {
         symbol: "igal",
         dimension: [.Length: 3],
         coefficient: 0.00454609
+    )
+    static let imperialPeck: DefinedUnit = try! DefinedUnit(
+        name: "imperialPeck",
+        symbol: "ipk",
+        dimension: [.Length: 3],
+        coefficient: 9.09218e-3
     )
     static let metricCup = try! DefinedUnit(
         name: "metricCup",
