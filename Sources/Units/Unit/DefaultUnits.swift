@@ -1022,6 +1022,13 @@ enum DefaultUnits {
         dimension: [.Length: 3],
         coefficient: 473.176473e-6
     )
+    // Liquid quart: https://en.wikipedia.org/wiki/Quart#US_liquid_quart
+    static let quart = try! DefinedUnit(
+        name: "quart",
+        symbol: "qt",
+        dimension: [.Length: 3],
+        coefficient: 9.46352946e-4
+    )
     static let gallon = try! DefinedUnit(
         name: "gallon",
         symbol: "gal",
@@ -1045,6 +1052,12 @@ enum DefaultUnits {
         symbol: "ipt",
         dimension: [.Length: 3],
         coefficient: 568.26125e-6
+    )
+    static let imperialQuart = try! DefinedUnit(
+        name: "imperialQuart",
+        symbol: "iqt",
+        dimension: [.Length: 3],
+        coefficient: 1.1365225e-3
     )
     static let imperialGallon = try! DefinedUnit(
         name: "imperialGallon",

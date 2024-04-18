@@ -239,10 +239,12 @@ public extension Unit {
     static let fluidOunce = Unit(definedBy: DefaultUnits.fluidOunce)
     static let cup = Unit(definedBy: DefaultUnits.cup)
     static let pint = Unit(definedBy: DefaultUnits.pint)
+    static let quart = Unit(definedBy: DefaultUnits.quart)
     static let gallon = Unit(definedBy: DefaultUnits.gallon)
     static let imperialFluidOunce = Unit(definedBy: DefaultUnits.imperialFluidOunce)
     static let imperialCup = Unit(definedBy: DefaultUnits.imperialCup)
     static let imperialPint = Unit(definedBy: DefaultUnits.imperialPint)
+    static let imperialQuart = Unit(definedBy: DefaultUnits.imperialQuart)
     static let imperialGallon = Unit(definedBy: DefaultUnits.imperialGallon)
     static let metricCup = Unit(definedBy: DefaultUnits.metricCup)
 }
