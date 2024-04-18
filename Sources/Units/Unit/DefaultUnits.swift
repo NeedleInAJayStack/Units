@@ -241,6 +241,7 @@ enum DefaultUnits {
         dimension: [.Mass: 1, .Length: 2, .Time: -2],
         coefficient: 4184
     )
+    // Thermochemical BTU: https://en.wikipedia.org/wiki/British_thermal_unit#Definitions
     static let btu = try! DefinedUnit(
         name: "btu",
         symbol: "BTU",
@@ -447,6 +448,7 @@ enum DefaultUnits {
         dimension: [.Length: 1],
         coefficient: 0.3048
     )
+    // International yard: https://en.wikipedia.org/wiki/Yard
     static let yard = try! DefinedUnit(
         name: "yard",
         symbol: "yd",
@@ -611,6 +613,7 @@ enum DefaultUnits {
         dimension: [.Mass: 1],
         coefficient: 0.028349523125
     )
+    // pound-mass: https://en.wikipedia.org/wiki/Pound_(mass)
     static let pound = try! DefinedUnit(
         name: "pound",
         symbol: "lb",
@@ -924,7 +927,7 @@ enum DefaultUnits {
         dimension: [.Time: 1],
         coefficient: 604_800
     )
-    // Julian year
+    // Julian year: https://en.wikipedia.org/wiki/Julian_year_%28astronomy%29
     static let year = try! DefinedUnit(
         name: "year",
         symbol: "yr",
