@@ -48,14 +48,14 @@ public struct Unit {
 
     /// Create a unit from the defined unit object.
     /// - Parameter definedBy: A defined unit to wrap
-    internal init(definedBy: DefinedUnit) {
+    init(definedBy: DefinedUnit) {
         type = .defined(definedBy)
     }
 
     /// Create a new from the sub-unit dictionary.
     /// - Parameter subUnits: A dictionary of defined units and exponents. If this dictionary has only a single unit with an exponent of one,
     /// we return that defined unit directly.
-    internal init(composedOf subUnits: [DefinedUnit: Int]) {
+    init(composedOf subUnits: [DefinedUnit: Int]) {
         if subUnits.count == 1, let subUnit = subUnits.first, subUnit.value == 1 {
             type = .defined(subUnit.key)
         } else {
