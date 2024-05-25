@@ -427,6 +427,41 @@ final class MeasurementTests: XCTestCase {
         )
     }
 
+    func testCompositeUnitDefine() throws {
+        let ampereHour = Unit.ampere * .hour
+
+        // Test conversion from custom unit
+        XCTAssertEqual(
+            try 1.measured(in: ampereHour).convert(to: .coulomb),
+            3600.measured(in: .coulomb),
+            accuracy: accuracy
+        )
+
+        // Test conversion to custom unit
+        XCTAssertEqual(
+            try 3600.measured(in: .coulomb).convert(to: ampereHour),
+            1.measured(in: ampereHour),
+            accuracy: accuracy
+        )
+
+        let ampereSquareMeters = Unit.ampere * .meter.pow(2)
+        let joulePerTesla = Unit.joule / .tesla
+
+        // Test complex conversion from custom unit
+        XCTAssertEqual(
+            try 1.measured(in: ampereSquareMeters).convert(to: joulePerTesla),
+            1.measured(in: joulePerTesla),
+            accuracy: accuracy
+        )
+
+        // Test complex conversion to custom unit
+        XCTAssertEqual(
+            try 1.measured(in: joulePerTesla).convert(to: ampereSquareMeters),
+            1.measured(in: ampereSquareMeters),
+            accuracy: accuracy
+        )
+    }
+
     func testUnitRegister() throws {
         try Unit.register(
             name: "centiinch",
