@@ -1,8 +1,8 @@
 /// UnitRegistry defines a structure that contains all defined units. This ensures
 /// that we are able to parse to and from unit symbol representations.
-internal class Registry {
+class Registry {
     // TODO: Should we eliminate this singleton and make clients keep track?
-    internal static let instance = Registry()
+    static let instance = Registry()
 
     // Quick access based on symbol
     private var symbolMap: [String: DefinedUnit]
@@ -29,7 +29,7 @@ internal class Registry {
 
     /// Returns a list of defined units and their exponents, given a composite unit symbol. It is expected that the caller has
     /// verified that this is a composite unit.
-    internal func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
+    func compositeUnitsFromSymbol(symbol: String) throws -> [DefinedUnit: Int] {
         let symbolsAndExponents = try deserializeSymbolicEquation(symbol)
 
         var compositeUnits = [DefinedUnit: Int]()
@@ -45,7 +45,7 @@ internal class Registry {
 
     /// Returns a defined unit given a defined unit symbol. It is expected that the caller has
     /// verified that this is not a composite unit.
-    internal func getUnit(bySymbol symbol: String) throws -> DefinedUnit {
+    func getUnit(bySymbol symbol: String) throws -> DefinedUnit {
         guard let definedUnit = symbolMap[symbol] else {
             throw UnitError.unitNotFound(message: "Symbol '\(symbol)' not recognized")
         }
@@ -54,7 +54,7 @@ internal class Registry {
 
     /// Returns a defined unit given a defined unit name. It is expected that the caller has
     /// verified that this is not a composite unit.
-    internal func getUnit(byName name: String) throws -> DefinedUnit {
+    func getUnit(byName name: String) throws -> DefinedUnit {
         guard let definedUnit = nameMap[name] else {
             throw UnitError.unitNotFound(message: "Name '\(name)' not recognized")
         }
@@ -67,7 +67,7 @@ internal class Registry {
     /// - parameter dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
     /// - parameter coefficient: The value to multiply a base unit of this dimension when converting it to this unit. For base units, this is 1.
     /// - parameter constant: The value to add to a base unit when converting it to this unit. This is added after the coefficient is multiplied according to order-of-operations.
-    internal func addUnit(
+    func addUnit(
         name: String,
         symbol: String,
         dimension: [Quantity: Int],
@@ -95,7 +95,7 @@ internal class Registry {
     }
 
     /// Returns all units currently defined by the registry
-    internal func allUnits() -> [Unit] {
+    func allUnits() -> [Unit] {
         var allUnits = [Unit]()
         for (_, unit) in symbolMap {
             allUnits.append(Unit(definedBy: unit))
