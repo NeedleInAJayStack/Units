@@ -30,6 +30,10 @@ let package = Package(
             ]
         ),
         .testTarget(
+            name: "CLITests",
+            dependencies: ["CLI"]
+        ),
+        .testTarget(
             name: "UnitsTests",
             dependencies: ["Units"]
         ),
