@@ -1,5 +1,7 @@
-// Implemented as a linked list of ExpressionNodes
+/// Represents a mathematical expression of measurements. It supports arithemetic operators and sub-expressions.
 class Expression {
+    // Implemented as a linked list of ExpressionNodes
+    
     var first: ExpressionNode
     var last: ExpressionNode
     var count: Int
@@ -39,6 +41,7 @@ class Expression {
         return self
     }
     
+    /// Reduces the expression to a single measurement, respecting the [order of operations](https://en.wikipedia.org/wiki/Order_of_operations)
     public func solve() throws -> Measurement {
         let copy = self.copy()
         return try copy.computeAndDestroy()
@@ -55,8 +58,11 @@ class Expression {
         return copy
     }
     
-    // NOTE: This flattens the list, destroying it.
+    /// Reduces the expression to a single measurement, respecting the [order of operations](https://en.wikipedia.org/wiki/Order_of_operations)
+    ///
+    /// NOTE: This flattens the list, destroying it. Use `solve` for non-destructive behavior.
     private func computeAndDestroy() throws -> Measurement {
+        
         // SubExpressions
         var left = first
         func computeSubExpression(node: ExpressionNode) throws {
