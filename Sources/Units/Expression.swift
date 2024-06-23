@@ -31,25 +31,25 @@ class Expression {
 //    }
     
     @discardableResult
-    func append(op: Operator, measurement: Measurement) -> Self {
-        let newNode = ExpressionNode(measurement: measurement)
+    func append(op: Operator, value: ExpressionNodeValue) -> Self {
+        let newNode = ExpressionNode(value)
         last.next = .init(op: op, node: newNode)
         last = newNode
         count = count + 1
         return self
     }
     
-    func solve() throws -> Measurement {
+    public func solve() throws -> Measurement {
         let copy = self.copy()
         return try copy.computeAndDestroy()
     }
     
-    private func copy() -> Expression {
+    func copy() -> Expression {
         // Copy the expression list so the original is not destroyed
-        let copy = Expression(node: ExpressionNode(measurement: first.measurement))
+        let copy = Expression(node: ExpressionNode(first.copyValue()))
         var traversal = first
         while let next = traversal.next {
-            copy.append(op: next.op, measurement: next.node.measurement)
+            copy.append(op: next.op, value: next.node.copyValue())
             traversal = next.node
         }
         return copy
@@ -57,19 +57,42 @@ class Expression {
     
     // NOTE: This flattens the list, destroying it.
     private func computeAndDestroy() throws -> Measurement {
-        // Multiplication
+        // SubExpressions
         var left = first
+        func computeSubExpression(node: ExpressionNode) throws {
+            switch node.value {
+            case .measurement:
+                break // Just pass through
+            case let .subExpression(expression):
+                // Reassign node's value from subExpression to the solved value
+                try node.value = .measurement(expression.solve())
+            }
+        }
+        while let next = left.next {
+            try computeSubExpression(node: left)
+            left = next.node
+        }
+        try computeSubExpression(node: left)
+        // At this point, there should be no more sub expressions
+        
+        // Multiplication
+        left = first
         while let next = left.next {
             let right = next.node
-            switch next.op {
-            case .add, .subtract: // Skip over operation
-                left = right
-            case .multiply: // Compute and absorb right node into left
-                left.measurement = left.measurement * right.measurement
-                left.next = right.next
-            case .divide: // Compute and absorb right node into left
-                left.measurement = left.measurement / right.measurement
-                left.next = right.next
+            switch (left.value, right.value) {
+            case let (.measurement(leftMeasurement), .measurement(rightMeasurement)):
+                switch next.op {
+                case .add, .subtract: // Skip over operation
+                    left = right
+                case .multiply: // Compute and absorb right node into left
+                    left.value = .measurement(leftMeasurement * rightMeasurement)
+                    left.next = right.next
+                case .divide: // Compute and absorb right node into left
+                    left.value = .measurement(leftMeasurement / rightMeasurement)
+                    left.next = right.next
+                }
+            default:
+                fatalError("Parentheses still present during multiplication phase")
             }
         }
         
@@ -77,51 +100,79 @@ class Expression {
         left = first
         while let next = left.next {
             let right = next.node
-            switch next.op {
-            case .add:  // Compute and absorb right node into left
-                left.measurement = try left.measurement + right.measurement
-                left.next = right.next
-            case .subtract: // Compute and absorb right node into left
-                left.measurement = try left.measurement - right.measurement
-                left.next = right.next
-            case .multiply, .divide:
-                // TODO: Throw
-                break
+            switch (left.value, right.value) {
+            case let (.measurement(leftMeasurement), .measurement(rightMeasurement)):
+                switch next.op {
+                case .add:  // Compute and absorb right node into left
+                    left.value = try .measurement(leftMeasurement + rightMeasurement)
+                    left.next = right.next
+                case .subtract: // Compute and absorb right node into left
+                    left.value = try .measurement(leftMeasurement - rightMeasurement)
+                    left.next = right.next
+                case .multiply, .divide:
+                    fatalError("Multiplication still present during addition phase")
+                }
+            default:
+                fatalError("Parentheses still present during addition phase")
             }
         }
         
-//        if first.next != nil {
-//            throw
-//        }
-        return first.measurement
+        if first.next != nil {
+            fatalError("Expression list reduction not complete")
+        }
+        switch first.value {
+        case let .measurement(measurement):
+            return measurement
+        default:
+            fatalError("Final value is not a computed measurement")
+        }
     }
 }
 
 extension Expression: CustomStringConvertible {
     var description: String {
-        return first.description
+        var result = first.value.description
+        var traversal = first
+        while let next = traversal.next {
+            result = result + " \(next.op.rawValue) \(next.node.value.description)"
+            traversal = next.node
+        }
+        return result
     }
 }
 
 class ExpressionNode {
-    var measurement: Measurement
+    var value: ExpressionNodeValue
     var next: ExpressionLink?
     
-    init(measurement: Measurement, next: ExpressionLink? = nil) {
-        self.measurement = measurement
+    init(_ value: ExpressionNodeValue, next: ExpressionLink? = nil) {
+        self.value = value
         self.next = next
+    }
+    
+    func copyValue() -> ExpressionNodeValue {
+        switch value {
+        case let .measurement(measurement):
+            return .measurement(measurement)
+        case let .subExpression(expression):
+            return .subExpression(expression.copy())
+        }
     }
 }
 
-extension ExpressionNode: CustomStringConvertible {
+enum ExpressionNodeValue {
+    case measurement(Measurement)
+    case subExpression(Expression)
+}
+
+extension ExpressionNodeValue: CustomStringConvertible {
     var description: String {
-        var result = measurement.description
-        var traversal = self
-        while let next = traversal.next {
-            result = result + " \(next.op.rawValue) \(next.node.measurement.description)"
-            traversal = next.node
+        switch self {
+        case let .measurement(measurement):
+            return measurement.description
+        case let .subExpression(subExpression):
+            return "(\(subExpression.description))"
         }
-        return result
     }
 }
 
