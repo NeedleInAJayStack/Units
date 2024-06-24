@@ -33,10 +33,9 @@ class Expression {
 //    }
     
     @discardableResult
-    func append(op: Operator, value: ExpressionNodeValue) -> Self {
-        let newNode = ExpressionNode(value)
-        last.next = .init(op: op, node: newNode)
-        last = newNode
+    func append(op: Operator, node: ExpressionNode) -> Self {
+        last.next = .init(op: op, node: node)
+        last = node
         count = count + 1
         return self
     }
@@ -49,10 +48,10 @@ class Expression {
     
     func copy() -> Expression {
         // Copy the expression list so the original is not destroyed
-        let copy = Expression(node: ExpressionNode(first.copyValue()))
+        let copy = Expression(node: first.copy())
         var traversal = first
         while let next = traversal.next {
-            copy.append(op: next.op, value: next.node.copyValue())
+            copy.append(op: next.op, node: next.node.copy())
             traversal = next.node
         }
         return copy
@@ -64,22 +63,43 @@ class Expression {
     private func computeAndDestroy() throws -> Measurement {
         
         // SubExpressions
-        var left = first
         func computeSubExpression(node: ExpressionNode) throws {
             switch node.value {
             case .measurement:
-                break // Just pass through
+                return // Just pass through
             case let .subExpression(expression):
                 // Reassign node's value from subExpression to the solved value
                 try node.value = .measurement(expression.solve())
             }
         }
+        var left = first
         while let next = left.next {
             try computeSubExpression(node: left)
             left = next.node
         }
         try computeSubExpression(node: left)
         // At this point, there should be no more sub expressions
+        
+        // Exponentals
+        func exponentiate(node: ExpressionNode) throws {
+            guard let exponent = node.exponent else {
+                return
+            }
+            switch node.value {
+            case .subExpression:
+                fatalError("Parentheses still present during exponent phase")
+            case let .measurement(measurement):
+                // Reassign node's value to the exponentiated result & clear exponent
+                node.value = .measurement(measurement.pow(exponent))
+                node.exponent = nil
+            }
+        }
+        left = first
+        while let next = left.next {
+            try exponentiate(node: left)
+            left = next.node
+        }
+        try exponentiate(node: left)
         
         // Multiplication
         left = first
@@ -149,26 +169,32 @@ extension Expression: CustomStringConvertible {
 
 class ExpressionNode {
     var value: ExpressionNodeValue
+    var exponent: Int?
     var next: ExpressionLink?
     
-    init(_ value: ExpressionNodeValue, next: ExpressionLink? = nil) {
+    init(_ value: ExpressionNodeValue, exponent: Int? = nil, next: ExpressionLink? = nil) {
         self.value = value
+        self.exponent = exponent
         self.next = next
     }
     
-    func copyValue() -> ExpressionNodeValue {
-        switch value {
-        case let .measurement(measurement):
-            return .measurement(measurement)
-        case let .subExpression(expression):
-            return .subExpression(expression.copy())
-        }
+    func copy() -> ExpressionNode {
+        return .init(value.copy(), exponent: self.exponent)
     }
 }
 
 enum ExpressionNodeValue {
     case measurement(Measurement)
     case subExpression(Expression)
+    
+    func copy() -> ExpressionNodeValue {
+        switch self {
+        case let .measurement(measurement):
+            return .measurement(measurement)
+        case let .subExpression(expression):
+            return .subExpression(expression.copy())
+        }
+    }
 }
 
 extension ExpressionNodeValue: CustomStringConvertible {
