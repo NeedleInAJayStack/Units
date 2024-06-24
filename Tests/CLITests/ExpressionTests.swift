@@ -2,7 +2,7 @@
 //import Units
 import XCTest
 
-final class CLITests: XCTestCase {
+final class ExpressionTests: XCTestCase {
     func testSingleMeasurement() throws {
         try XCTAssertEqual(
             Expression(node: .init(.measurement(5.measured(in: .kilowatt)))).solve(),
@@ -182,6 +182,96 @@ final class CLITests: XCTestCase {
                 .append(op: .multiply, node: .init(.measurement(2.measured(in: .hour))))
                 .description,
             "5.0 kW * 3.0 hr + 2.0 kW * 2.0 hr"
+        )
+    }
+    
+    func testEquatable() throws {
+        XCTAssertEqual(
+            // 5.0 kW + 3.0 kW + 2.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(2.measured(in: .kilowatt)))),
+            // 5.0 kW + 3.0 kW + 2.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(2.measured(in: .kilowatt))))
+        )
+    }
+    
+    func testNotEqualWhenCountsDontMatch() throws {
+        XCTAssertNotEqual(
+            // 5.0 kW + 3.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .kilowatt)))),
+            // 5.0 kW + 3.0 kW + 2.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(2.measured(in: .kilowatt))))
+        )
+    }
+    
+    func testNotEqualWhenOperatorsDontMatch() throws {
+        XCTAssertNotEqual(
+            // 5.0 kW + 3.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .kilowatt)))),
+            // 5.0 kW * 3.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .multiply, node: .init(.measurement(3.measured(in: .kilowatt))))
+        )
+    }
+    
+    func testNotEqualWhenUnitsDontMatch() throws {
+        XCTAssertNotEqual(
+            // 5.0 kW + 3.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .kilowatt)))),
+            // 5.0 W * 3.0 W
+            Expression(node: .init(.measurement(5.measured(in: .watt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .watt))))
+        )
+    }
+    
+    func testNotEqualWhenScalarsDontMatch() throws {
+        XCTAssertNotEqual(
+            // 5.0 kW + 3.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .kilowatt)))),
+            // 5.0 kW * 4.0 kW
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+                .append(op: .add, node: .init(.measurement(4.measured(in: .kilowatt))))
+        )
+    }
+    
+    func testNotEqualWhenExponentsDontMatch() throws {
+        XCTAssertNotEqual(
+            // (5.0 kW)^2
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt)), exponent: 2)),
+            // (5.0 kW)^3
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt)), exponent: 3))
+        )
+    }
+    
+    func testNotEqualWhenSubExpressionsDontMatch() throws {
+        XCTAssertNotEqual(
+            // 5 kW * (2 hr + 1 hr)
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+            .append(op: .multiply, node: .init(
+                .subExpression(.init(
+                    node: .init(.measurement(2.measured(in: .hour)))
+                ).append(op: .add,
+                    node: .init(.measurement(1.measured(in: .hour)))
+                ))
+            )),
+            // 5 kW * (1 hr + 1 hr)
+            Expression(node: .init(.measurement(5.measured(in: .kilowatt))))
+            .append(op: .multiply, node: .init(
+                .subExpression(.init(
+                    node: .init(.measurement(1.measured(in: .hour)))
+                ).append(op: .add,
+                    node: .init(.measurement(1.measured(in: .hour)))
+                ))
+            ))
         )
     }
     

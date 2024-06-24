@@ -167,6 +167,27 @@ extension Expression: CustomStringConvertible {
     }
 }
 
+extension Expression: Equatable {
+    static func == (lhs: Expression, rhs: Expression) -> Bool {
+        guard lhs.count == rhs.count else {
+            return false
+        }
+        var lhsNode = lhs.first
+        var rhsNode = rhs.first
+        guard lhsNode == rhsNode else {
+            return false
+        }
+        while let lhsNext = lhsNode.next, let rhsNext = rhsNode.next {
+            guard lhsNext == rhsNext else {
+                return false
+            }
+            lhsNode = lhsNext.node
+            rhsNode = rhsNext.node
+        }
+        return true
+    }
+}
+
 class ExpressionNode {
     var value: ExpressionNodeValue
     var exponent: Int?
@@ -180,6 +201,13 @@ class ExpressionNode {
     
     func copy() -> ExpressionNode {
         return .init(value.copy(), exponent: self.exponent)
+    }
+}
+
+extension ExpressionNode: Equatable {
+    static func == (lhs: ExpressionNode, rhs: ExpressionNode) -> Bool {
+        return lhs.value == rhs.value &&
+            lhs.exponent == rhs.exponent
     }
 }
 
@@ -208,6 +236,19 @@ extension ExpressionNodeValue: CustomStringConvertible {
     }
 }
 
+extension ExpressionNodeValue: Equatable {
+    static func == (lhs: ExpressionNodeValue, rhs: ExpressionNodeValue) -> Bool {
+        switch (lhs, rhs) {
+        case let (.measurement(lhsM), .measurement(rhsM)):
+            return lhsM == rhsM
+        case let (.subExpression(lhsE), .subExpression(rhsE)):
+            return lhsE == rhsE
+        default:
+            return false
+        }
+    }
+}
+
 class ExpressionLink {
     let op: Operator
     let node: ExpressionNode
@@ -215,6 +256,13 @@ class ExpressionLink {
     init(op: Operator, node: ExpressionNode) {
         self.op = op
         self.node = node
+    }
+}
+
+extension ExpressionLink: Equatable {
+    static func == (lhs: ExpressionLink, rhs: ExpressionLink) -> Bool {
+        return lhs.op == rhs.op &&
+            lhs.node == rhs.node
     }
 }
 
