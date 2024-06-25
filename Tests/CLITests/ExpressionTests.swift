@@ -3,6 +3,27 @@
 import XCTest
 
 final class ExpressionTests: XCTestCase {
+    func testParse() throws {
+        XCTAssertEqual(
+            try Expression("5 m + 3 m"),
+            Expression(node: .init(.measurement(5.measured(in: .meter))))
+                .append(op: .add, node: .init(.measurement(3.measured(in: .meter))))
+        )
+        
+        XCTAssertEqual(
+            try Expression("5 m^2/s + (1 m + 2 m)^2 / 5 s"),
+            Expression(node: .init(.measurement(5.measured(in: .meter * .meter / .second))))
+                .append(op: .add, node: .init(
+                    .subExpression(
+                        .init(node: .init(.measurement(1.measured(in: .meter))))
+                        .append(op: .add, node: .init(.measurement(2.measured(in: .meter))))
+                    ),
+                    exponent: 2
+                ))
+                .append(op: .divide, node: .init(.measurement(5.measured(in: .second))))
+        )
+    }
+    
     func testSingleMeasurement() throws {
         try XCTAssertEqual(
             Expression(node: .init(.measurement(5.measured(in: .kilowatt)))).solve(),

@@ -12,25 +12,12 @@ class Expression {
         count = 1
     }
     
-//    // TODO: parsing
-//    init(_ expr: String) {
-//        // Goal: Split string up into measurements and operators. Measurement parsing is complete,
-//        // so at that point, we just go left to right adding items to the expression.
-//        let utf8 = expr.unicodeScalars
-//        var prev: Character? = nil
-//
-//        let space = Character(" ")
-//        for (index, char) in utf8.enumerated() {
-//            guard let prev = prev else {
-//                prev = Character(char)
-//                continue
-//            }
-//            if prev == space {
-//
-//            }
-//            prev = Character(char)
-//        }
-//    }
+    init(_ expr: String) throws {
+        let parsed = try Parser(expr).parseExpression()
+        self.first = parsed.first
+        self.last = parsed.last
+        self.count = parsed.count
+    }
     
     @discardableResult
     func append(op: Operator, node: ExpressionNode) -> Self {
