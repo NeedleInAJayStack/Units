@@ -117,7 +117,20 @@ Here are a few examples:
 - `m/s*kg`: equivalent to `kg*m/s`
 - `m^1*s^-1*kg^1`: equivalent to `kg*m/s`
 
-Measurements are represented as the numeric value followed by a space, then the serialized unit. For example, `5 m/s`
+Measurements are represented as the numeric value followed by the serialized unit with an optional space. For example, `5m/s` or `5 m/s`.
+
+Expressions are a mathematical combination of measurements. Arithemetic operators, exponents, and sub-expressions are supported. Here are a few expression examples:
+
+- `5m + 3m`
+- `5.3 m + 3.8 m`
+- `5m^2/s + (1m + 2m)^2 / 5s`
+
+There are few expression parsing rules to keep in mind: 
+
+- All parentheses must be matched
+- All measurement operators must have a leading and following space. i.e. ` * `
+- Only integer exponentiation is supported
+- Exponentiated measurements must have parentheses to avoid ambiguity with units. i.e. `(3m)^2`
 
 ## Default Units
 
@@ -236,12 +249,18 @@ To uninstall, run:
 You can then perform unit conversions using the `unit convert` command:
 
 ```bash
-unit convert 5_m/s mi/hr  # Returns 11.184681460272012 mi/hr
+unit convert 5m/s mi/hr  # Returns 11.184681460272012 mi/hr
 ```
 
-This command uses the unit and measurement [serialization format](#serialization). Note that for
+This command uses the unit and expression [serialization format](#serialization). Note that for
 convenience, you may use an underscore `_` to represent the normally serialized space. Also,
 `*` characters may need to be escaped.
+
+You can also evaulate math in the first argument. For example:
+
+```bash
+unit convert "60mi/hr * 30min" "mi"  # Returns 30.0 mi
+```
 
 ### List
 

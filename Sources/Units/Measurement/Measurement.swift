@@ -163,22 +163,11 @@ extension Measurement: CustomStringConvertible {
 
 extension Measurement: LosslessStringConvertible {
     public init?(_ description: String) {
-        let valueEndIndex = description.firstIndex(of: " ") ?? description.endIndex
-        guard let value = Double(description[..<valueEndIndex]) else {
+        guard let parsed = try? Parser(description).parseMeasurement() else {
             return nil
         }
-        self.value = value
-
-        if valueEndIndex != description.endIndex {
-            guard let unit = Unit(String(
-                description[description.index(after: valueEndIndex) ..< description.endIndex]
-            )) else {
-                return nil
-            }
-            self.unit = unit
-        } else {
-            unit = .none
-        }
+        self.value = parsed.value
+        self.unit = parsed.unit
     }
 }
 
