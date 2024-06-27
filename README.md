@@ -249,12 +249,18 @@ To uninstall, run:
 You can then perform unit conversions using the `unit convert` command:
 
 ```bash
-unit convert 5_m/s mi/hr  # Returns 11.184681460272012 mi/hr
+unit convert 5m/s mi/hr  # Returns 11.184681460272012 mi/hr
 ```
 
-This command uses the unit and measurement [serialization format](#serialization). Note that for
+This command uses the unit and expression [serialization format](#serialization). Note that for
 convenience, you may use an underscore `_` to represent the normally serialized space. Also,
 `*` characters may need to be escaped.
+
+You can also evaulate math in the first argument. For example:
+
+```bash
+unit convert "60mi/hr * 30min" "mi"  # Returns 30.0 mi
+```
 
 ### List
 
