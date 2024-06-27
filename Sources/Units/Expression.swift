@@ -1,5 +1,5 @@
 /// Represents a mathematical expression of measurements. It supports arithemetic operators, exponents, and sub-expressions.
-public class Expression {
+public final class Expression {
     // Implemented as a linked list of ExpressionNodes. This allows us to indicate operators,
     // and iteratively solve by reducing the list according to the order of operations.
     

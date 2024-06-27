@@ -3,7 +3,7 @@ import Units
 
 struct Convert: ParsableCommand {
     static var configuration = CommandConfiguration(
-        abstract: "Convert a measurement to a specified unit.",
+        abstract: "Convert a measurement expression to a specified unit.",
         discussion: """
         Run `unit list` to see the supported unit symbols and names. Unless arguments are wrapped \
         in quotes, the `*` character may need to be escaped.
@@ -12,20 +12,21 @@ struct Convert: ParsableCommand {
         https://github.com/NeedleInAJayStack/Units/blob/main/README.md#serialization
 
         EXAMPLES:
-          unit convert 1_ft m
+          unit convert 1ft m
           unit convert 1_ft meter
           unit convert 5.4_kW\\*hr J
           unit convert 5.4e-3_km/s mi/hr
           unit convert "12 kg*m/s^2" "N"
-          unit convert 12_m^1\\*s^-1\\*kg^1 kg\\*m/s
+          unit convert "8kg * 3m / 2s^2" "N"
         """
     )
 
     @Argument(help: """
-    The measurement to convert. This is a number, followed by a space, followed by a unit \
-    symbol. For convenience, you may use an underscore `_` to represent the space.
+    The expression to compute to convert. This must follow the expression parsing rules found \
+    in https://github.com/NeedleInAJayStack/Units/blob/main/README.md#serialization. \
+    For convenience, you may use an underscore `_` to represent spaces.
     """)
-    var from: Measurement
+    var from: Expression
 
     @Argument(help: """
     The unit to convert to. This can either be a unit name, a unit symbol, or an equation of \
@@ -34,17 +35,14 @@ struct Convert: ParsableCommand {
     var to: Units.Unit
 
     func run() throws {
-        try print(from.convert(to: to))
+        try print(from.solve().convert(to: to))
     }
 }
 
-extension Measurement: ExpressibleByArgument {
-    public init?(argument: String) {
+extension Expression: ExpressibleByArgument {
+    public convenience init?(argument: String) {
         let argument = argument.replacingOccurrences(of: "_", with: " ")
-        guard let measurement = Measurement(argument) else {
-            return nil
-        }
-        self = measurement
+        try? self.init(argument)
     }
 }
 
