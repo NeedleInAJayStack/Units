@@ -10,6 +10,12 @@ final class ExpressionTests: XCTestCase {
         )
         
         XCTAssertEqual(
+            try Expression("5.3 m + 3.8 m"),
+            Expression(node: .init(.measurement(5.3.measured(in: .meter))))
+                .append(op: .add, node: .init(.measurement(3.8.measured(in: .meter))))
+        )
+        
+        XCTAssertEqual(
             try Expression("5m^2/s + (1m + 2m)^2 / 5s"),
             Expression(node: .init(.measurement(5.measured(in: .meter * .meter / .second))))
                 .append(op: .add, node: .init(

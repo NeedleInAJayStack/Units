@@ -117,7 +117,20 @@ Here are a few examples:
 - `m/s*kg`: equivalent to `kg*m/s`
 - `m^1*s^-1*kg^1`: equivalent to `kg*m/s`
 
-Measurements are represented as the numeric value followed by a space, then the serialized unit. For example, `5 m/s`
+Measurements are represented as the numeric value followed by the serialized unit with an optional space. For example, `5m/s` or `5 m/s`.
+
+Expressions are a mathematical combination of measurements. Arithemetic operators, exponents, and sub-expressions are supported. Here are a few expression examples:
+
+- `5m + 3m`
+- `5.3 m + 3.8 m`
+- `5m^2/s + (1m + 2m)^2 / 5s`
+
+There are few expression parsing rules to keep in mind: 
+
+- All parentheses must be matched
+- All measurement operators must have a leading and following space. i.e. ` * `
+- Only integer exponentiation is supported
+- Exponentiated measurements must have parentheses to avoid ambiguity with units. i.e. `(3m)^2`
 
 ## Default Units
 

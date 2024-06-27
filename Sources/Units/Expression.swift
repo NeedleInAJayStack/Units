@@ -1,6 +1,7 @@
-/// Represents a mathematical expression of measurements. It supports arithemetic operators and sub-expressions.
-class Expression {
-    // Implemented as a linked list of ExpressionNodes
+/// Represents a mathematical expression of measurements. It supports arithemetic operators, exponents, and sub-expressions.
+public class Expression {
+    // Implemented as a linked list of ExpressionNodes. This allows us to indicate operators,
+    // and iteratively solve by reducing the list according to the order of operations.
     
     var first: ExpressionNode
     var last: ExpressionNode
@@ -12,11 +13,31 @@ class Expression {
         count = 1
     }
     
-    init(_ expr: String) throws {
+    /// Initializes an expression from a string.
+    ///
+    /// Parsing rules:
+    /// - All parentheses must be matched
+    /// - All measurement operators must have a leading and following space. i.e. ` * `
+    /// - Only integer exponentiation is supported
+    /// - Exponentiated measurements must have parentheses to avoid ambiguity with units. i.e. `(3m)^2`
+    ///
+    /// Examples:
+    /// - `5m + 3m`
+    /// - `5.3 m + 3.8 m`
+    /// - `5m^2/s + (1m + 2m)^2 / 5s`
+    ///
+    /// - Parameter expr: The string expression to parse.
+    public init(_ expr: String) throws {
         let parsed = try Parser(expr).parseExpression()
         self.first = parsed.first
         self.last = parsed.last
         self.count = parsed.count
+    }
+    
+    /// Reduces the expression to a single measurement, respecting the [order of operations](https://en.wikipedia.org/wiki/Order_of_operations)
+    public func solve() throws -> Measurement {
+        let copy = self.copy()
+        return try copy.computeAndDestroy()
     }
     
     @discardableResult
@@ -25,12 +46,6 @@ class Expression {
         last = node
         count = count + 1
         return self
-    }
-    
-    /// Reduces the expression to a single measurement, respecting the [order of operations](https://en.wikipedia.org/wiki/Order_of_operations)
-    public func solve() throws -> Measurement {
-        let copy = self.copy()
-        return try copy.computeAndDestroy()
     }
     
     func copy() -> Expression {
@@ -143,7 +158,7 @@ class Expression {
 }
 
 extension Expression: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         var result = first.value.description
         var traversal = first
         while let next = traversal.next {
@@ -155,7 +170,7 @@ extension Expression: CustomStringConvertible {
 }
 
 extension Expression: Equatable {
-    static func == (lhs: Expression, rhs: Expression) -> Bool {
+    public static func == (lhs: Expression, rhs: Expression) -> Bool {
         guard lhs.count == rhs.count else {
             return false
         }
