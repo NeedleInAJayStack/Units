@@ -16,6 +16,13 @@ final class ParseMeasurementTests: XCTestCase {
         )
     }
     
+    func testUnitWithSymbol() throws {
+        XCTAssertEqual(
+            try Parser("5.1 °F").parseMeasurement(),
+            5.1.measured(in: .fahrenheit)
+        )
+    }
+    
     func testComplexUnit() throws {
         XCTAssertEqual(
             try Parser("5.1 m^2*kg/s^3").parseMeasurement(),

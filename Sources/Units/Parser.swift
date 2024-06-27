@@ -1,7 +1,7 @@
 import Foundation
 
 class Parser {
-    var data: Data
+    var data: [UnicodeScalar]
     var position = 0
     
     private var cur: Character? {
@@ -19,7 +19,7 @@ class Parser {
     }
     
     init(_ string: String) {
-        self.data = Data(string.utf8)
+        self.data = Array(string.unicodeScalars)
     }
     
     func parseMeasurement() throws -> Measurement {
@@ -154,28 +154,15 @@ class Parser {
             }
             return .number(number)
         }
-        
-        if char.isLetter {
-            var unitString = ""
-            while let cur = cur, (cur.isLetter || cur.isNumber || OperatorSymbols.allCases.map{$0.rawValue}.contains(cur)) {
-                unitString.append(cur)
-                consume()
-            }
-            let unit = try Unit.init(fromSymbol: unitString)
-            return .unit(unit)
-        }
-        
-        if char == "(" {
+        else if char == "(" {
             consume()
             return .lParen
         }
-        
-        if char == ")" {
+        else if char == ")" {
             consume()
             return .rParen
         }
-        
-        if char == "^" {
+        else if char == "^" {
             let startPosition = position
             try consume("^")
             var intString = ""
@@ -188,8 +175,7 @@ class Parser {
             }
             return .exp(int)
         }
-        
-        if char.isWhitespace {
+        else if char.isWhitespace {
             if peek == "+" {
                 try consume(" ")
                 try consume("+")
@@ -219,8 +205,15 @@ class Parser {
             consume()
             return try next()
         }
-        
-        throw ParserError.unexpectedCharacter(char, position: position)
+        else {
+            var unitString = ""
+            while let cur = cur, cur != "(" && cur != ")" && !cur.isWhitespace {
+                unitString.append(cur)
+                consume()
+            }
+            let unit = try Unit.init(fromSymbol: unitString)
+            return .unit(unit)
+        }
     }
     
     private func consume() {
