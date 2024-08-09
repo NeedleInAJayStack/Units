@@ -245,6 +245,54 @@ enum DefaultUnits {
         dimension: [.Data: 1],
         coefficient: 8e24
     )
+    static let kibibyte = try! DefinedUnit(
+        name: "kibibyte",
+        symbol: "KiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * 1024
+    )
+    static let mebibyte = try! DefinedUnit(
+        name: "mebibyte",
+        symbol: "MiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 2)
+    )
+    static let gibibyte = try! DefinedUnit(
+        name: "gibibyte",
+        symbol: "GiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 3)
+    )
+    static let tebibyte = try! DefinedUnit(
+        name: "tebibyte",
+        symbol: "TiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 4)
+    )
+    static let pebibyte = try! DefinedUnit(
+        name: "pebibyte",
+        symbol: "PiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 5)
+    )
+    static let exbibyte = try! DefinedUnit(
+        name: "exbibyte",
+        symbol: "EiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 6)
+    )
+    static let zebibyte = try! DefinedUnit(
+        name: "zebibyte",
+        symbol: "ZiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 7)
+    )
+    static let yobibyte = try! DefinedUnit(
+        name: "yobibyte",
+        symbol: "YiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 8)
+    )
 
     // MARK: Electric Potential Difference
 
