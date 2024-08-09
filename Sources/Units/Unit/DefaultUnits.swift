@@ -1,6 +1,11 @@
+import Foundation
+
 /// Static type containing this package's pre-defined units
 enum DefaultUnits {
-    // MARK: If adding units to this list, add corresponding entries in the `Unit+DefaultUnits.swift` & `Registry.swift` files
+    // MARK: If adding units to this list, add corresponding entries to the following files:
+    // - Unit+DefaultUnits.swift
+    // - Registry.swift
+    // - DefinitionTests.swift
 
     // MARK: Acceleration
 
@@ -143,6 +148,102 @@ enum DefaultUnits {
         symbol: "bit",
         dimension: [.Data: 1]
     )
+    static let kilobit = try! DefinedUnit(
+        name: "kilobit",
+        symbol: "kbit",
+        dimension: [.Data: 1],
+        coefficient: 1000
+    )
+    static let megabit = try! DefinedUnit(
+        name: "megabit",
+        symbol: "Mbit",
+        dimension: [.Data: 1],
+        coefficient: 1e6
+    )
+    static let gigabit = try! DefinedUnit(
+        name: "gigabit",
+        symbol: "Gbit",
+        dimension: [.Data: 1],
+        coefficient: 1e9
+    )
+    static let terabit = try! DefinedUnit(
+        name: "terabit",
+        symbol: "Tbit",
+        dimension: [.Data: 1],
+        coefficient: 1e12
+    )
+    static let petabit = try! DefinedUnit(
+        name: "petabit",
+        symbol: "Pbit",
+        dimension: [.Data: 1],
+        coefficient: 1e15
+    )
+    static let exabit = try! DefinedUnit(
+        name: "exabit",
+        symbol: "Ebit",
+        dimension: [.Data: 1],
+        coefficient: 1e18
+    )
+    static let zetabit = try! DefinedUnit(
+        name: "zetabit",
+        symbol: "Zbit",
+        dimension: [.Data: 1],
+        coefficient: 1e21
+    )
+    static let yottabit = try! DefinedUnit(
+        name: "yottabit",
+        symbol: "Ybit",
+        dimension: [.Data: 1],
+        coefficient: 1e24
+    )
+    static let kibibit = try! DefinedUnit(
+        name: "kibibit",
+        symbol: "Kibit",
+        dimension: [.Data: 1],
+        coefficient: 1024
+    )
+    static let mebibit = try! DefinedUnit(
+        name: "mebibit",
+        symbol: "Mibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 2)
+    )
+    static let gibibit = try! DefinedUnit(
+        name: "gibibit",
+        symbol: "Gibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 3)
+    )
+    static let tebibit = try! DefinedUnit(
+        name: "tebibit",
+        symbol: "Tibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 4)
+    )
+    static let pebibit = try! DefinedUnit(
+        name: "pebibit",
+        symbol: "Pibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 5)
+    )
+    static let exbibit = try! DefinedUnit(
+        name: "exbibit",
+        symbol: "Eibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 6)
+    )
+    static let zebibit = try! DefinedUnit(
+        name: "zebibit",
+        symbol: "Zibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 7)
+    )
+    static let yobibit = try! DefinedUnit(
+        name: "yobibit",
+        symbol: "Yibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 8)
+    )
     static let byte = try! DefinedUnit(
         name: "byte",
         symbol: "byte",
@@ -167,11 +268,83 @@ enum DefaultUnits {
         dimension: [.Data: 1],
         coefficient: 8e9
     )
+    static let terabyte = try! DefinedUnit(
+        name: "terabyte",
+        symbol: "TB",
+        dimension: [.Data: 1],
+        coefficient: 8e12
+    )
     static let petabyte = try! DefinedUnit(
         name: "petabyte",
         symbol: "PB",
         dimension: [.Data: 1],
-        coefficient: 8e12
+        coefficient: 8e15
+    )
+    static let exabyte = try! DefinedUnit(
+        name: "exabyte",
+        symbol: "EB",
+        dimension: [.Data: 1],
+        coefficient: 8e18
+    )
+    static let zetabyte = try! DefinedUnit(
+        name: "zetabyte",
+        symbol: "ZB",
+        dimension: [.Data: 1],
+        coefficient: 8e21
+    )
+    static let yottabyte = try! DefinedUnit(
+        name: "yottabyte",
+        symbol: "YB",
+        dimension: [.Data: 1],
+        coefficient: 8e24
+    )
+    static let kibibyte = try! DefinedUnit(
+        name: "kibibyte",
+        symbol: "KiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * 1024
+    )
+    static let mebibyte = try! DefinedUnit(
+        name: "mebibyte",
+        symbol: "MiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 2)
+    )
+    static let gibibyte = try! DefinedUnit(
+        name: "gibibyte",
+        symbol: "GiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 3)
+    )
+    static let tebibyte = try! DefinedUnit(
+        name: "tebibyte",
+        symbol: "TiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 4)
+    )
+    static let pebibyte = try! DefinedUnit(
+        name: "pebibyte",
+        symbol: "PiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 5)
+    )
+    static let exbibyte = try! DefinedUnit(
+        name: "exbibyte",
+        symbol: "EiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 6)
+    )
+    static let zebibyte = try! DefinedUnit(
+        name: "zebibyte",
+        symbol: "ZiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 7)
+    )
+    static let yobibyte = try! DefinedUnit(
+        name: "yobibyte",
+        symbol: "YiB",
+        dimension: [.Data: 1],
+        coefficient: 8 * pow(1024, 8)
     )
 
     // MARK: Electric Potential Difference

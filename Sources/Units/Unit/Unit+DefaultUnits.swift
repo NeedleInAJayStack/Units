@@ -1,7 +1,6 @@
 // TODO: Make more
 // - Concentration Mass
 // - Dispersion
-// - Information Storage: https://developer.apple.com/documentation/foundation/unitinformationstorage
 
 public extension Unit {
     // Provided as easy access to UnitRegistry default units
@@ -47,11 +46,39 @@ public extension Unit {
     // MARK: Data
 
     static let bit = Unit(definedBy: DefaultUnits.bit)
+    static let kilobit = Unit(definedBy: DefaultUnits.kilobit)
+    static let megabit = Unit(definedBy: DefaultUnits.megabit)
+    static let gigabit = Unit(definedBy: DefaultUnits.gigabit)
+    static let terabit = Unit(definedBy: DefaultUnits.terabit)
+    static let petabit = Unit(definedBy: DefaultUnits.petabit)
+    static let exabit = Unit(definedBy: DefaultUnits.exabit)
+    static let zetabit = Unit(definedBy: DefaultUnits.zetabit)
+    static let yottabit = Unit(definedBy: DefaultUnits.yottabit)
+    static let kibibit = Unit(definedBy: DefaultUnits.kibibit)
+    static let mebibit = Unit(definedBy: DefaultUnits.mebibit)
+    static let gibibit = Unit(definedBy: DefaultUnits.gibibit)
+    static let tebibit = Unit(definedBy: DefaultUnits.tebibit)
+    static let pebibit = Unit(definedBy: DefaultUnits.pebibit)
+    static let exbibit = Unit(definedBy: DefaultUnits.exbibit)
+    static let zebibit = Unit(definedBy: DefaultUnits.zebibit)
+    static let yobibit = Unit(definedBy: DefaultUnits.yobibit)
     static let byte = Unit(definedBy: DefaultUnits.byte)
     static let kilobyte = Unit(definedBy: DefaultUnits.kilobyte)
     static let megabyte = Unit(definedBy: DefaultUnits.megabyte)
     static let gigabyte = Unit(definedBy: DefaultUnits.gigabyte)
+    static let terabyte = Unit(definedBy: DefaultUnits.terabyte)
     static let petabyte = Unit(definedBy: DefaultUnits.petabyte)
+    static let exabyte = Unit(definedBy: DefaultUnits.exabyte)
+    static let zetabyte = Unit(definedBy: DefaultUnits.zetabyte)
+    static let yottabyte = Unit(definedBy: DefaultUnits.yottabyte)
+    static let kibibyte = Unit(definedBy: DefaultUnits.kibibyte)
+    static let mebibyte = Unit(definedBy: DefaultUnits.mebibyte)
+    static let gibibyte = Unit(definedBy: DefaultUnits.gibibyte)
+    static let tebibyte = Unit(definedBy: DefaultUnits.tebibyte)
+    static let pebibyte = Unit(definedBy: DefaultUnits.pebibyte)
+    static let exbibyte = Unit(definedBy: DefaultUnits.exbibyte)
+    static let zebibyte = Unit(definedBy: DefaultUnits.zebibyte)
+    static let yobibyte = Unit(definedBy: DefaultUnits.yobibyte)
 
     // MARK: Electric Potential Difference
 
