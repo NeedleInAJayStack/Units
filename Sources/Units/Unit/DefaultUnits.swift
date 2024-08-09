@@ -219,7 +219,7 @@ enum DefaultUnits {
         name: "petabyte",
         symbol: "PB",
         dimension: [.Data: 1],
-        coefficient: 8e12
+        coefficient: 8e15
     )
 
     // MARK: Electric Potential Difference
