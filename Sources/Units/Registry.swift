@@ -118,6 +118,7 @@ class Registry {
 
         DefaultUnits.radian,
         DefaultUnits.degree,
+        DefaultUnits.revolution,
 
         // MARK: Area
 
@@ -190,6 +191,7 @@ class Registry {
 
         DefaultUnits.joule,
         DefaultUnits.kilojoule,
+        DefaultUnits.megajoule,
         DefaultUnits.calorie,
         DefaultUnits.kilocalorie,
         DefaultUnits.btu,
@@ -251,7 +253,11 @@ class Registry {
         // MARK: Luminous Intensity
 
         DefaultUnits.candela,
+        
+        // MARK: Luminous Flux
 
+        DefaultUnits.lumen,
+        
         // MARK: Magnetic Flux
 
         DefaultUnits.weber,
@@ -337,6 +343,9 @@ class Registry {
         DefaultUnits.millisecond,
         DefaultUnits.minute,
         DefaultUnits.hour,
+        DefaultUnits.day,
+        DefaultUnits.week,
+        DefaultUnits.year,
 
         // MARK: Velocity
 
@@ -357,6 +366,7 @@ class Registry {
         DefaultUnits.fluidOunce,
         DefaultUnits.cup,
         DefaultUnits.pint,
+        DefaultUnits.quart,
         DefaultUnits.gallon,
         DefaultUnits.dryPint,
         DefaultUnits.dryQuart,
@@ -365,6 +375,7 @@ class Registry {
         DefaultUnits.imperialFluidOunce,
         DefaultUnits.imperialCup,
         DefaultUnits.imperialPint,
+        DefaultUnits.imperialQuart,
         DefaultUnits.imperialGallon,
         DefaultUnits.imperialPeck,
         DefaultUnits.metricCup,
