@@ -1,3 +1,5 @@
+import Foundation
+
 /// Static type containing this package's pre-defined units
 enum DefaultUnits {
     // MARK: If adding units to this list, add corresponding entries in the `Unit+DefaultUnits.swift` & `Registry.swift` files
@@ -190,6 +192,54 @@ enum DefaultUnits {
         symbol: "Ybit",
         dimension: [.Data: 1],
         coefficient: 1e24
+    )
+    static let kibibit = try! DefinedUnit(
+        name: "kibibit",
+        symbol: "Kibit",
+        dimension: [.Data: 1],
+        coefficient: 1024
+    )
+    static let mebibit = try! DefinedUnit(
+        name: "mebibit",
+        symbol: "Mibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 2)
+    )
+    static let gibibit = try! DefinedUnit(
+        name: "gibibit",
+        symbol: "Gibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 3)
+    )
+    static let tebibit = try! DefinedUnit(
+        name: "tebibit",
+        symbol: "Tibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 4)
+    )
+    static let pebibit = try! DefinedUnit(
+        name: "pebibit",
+        symbol: "Pibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 5)
+    )
+    static let exbibit = try! DefinedUnit(
+        name: "exbibit",
+        symbol: "Eibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 6)
+    )
+    static let zebibit = try! DefinedUnit(
+        name: "zebibit",
+        symbol: "Zibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 7)
+    )
+    static let yobibit = try! DefinedUnit(
+        name: "yobibit",
+        symbol: "Yibit",
+        dimension: [.Data: 1],
+        coefficient: pow(1024, 8)
     )
     static let byte = try! DefinedUnit(
         name: "byte",

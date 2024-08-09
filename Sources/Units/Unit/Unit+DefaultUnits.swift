@@ -71,6 +71,14 @@ public extension Unit {
     static let exabyte = Unit(definedBy: DefaultUnits.exabyte)
     static let zetabyte = Unit(definedBy: DefaultUnits.zetabyte)
     static let yottabyte = Unit(definedBy: DefaultUnits.yottabyte)
+    static let kibibyte = Unit(definedBy: DefaultUnits.kibibyte)
+    static let mebibyte = Unit(definedBy: DefaultUnits.mebibyte)
+    static let gibibyte = Unit(definedBy: DefaultUnits.gibibyte)
+    static let tebibyte = Unit(definedBy: DefaultUnits.tebibyte)
+    static let pebibyte = Unit(definedBy: DefaultUnits.pebibyte)
+    static let exbibyte = Unit(definedBy: DefaultUnits.exbibyte)
+    static let zebibyte = Unit(definedBy: DefaultUnits.zebibyte)
+    static let yobibyte = Unit(definedBy: DefaultUnits.yobibyte)
 
     // MARK: Electric Potential Difference
 
