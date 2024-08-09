@@ -215,11 +215,35 @@ enum DefaultUnits {
         dimension: [.Data: 1],
         coefficient: 8e9
     )
+    static let terabyte = try! DefinedUnit(
+        name: "terabyte",
+        symbol: "TB",
+        dimension: [.Data: 1],
+        coefficient: 8e12
+    )
     static let petabyte = try! DefinedUnit(
         name: "petabyte",
         symbol: "PB",
         dimension: [.Data: 1],
         coefficient: 8e15
+    )
+    static let exabyte = try! DefinedUnit(
+        name: "exabyte",
+        symbol: "EB",
+        dimension: [.Data: 1],
+        coefficient: 8e18
+    )
+    static let zetabyte = try! DefinedUnit(
+        name: "zetabyte",
+        symbol: "ZB",
+        dimension: [.Data: 1],
+        coefficient: 8e21
+    )
+    static let yottabyte = try! DefinedUnit(
+        name: "yottabyte",
+        symbol: "YB",
+        dimension: [.Data: 1],
+        coefficient: 8e24
     )
 
     // MARK: Electric Potential Difference

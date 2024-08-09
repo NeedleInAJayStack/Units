@@ -156,7 +156,11 @@ class Registry {
         DefaultUnits.kilobyte,
         DefaultUnits.megabyte,
         DefaultUnits.gigabyte,
+        DefaultUnits.terabyte,
         DefaultUnits.petabyte,
+        DefaultUnits.exabyte,
+        DefaultUnits.zetabyte,
+        DefaultUnits.yottabyte,
 
         // MARK: Electric Potential Difference
 

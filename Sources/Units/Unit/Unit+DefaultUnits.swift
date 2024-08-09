@@ -1,7 +1,6 @@
 // TODO: Make more
 // - Concentration Mass
 // - Dispersion
-// - Information Storage: https://developer.apple.com/documentation/foundation/unitinformationstorage
 
 public extension Unit {
     // Provided as easy access to UnitRegistry default units
@@ -59,7 +58,11 @@ public extension Unit {
     static let kilobyte = Unit(definedBy: DefaultUnits.kilobyte)
     static let megabyte = Unit(definedBy: DefaultUnits.megabyte)
     static let gigabyte = Unit(definedBy: DefaultUnits.gigabyte)
+    static let terabyte = Unit(definedBy: DefaultUnits.terabyte)
     static let petabyte = Unit(definedBy: DefaultUnits.petabyte)
+    static let exabyte = Unit(definedBy: DefaultUnits.exabyte)
+    static let zetabyte = Unit(definedBy: DefaultUnits.zetabyte)
+    static let yottabyte = Unit(definedBy: DefaultUnits.yottabyte)
 
     // MARK: Electric Potential Difference
 
