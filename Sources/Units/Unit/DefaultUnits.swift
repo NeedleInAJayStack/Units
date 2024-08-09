@@ -1238,7 +1238,7 @@ enum DefaultUnits {
         name: "imperialCup",
         symbol: "icup",
         dimension: [.Length: 3],
-        coefficient: 197.15686375 - 6
+        coefficient: 197.15686375e-6
     )
     static let imperialPint = try! DefinedUnit(
         name: "imperialPint",
