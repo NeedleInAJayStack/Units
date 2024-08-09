@@ -143,6 +143,54 @@ enum DefaultUnits {
         symbol: "bit",
         dimension: [.Data: 1]
     )
+    static let kilobit = try! DefinedUnit(
+        name: "kilobit",
+        symbol: "kbit",
+        dimension: [.Data: 1],
+        coefficient: 1000
+    )
+    static let megabit = try! DefinedUnit(
+        name: "megabit",
+        symbol: "Mbit",
+        dimension: [.Data: 1],
+        coefficient: 1e6
+    )
+    static let gigabit = try! DefinedUnit(
+        name: "gigabit",
+        symbol: "Gbit",
+        dimension: [.Data: 1],
+        coefficient: 1e9
+    )
+    static let terabit = try! DefinedUnit(
+        name: "terabit",
+        symbol: "Tbit",
+        dimension: [.Data: 1],
+        coefficient: 1e12
+    )
+    static let petabit = try! DefinedUnit(
+        name: "petabit",
+        symbol: "Pbit",
+        dimension: [.Data: 1],
+        coefficient: 1e15
+    )
+    static let exabit = try! DefinedUnit(
+        name: "exabit",
+        symbol: "Ebit",
+        dimension: [.Data: 1],
+        coefficient: 1e18
+    )
+    static let zetabit = try! DefinedUnit(
+        name: "zetabit",
+        symbol: "Zbit",
+        dimension: [.Data: 1],
+        coefficient: 1e21
+    )
+    static let yottabit = try! DefinedUnit(
+        name: "yottabit",
+        symbol: "Ybit",
+        dimension: [.Data: 1],
+        coefficient: 1e24
+    )
     static let byte = try! DefinedUnit(
         name: "byte",
         symbol: "byte",

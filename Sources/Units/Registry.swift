@@ -144,6 +144,14 @@ class Registry {
         // MARK: Data
 
         DefaultUnits.bit,
+        DefaultUnits.kilobit,
+        DefaultUnits.megabit,
+        DefaultUnits.gigabit,
+        DefaultUnits.terabit,
+        DefaultUnits.petabit,
+        DefaultUnits.exabit,
+        DefaultUnits.zetabit,
+        DefaultUnits.yottabit,
         DefaultUnits.byte,
         DefaultUnits.kilobyte,
         DefaultUnits.megabyte,

@@ -47,6 +47,14 @@ public extension Unit {
     // MARK: Data
 
     static let bit = Unit(definedBy: DefaultUnits.bit)
+    static let kilobit = Unit(definedBy: DefaultUnits.kilobit)
+    static let megabit = Unit(definedBy: DefaultUnits.megabit)
+    static let gigabit = Unit(definedBy: DefaultUnits.gigabit)
+    static let terabit = Unit(definedBy: DefaultUnits.terabit)
+    static let petabit = Unit(definedBy: DefaultUnits.petabit)
+    static let exabit = Unit(definedBy: DefaultUnits.exabit)
+    static let zetabit = Unit(definedBy: DefaultUnits.zetabit)
+    static let yottabit = Unit(definedBy: DefaultUnits.yottabit)
     static let byte = Unit(definedBy: DefaultUnits.byte)
     static let kilobyte = Unit(definedBy: DefaultUnits.kilobyte)
     static let megabyte = Unit(definedBy: DefaultUnits.megabyte)
