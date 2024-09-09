@@ -379,5 +379,9 @@ class Registry {
         DefaultUnits.imperialGallon,
         DefaultUnits.imperialPeck,
         DefaultUnits.metricCup,
+
+        // MARK: Unitless
+
+        DefaultUnits.percent
     ]
 }
