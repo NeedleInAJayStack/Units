@@ -196,6 +196,64 @@ final class MeasurementTests: XCTestCase {
         )
     }
 
+    func testPercent() throws {
+        XCTAssertEqual(
+            1.measured(in: .percent),
+            1.measured(in: .percent)
+        )
+
+        XCTAssertNotEqual(
+            100.measured(in: .percent),
+            1.measured(in: .none)
+        )
+
+        try {
+            let percent1 = 5.measured(in: .percent)
+            let percent2 = 5.measured(in: .percent)
+            XCTAssertEqual(
+                try percent1 + percent2,
+                10.measured(in: .percent),
+                accuracy: accuracy
+            )
+        }()
+
+        try {
+            let percent1 = 5.measured(in: .percent)
+            let value2 = 5.measured(in: .none)
+            XCTAssertThrowsError(try percent1 + value2)
+        }()
+
+        XCTAssertTrue(
+            2.measured(in: .percent).isDimensionallyEquivalent(
+                to: 2.measured(in: .percent)
+            )
+        )
+
+        XCTAssertTrue(
+            2.measured(in: .percent).isDimensionallyEquivalent(
+                to: 2.measured(in: .none)
+            )
+        )
+
+        XCTAssertEqual(
+            try 1.measured(in: .percent).convert(to: .none),
+            0.01.measured(in: .none),
+            accuracy: accuracy
+        )
+
+        XCTAssertEqual(
+            try 1.measured(in: .none).convert(to: .percent),
+            100.measured(in: .percent),
+            accuracy: accuracy
+        )
+
+        _ = {
+            let measurement = 1.measured(in: .percent) / 2.measured(in: .second)
+            XCTAssertEqual(measurement.unit, Unit.percent / Unit.second)
+            XCTAssertEqual(measurement.value, 0.5, accuracy: accuracy)
+        }()
+    }
+
     func testComplexArithmetic() throws {
         XCTAssertEqual(
             try 1.measured(in: .mile / .mile) * 1.measured(in: .mile) - 1.measured(in: .mile),
