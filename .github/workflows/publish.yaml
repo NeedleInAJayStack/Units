@@ -1,0 +1,36 @@
+name: Build and publish a Docker image to GitHub Releases
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  build-and-publish:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Swift
+        uses: swift-actions/setup-swift@v2
+      - name: Build
+        run: swift build --configuration release
+      - name: Archive binary
+        run: |
+          mkdir -p build
+          cp .build/release/unit build/unit
+          tar -czf ${{ github.ref_name }}-${{ matrix.platform }}.tar.gz -C build .
+          shasum -a 256 ${{ github.ref_name }}-${{ matrix.platform }}.tar.gz > ${{ github.ref_name }}-${{ matrix.platform }}.sha256
+      - name: Upload assets to release
+        id: upload_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          generate_release_notes: true
+          files: |
+            ${{ github.ref_name }}-${{ matrix.platform }}.tar.gz
+            ${{ github.ref_name }}-${{ matrix.platform }}.sha256
