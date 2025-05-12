@@ -64,7 +64,7 @@ class DefinitionTests: XCTestCase {
         try XCTAssertEqual(Measurement("1Ebit"), 1e18.measured(in: .bit).convert(to: .exabit))
         try XCTAssertEqual(Measurement("1Zbit"), 1e21.measured(in: .bit).convert(to: .zetabit))
         try XCTAssertEqual(Measurement("1Ybit"), 1e24.measured(in: .bit).convert(to: .yottabit))
-        
+
         try XCTAssertEqual(Measurement("1Kibit"), 1024.measured(in: .bit).convert(to: .kibibit))
         try XCTAssertEqual(Measurement("1Mibit"), pow(1024, 2).measured(in: .bit).convert(to: .mebibit))
         try XCTAssertEqual(Measurement("1Gibit"), pow(1024, 3).measured(in: .bit).convert(to: .gibibit))
@@ -73,7 +73,7 @@ class DefinitionTests: XCTestCase {
         try XCTAssertEqual(Measurement("1Eibit"), pow(1024, 6).measured(in: .bit).convert(to: .exbibit))
         try XCTAssertEqual(Measurement("1Zibit"), pow(1024, 7).measured(in: .bit).convert(to: .zebibit))
         try XCTAssertEqual(Measurement("1Yibit"), pow(1024, 8).measured(in: .bit).convert(to: .yobibit))
-        
+
         try XCTAssertEqual(Measurement("1byte"), 8.measured(in: .bit).convert(to: .byte))
         try XCTAssertEqual(Measurement("1kB"), 8000.measured(in: .bit).convert(to: .kilobyte))
         try XCTAssertEqual(Measurement("1MB"), 8e6.measured(in: .bit).convert(to: .megabyte))
@@ -83,7 +83,7 @@ class DefinitionTests: XCTestCase {
         try XCTAssertEqual(Measurement("1EB"), 8e18.measured(in: .bit).convert(to: .exabyte))
         try XCTAssertEqual(Measurement("1ZB"), 8e21.measured(in: .bit).convert(to: .zetabyte))
         try XCTAssertEqual(Measurement("1YB"), 8e24.measured(in: .bit).convert(to: .yottabyte))
-        
+
         try XCTAssertEqual(Measurement("1KiB"), (8 * 1024).measured(in: .bit).convert(to: .kibibyte))
         try XCTAssertEqual(Measurement("1MiB"), (8 * pow(1024, 2)).measured(in: .bit).convert(to: .mebibyte))
         try XCTAssertEqual(Measurement("1GiB"), (8 * pow(1024, 3)).measured(in: .bit).convert(to: .gibibyte))

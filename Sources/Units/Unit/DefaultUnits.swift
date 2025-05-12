@@ -3,6 +3,7 @@ import Foundation
 /// Static type containing this package's pre-defined units
 enum DefaultUnits {
     // MARK: If adding units to this list, add corresponding entries to the following files:
+
     // - Unit+DefaultUnits.swift
     // - Registry.swift
     // - DefinitionTests.swift

@@ -3,25 +3,25 @@ import Foundation
 class Parser {
     var data: [UnicodeScalar]
     var position = 0
-    
+
     private var cur: Character? {
         guard position < data.count else {
             return nil
         }
         return Character(UnicodeScalar(data[position]))
     }
-    
+
     private var peek: Character? {
         guard position < data.count - 1 else {
             return nil
         }
-        return Character(UnicodeScalar(data[position+1]))
+        return Character(UnicodeScalar(data[position + 1]))
     }
-    
+
     init(_ string: String) {
-        self.data = Array(string.unicodeScalars)
+        data = Array(string.unicodeScalars)
     }
-    
+
     func parseMeasurement() throws -> Measurement {
         let value: Double
         switch try next() {
@@ -30,7 +30,7 @@ class Parser {
         default:
             throw ParserError.invalidMeasurement
         }
-        
+
         let unit: Unit
         switch try next() {
         case let .unit(parsed):
@@ -40,17 +40,17 @@ class Parser {
         default:
             throw ParserError.invalidMeasurement
         }
-        
+
         return Measurement(value: value, unit: unit)
     }
-    
+
     func parseExpression() throws -> Expression {
         return try parseExpression(isSubExpression: false)
     }
-    
+
     private func parseExpression(isSubExpression: Bool) throws -> Expression {
         var expression: Expression? = nil
-        
+
         var token = try next()
         var op: Operator? = nil
         // We do while/true because we can exit on either eof or rParen, depending on isSubExpression
@@ -63,7 +63,7 @@ class Parser {
                 break parseLoop
             case let .number(value):
                 let unit: Unit
-                
+
                 // Check next token to see if it is a unit. Continue loop to avoid calling next again below.
                 let nextToken = try next()
                 switch nextToken {
@@ -89,7 +89,7 @@ class Parser {
             case .lParen:
                 let subExpression = try parseExpression(isSubExpression: true)
                 let node = ExpressionNode(.subExpression(subExpression))
-                
+
                 if let expression = expression {
                     guard let op = op else {
                         throw ParserError.invalidExpression(reason: "No operator preceeding left parentheses")
@@ -127,7 +127,7 @@ class Parser {
             }
             token = try next()
         }
-        
+
         if let op = op {
             throw ParserError.invalidExpression(reason: "Expression ended with operator `\(op)`")
         }
@@ -136,16 +136,16 @@ class Parser {
         }
         return expression
     }
-    
+
     private func next() throws -> Token {
         guard let char = cur else {
             return .eof
         }
-        
+
         if char.isNumber {
             let startPosition = position
             var numberString = ""
-            while let cur = cur, (cur.isNumber ||  cur == ".") {
+            while let cur = cur, cur.isNumber || cur == "." {
                 numberString.append(cur)
                 consume()
             }
@@ -153,16 +153,13 @@ class Parser {
                 throw ParserError.unableToParseNumber(numberString, position: startPosition)
             }
             return .number(number)
-        }
-        else if char == "(" {
+        } else if char == "(" {
             consume()
             return .lParen
-        }
-        else if char == ")" {
+        } else if char == ")" {
             consume()
             return .rParen
-        }
-        else if char == "^" {
+        } else if char == "^" {
             let startPosition = position
             try consume("^")
             var intString = ""
@@ -174,8 +171,7 @@ class Parser {
                 throw ParserError.unableToParseExponent("^\(intString)", position: startPosition)
             }
             return .exp(int)
-        }
-        else if char.isWhitespace {
+        } else if char.isWhitespace {
             if peek == "+" {
                 try consume(" ")
                 try consume("+")
@@ -200,26 +196,25 @@ class Parser {
                 try consume(" ")
                 return .div
             }
-            
+
             // consume and try again
             consume()
             return try next()
-        }
-        else {
+        } else {
             var unitString = ""
             while let cur = cur, cur != "(" && cur != ")" && !cur.isWhitespace {
                 unitString.append(cur)
                 consume()
             }
-            let unit = try Unit.init(fromSymbol: unitString)
+            let unit = try Unit(fromSymbol: unitString)
             return .unit(unit)
         }
     }
-    
+
     private func consume() {
         position = position + 1
     }
-    
+
     private func consume(_ expected: Character) throws {
         guard let character = cur else {
             return
@@ -248,7 +243,7 @@ enum ParserError: Error {
     case unexpectedCharacter(Character, position: Int)
     case unableToParseNumber(String, position: Int)
     case unableToParseExponent(String, position: Int)
-    
+
     case invalidMeasurement
     case invalidExpression(reason: String)
 }
