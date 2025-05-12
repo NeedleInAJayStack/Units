@@ -166,8 +166,8 @@ extension Measurement: LosslessStringConvertible {
         guard let parsed = try? Parser(description).parseMeasurement() else {
             return nil
         }
-        self.value = parsed.value
-        self.unit = parsed.unit
+        value = parsed.value
+        unit = parsed.unit
     }
 }
 

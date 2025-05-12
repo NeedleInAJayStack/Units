@@ -2,17 +2,17 @@
 public final class Expression {
     // Implemented as a linked list of ExpressionNodes. This allows us to indicate operators,
     // and iteratively solve by reducing the list according to the order of operations.
-    
+
     var first: ExpressionNode
     var last: ExpressionNode
     var count: Int
-    
+
     init(node: ExpressionNode) {
-        self.first = node
-        self.last = node
+        first = node
+        last = node
         count = 1
     }
-    
+
     /// Initializes an expression from a string.
     ///
     /// Parsing rules:
@@ -29,17 +29,17 @@ public final class Expression {
     /// - Parameter expr: The string expression to parse.
     public init(_ expr: String) throws {
         let parsed = try Parser(expr).parseExpression()
-        self.first = parsed.first
-        self.last = parsed.last
-        self.count = parsed.count
+        first = parsed.first
+        last = parsed.last
+        count = parsed.count
     }
-    
+
     /// Reduces the expression to a single measurement, respecting the [order of operations](https://en.wikipedia.org/wiki/Order_of_operations)
     public func solve() throws -> Measurement {
         let copy = self.copy()
         return try copy.computeAndDestroy()
     }
-    
+
     @discardableResult
     func append(op: Operator, node: ExpressionNode) -> Self {
         last.next = .init(op: op, node: node)
@@ -47,7 +47,7 @@ public final class Expression {
         count = count + 1
         return self
     }
-    
+
     func copy() -> Expression {
         // Copy the expression list so the original is not destroyed
         let copy = Expression(node: first.copy())
@@ -58,12 +58,11 @@ public final class Expression {
         }
         return copy
     }
-    
+
     /// Reduces the expression to a single measurement, respecting the [order of operations](https://en.wikipedia.org/wiki/Order_of_operations)
     ///
     /// NOTE: This flattens the list, destroying it. Use `solve` for non-destructive behavior.
     private func computeAndDestroy() throws -> Measurement {
-        
         // SubExpressions
         func computeSubExpression(node: ExpressionNode) throws {
             switch node.value {
@@ -81,7 +80,7 @@ public final class Expression {
         }
         try computeSubExpression(node: left)
         // At this point, there should be no more sub expressions
-        
+
         // Exponentals
         func exponentiate(node: ExpressionNode) throws {
             guard let exponent = node.exponent else {
@@ -102,7 +101,7 @@ public final class Expression {
             left = next.node
         }
         try exponentiate(node: left)
-        
+
         // Multiplication
         left = first
         while let next = left.next {
@@ -123,7 +122,7 @@ public final class Expression {
                 fatalError("Parentheses still present during multiplication phase")
             }
         }
-        
+
         // Addition
         left = first
         while let next = left.next {
@@ -131,7 +130,7 @@ public final class Expression {
             switch (left.value, right.value) {
             case let (.measurement(leftMeasurement), .measurement(rightMeasurement)):
                 switch next.op {
-                case .add:  // Compute and absorb right node into left
+                case .add: // Compute and absorb right node into left
                     left.value = try .measurement(leftMeasurement + rightMeasurement)
                     left.next = right.next
                 case .subtract: // Compute and absorb right node into left
@@ -144,7 +143,7 @@ public final class Expression {
                 fatalError("Parentheses still present during addition phase")
             }
         }
-        
+
         if first.next != nil {
             fatalError("Expression list reduction not complete")
         }
@@ -194,15 +193,15 @@ class ExpressionNode {
     var value: ExpressionNodeValue
     var exponent: Int?
     var next: ExpressionLink?
-    
+
     init(_ value: ExpressionNodeValue, exponent: Int? = nil, next: ExpressionLink? = nil) {
         self.value = value
         self.exponent = exponent
         self.next = next
     }
-    
+
     func copy() -> ExpressionNode {
-        return .init(value.copy(), exponent: self.exponent)
+        return .init(value.copy(), exponent: exponent)
     }
 }
 
@@ -216,7 +215,7 @@ extension ExpressionNode: Equatable {
 enum ExpressionNodeValue {
     case measurement(Measurement)
     case subExpression(Expression)
-    
+
     func copy() -> ExpressionNodeValue {
         switch self {
         case let .measurement(measurement):
@@ -254,7 +253,7 @@ extension ExpressionNodeValue: Equatable {
 class ExpressionLink {
     let op: Operator
     let node: ExpressionNode
-    
+
     init(op: Operator, node: ExpressionNode) {
         self.op = op
         self.node = node

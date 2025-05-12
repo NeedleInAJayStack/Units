@@ -253,11 +253,11 @@ class Registry {
         // MARK: Luminous Intensity
 
         DefaultUnits.candela,
-        
+
         // MARK: Luminous Flux
 
         DefaultUnits.lumen,
-        
+
         // MARK: Magnetic Flux
 
         DefaultUnits.weber,
