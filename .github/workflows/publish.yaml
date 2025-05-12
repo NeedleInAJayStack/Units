@@ -1,10 +1,10 @@
-name: Build and publish a Docker image to GitHub Releases
+name: Build and publish binaries to GitHub Releases
 on:
   push:
     tags:
       - v*
 jobs:
-  build-and-publish:
+  publish:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest]
