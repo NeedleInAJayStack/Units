@@ -23,7 +23,7 @@ This package has no other dependencies.
 
 ## Usage
 
-Users should interact primarily with the `Measurement` struct. Here are a few usage examples:
+Users should interact primarily with the `Measurement` struct. Here are a examples of arithmetic:
 
 ```swift
 let drivingSpeed = 60.measured(in: .mile / .hour)
@@ -33,6 +33,8 @@ let drivingTime = 30.measured(in: .minute)
 let drivingDistance = drivingSpeed * drivingTime
 print(drivingDistance.convert(to: .mile)) // Prints 30 mi
 ```
+
+Note that a measurement may be multiplied or divided by another measurement with any unit, resulting in a measurement that has a new-dimensioned unit (5 meters / 10 seconds ✅). However, addition and subtraction requires that both measurements have the same dimensionality (5 meters - 10 seconds ❌), otherwise a runtime error is thrown. If adding or subtracting two measurements with different units but the same dimensionality, the result retains the first measurement's unit (5 meters - 5 millimeters = 4.995 meters).
 
 The type names in this package align closely with the unit system provided by `Foundation`. This was intentional to provide a
 familiar nomenclature for Swift developers. The APIs have been designed to avoid namespace ambiguity in files where both `Units`

@@ -38,6 +38,10 @@ public struct Measurement: Equatable, Codable {
     /// - Parameter newUnit: The unit to convert this measurement to
     /// - Returns: A new measurement with the converted scalar value and provided unit of measure
     public func convert(to newUnit: Unit) throws -> Measurement {
+        if unit == newUnit {
+            // No conversion needed
+            return self
+        }
         guard unit.isDimensionallyEquivalent(to: newUnit) else {
             throw UnitError.incompatibleUnits(message: "Cannot convert \(unit) to \(newUnit)")
         }
@@ -52,9 +56,9 @@ public struct Measurement: Equatable, Codable {
     ///   - rhs: The right-hand-side measurement
     /// - Returns: A new measurement with the summed scalar values and the same unit of measure
     public static func + (lhs: Measurement, rhs: Measurement) throws -> Measurement {
-        try checkSameUnit(lhs, rhs)
+        let rhsValue = try rhs.convert(to: lhs.unit).value
         return Measurement(
-            value: lhs.value + rhs.value,
+            value: lhs.value + rhsValue,
             unit: lhs.unit
         )
     }
@@ -64,8 +68,8 @@ public struct Measurement: Equatable, Codable {
     ///   - lhs: The left-hand-side measurement
     ///   - rhs: The right-hand-side measurement
     public static func += (lhs: inout Measurement, rhs: Measurement) throws {
-        try checkSameUnit(lhs, rhs)
-        lhs.value = lhs.value + rhs.value
+        let rhsValue = try rhs.convert(to: lhs.unit).value
+        lhs.value = lhs.value + rhsValue
     }
 
     /// Subtract one measurement from another. The measurements must have the same unit.
@@ -75,9 +79,9 @@ public struct Measurement: Equatable, Codable {
     /// - Returns: A new measurement with the subtracted scalar values and the same unit of measure
     /// and the same unit of measure
     public static func - (lhs: Measurement, rhs: Measurement) throws -> Measurement {
-        try checkSameUnit(lhs, rhs)
+        let rhsValue = try rhs.convert(to: lhs.unit).value
         return Measurement(
-            value: lhs.value - rhs.value,
+            value: lhs.value - rhsValue,
             unit: lhs.unit
         )
     }
@@ -87,8 +91,8 @@ public struct Measurement: Equatable, Codable {
     ///   - lhs: The left-hand-side measurement
     ///   - rhs: The right-hand-side measurement
     public static func -= (lhs: inout Measurement, rhs: Measurement) throws {
-        try checkSameUnit(lhs, rhs)
-        lhs.value = lhs.value - rhs.value
+        let rhsValue = try rhs.convert(to: lhs.unit).value
+        lhs.value = lhs.value - rhsValue
     }
 
     /// Multiply the measurements. The measurements may have different units.

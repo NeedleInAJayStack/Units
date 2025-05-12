@@ -36,6 +36,13 @@ final class MeasurementTests: XCTestCase {
             accuracy: accuracy
         )
 
+        // Test that adding different units of the same dimension works
+        XCTAssertEqual(
+            try 5.measured(in: .meter) + 5.measured(in: .millimeter),
+            5.005.measured(in: .meter),
+        )
+
+        // Test that adding different dimensions throws an error
         XCTAssertThrowsError(
             try 5.measured(in: .meter) + 5.measured(in: .second)
         )
@@ -62,6 +69,13 @@ final class MeasurementTests: XCTestCase {
             accuracy: accuracy
         )
 
+        // Test that subtracting different units of the same dimension works
+        XCTAssertEqual(
+            try 5.measured(in: .meter) - 5.measured(in: .millimeter),
+            4.995.measured(in: .meter),
+        )
+
+        // Test that subtracting different dimensions throws an error
         XCTAssertThrowsError(
             try 5.measured(in: .meter) - 5.measured(in: .second)
         )
