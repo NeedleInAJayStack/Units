@@ -1271,4 +1271,13 @@ enum DefaultUnits {
         dimension: [.Length: 3],
         coefficient: 0.00025
     )
+
+    // MARK: Unitless
+
+    static let percent = try! DefinedUnit(
+        name: "percent",
+        symbol: "%",
+        dimension: [:],
+        coefficient: 0.01
+    )
 }
