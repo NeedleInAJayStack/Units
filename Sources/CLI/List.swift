@@ -7,7 +7,7 @@ struct List: ParsableCommand {
     )
 
     func run() throws {
-        let units = Units.Unit.allDefined().sorted { u1, u2 in
+        let units = registry.allUnits().sorted { u1, u2 in
             u1.name <= u2.name
         }
 

@@ -6,9 +6,8 @@ import Foundation
 /// Units may be multiplied and divided, resulting in "composite" units, which retain all the characteristics
 /// of a basic, predefined unit.
 ///
-/// This type is backed by a global registry that allows units to be encoded and decoded using their symbol.
 /// It also is given a large number of static members for easy access to this package's predefined units.
-public struct Unit {
+public struct Unit: Sendable {
     private let type: UnitType
 
     /// Singleton representing the lack of a unit
@@ -16,33 +15,33 @@ public struct Unit {
         Unit(type: .none)
     }
 
-    /// Create a unit from the symbol. This symbol is compared to the global registry, decomposed if necessary,
+    /// Create a unit from the symbol. This symbol is compared to the registry, decomposed if necessary,
     /// and the relevant unit is initialized.
     /// - Parameter symbol: A string defining the unit to retrieve. This can be the symbol of a defined unit
     /// or a complex unit symbol that combines basic units with `*`, `/`, or `^`.
-    public init(fromSymbol symbol: String) throws {
+    public init(fromSymbol symbol: String, registry: Registry = .default) throws {
         let symbolContainsOperator = OperatorSymbols.allCases.contains { arithSymbol in
             symbol.contains(arithSymbol.rawValue)
         }
         if symbolContainsOperator {
-            let compositeUnits = try Registry.instance.compositeUnitsFromSymbol(symbol: symbol)
+            let compositeUnits = try registry.compositeUnitsFromSymbol(symbol: symbol)
             if compositeUnits.isEmpty {
                 self = .none
             } else {
                 self.init(composedOf: compositeUnits)
             }
         } else {
-            let definedUnit = try Registry.instance.getUnit(bySymbol: symbol)
+            let definedUnit = try registry.getUnit(bySymbol: symbol)
             self.init(definedBy: definedUnit)
         }
     }
 
-    /// Retrieve a unit by name. This name is compared to the global registry and the relevant unit is initialized.
+    /// Retrieve a unit by name. This name is compared to the registry and the relevant unit is initialized.
     /// Only defined units are returned - complex unit name equations are not supported.
     ///
     /// - Parameter symbol: A string name of the unit to retrieve. This cannot be a complex equation of names.
-    public init(fromName name: String) throws {
-        let definedUnit = try Registry.instance.getUnit(byName: name)
+    public init(fromName name: String, registry: Registry = .default) throws {
+        let definedUnit = try registry.getUnit(byName: name)
         self.init(definedBy: definedUnit)
     }
 
@@ -65,82 +64,6 @@ public struct Unit {
 
     private init(type: UnitType) {
         self.type = type
-    }
-
-    /// Define a unit extension without adding it to the registry. The resulting unit object should be retained
-    /// and passed to the callers that may want to use it.
-    ///
-    /// This unit can be used for arithmatic, conversions, and is encoded correctly. However, since it is
-    /// not part of the global registry it will not be decoded, will not be included in the `allDefined()`
-    /// method, and cannot not be retrieved using `Unit(fromSymbol:)`.
-    ///
-    /// This method is considered "safe" because it does not modify the global unit registry.
-    ///
-    /// - Parameters:
-    ///   - name: The string name of the unit.
-    ///   - symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
-    ///   - dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
-    ///   - coefficient: The value to multiply a base unit of this dimension when converting it to this unit.
-    ///   For base units, this is 1.
-    ///   - constant: The value to add to a base unit when converting it to this unit. For units without scaling
-    ///   differences, this is 0. This is added after the coefficient is multiplied according to order-of-operations.
-    /// - Returns: The unit that was defined.
-    public static func define(
-        name: String,
-        symbol: String,
-        dimension: [Quantity: Int],
-        coefficient: Double = 1,
-        constant: Double = 0
-    ) throws -> Unit {
-        return try Unit(
-            definedBy: .init(
-                name: name,
-                symbol: symbol,
-                dimension: dimension,
-                coefficient: coefficient,
-                constant: constant
-            )
-        )
-    }
-
-    /// **Careful!** Register a new unit to the global registry. Unless you need deserialization support for this unit,
-    /// or support to look up this unit from a different memory-space, we suggest that `define` is used instead.
-    ///
-    /// By using this method, the unit is added to the global registry so it will be deserialized correctly, will be included
-    /// in the `allDefined()` and `Unit(fromSymbol)` methods, and will be available to everyone accessing
-    /// this package in your runtime environment.
-    ///
-    /// - Parameters:
-    ///   - name: The string name of the unit.
-    ///   - symbol: The string symbol of the unit. Symbols may not contain the characters `*`, `/`, or `^`.
-    ///   - dimension: The unit dimensionality as a dictionary of quantities and their respective exponents.
-    ///   - coefficient: The value to multiply a base unit of this dimension when converting it to this unit.
-    ///   For base units, this is 1.
-    ///   - constant: The value to add to a base unit when converting it to this unit. For units without scaling
-    ///   differences, this is 0. This is added after the coefficient is multiplied according to order-of-operations.
-    /// - Returns: The unit definition that now exists in the registry.
-    @discardableResult
-    public static func register(
-        name: String,
-        symbol: String,
-        dimension: [Quantity: Int],
-        coefficient: Double = 1,
-        constant: Double = 0
-    ) throws -> Unit {
-        try Registry.instance.addUnit(
-            name: name,
-            symbol: symbol,
-            dimension: dimension,
-            coefficient: coefficient,
-            constant: constant
-        )
-        return try Unit(fromSymbol: symbol)
-    }
-
-    /// Get all defined units
-    /// - Returns: A list of units representing all that are defined in the registry
-    public static func allDefined() -> [Unit] {
-        Registry.instance.allUnits()
     }
 
     /// The dimension of the unit in terms of base quanties
@@ -385,14 +308,14 @@ extension Unit: CustomStringConvertible {
     }
 }
 
-extension Unit: LosslessStringConvertible {
+public extension Unit {
     /// Initialize a unit from the provided string. This checks the input against the symbols stored
     /// in the registry. If no match is found, nil is returned.
-    public init?(_ description: String) {
+    init?(_ description: String, registry _: Registry = .default) {
         if description == "none" {
             self = .none
         } else {
-            guard let unit = try? Unit(fromSymbol: description) else {
+            guard let unit = try? Unit(fromSymbol: description, registry: .default) else {
                 return nil
             }
             self = unit
@@ -401,6 +324,10 @@ extension Unit: LosslessStringConvertible {
 }
 
 extension Unit: Codable {
+    public static var registryUserInfoKey: CodingUserInfoKey {
+        return CodingUserInfoKey(rawValue: "registry")!
+    }
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(symbol)
@@ -408,8 +335,7 @@ extension Unit: Codable {
 
     public init(from: Decoder) throws {
         let symbol = try from.singleValueContainer().decode(String.self)
-        try self.init(fromSymbol: symbol)
+        let registry = from.userInfo[Self.registryUserInfoKey] as? Registry ?? .default
+        try self.init(fromSymbol: symbol, registry: registry)
     }
 }
-
-extension Unit: Sendable {}

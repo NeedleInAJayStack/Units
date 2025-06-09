@@ -39,6 +39,8 @@ struct Convert: ParsableCommand {
     }
 }
 
+let registry = Units.Registry.default
+
 extension Expression: @retroactive ExpressibleByArgument {
     public convenience init?(argument: String) {
         let argument = argument.replacingOccurrences(of: "_", with: " ")
@@ -48,9 +50,9 @@ extension Expression: @retroactive ExpressibleByArgument {
 
 extension Units.Unit: @retroactive ExpressibleByArgument {
     public init?(argument: String) {
-        if let unit = try? Self(fromName: argument) {
+        if let unit = try? Self(fromName: argument, registry: registry) {
             self = unit
-        } else if let unit = try? Self(fromSymbol: argument) {
+        } else if let unit = try? Self(fromSymbol: argument, registry: registry) {
             self = unit
         } else {
             return nil
