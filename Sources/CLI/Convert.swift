@@ -2,7 +2,7 @@ import ArgumentParser
 import Units
 
 struct Convert: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
         abstract: "Convert a measurement expression to a specified unit.",
         discussion: """
         Run `unit list` to see the supported unit symbols and names. Unless arguments are wrapped \
@@ -39,14 +39,14 @@ struct Convert: ParsableCommand {
     }
 }
 
-extension Expression: ExpressibleByArgument {
+extension Expression: @retroactive ExpressibleByArgument {
     public convenience init?(argument: String) {
         let argument = argument.replacingOccurrences(of: "_", with: " ")
         try? self.init(argument)
     }
 }
 
-extension Units.Unit: ExpressibleByArgument {
+extension Units.Unit: @retroactive ExpressibleByArgument {
     public init?(argument: String) {
         if let unit = try? Self(fromName: argument) {
             self = unit

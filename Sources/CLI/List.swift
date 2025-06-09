@@ -2,7 +2,7 @@ import ArgumentParser
 import Units
 
 struct List: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
         abstract: "Print a table of the available units, their symbols, and their dimensionality."
     )
 
