@@ -1,5 +1,8 @@
 # Units 📏
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FNeedleInAJayStack%2FUnits%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/NeedleInAJayStack/Units)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FNeedleInAJayStack%2FUnits%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/NeedleInAJayStack/Units)
+
 Units is a Swift package to manipulate, compare, and convert between physical quantities. This package models measurements, which are a numerical value with a unit of measure. It has been designed so that users don't need to worry whether they are using a defined unit (like `Newton`) or a complex composite unit (like `kg*m/s^2`). Both should be easy to convert to and from different units, perform arithmetic operations, check dimensionality, or serialize to and from a string format.
 
 This approach allows us to easily handle any permutation of units. You want to convert `12 km³/hr/N` to `ft²*s/lb`? We've got you covered!
