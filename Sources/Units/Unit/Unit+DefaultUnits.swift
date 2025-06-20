@@ -2,8 +2,12 @@
 // - Concentration Mass
 // - Dispersion
 
+// Provided for easy access to default units
 public extension Unit {
-    // Provided as easy access to UnitRegistry default units
+    // If adding units to this list, add corresponding entries to the following files:
+    // - DefaultUnits.swift
+    // - RegistryBuilder.swift
+    // - DefinitionTests.swift
 
     // MARK: Acceleration
 

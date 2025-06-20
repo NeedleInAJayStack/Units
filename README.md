@@ -121,15 +121,18 @@ For a list of the default units and their conversion factors, see the [`DefaultU
 
 ## Custom Units
 
-To extend this package, users can define their own custom units using `Unit.define`:
+The unit system is backed by a `Registry` that maps unit symbols to their metadata. To add new units, use `RegistryBuilder`, and pass it to any operation that converts from a `String` to a `Unit`:
 
 ```swift
-let centifoot = try Unit.define(
+let registryBuilder = RegistryBuilder()
+registryBuilder.addUnit(
     name: "centifoot",
     symbol: "cft",
     dimension: [.Length: 1],
     coefficient: 0.003048 // This is the conversion to meters
 )
+let registry = registryBuilder.registry()
+let centifoot = try Unit(fromSymbol: "cft", registry: registry)
 
 let measurement = Measurement(value: 5, unit: centifoot)
 print(5.measured(in: .foot).convert(to: centifoot))
@@ -137,24 +140,38 @@ print(5.measured(in: .foot).convert(to: centifoot))
 
 This returns a Unit object that can be used in arithmetic, conversions, and serialization.
 
+### Encoding and Decoding
+
+When using custom units, you must provide the custom registry to the encoder or decoder using `userInfo`:
+
+```swift
+let decoder = JSONDecoder()
+decoder.userInfo[Unit.registryUserInfoKey] = registry  // Required to recognize custom units.
+try decoder.decode(Unit.self, from: #""cft/s""#.data(using: .utf8))
+```
+
 ### Non-scientific Units
 
 For "non-scientific" units, it is typically appropriate to use the `Amount` quantity. Through this approach, you can easily build up an impromptu conversion system on the fly. For example:
 
 ```swift
-let apple = try Unit.define(
+let registryBuilder = RegistryBuilder()
+try registryBuilder.addUnit(
     name: "apple",
     symbol: "apple",
     dimension: [.Amount: 1],
     coefficient: 1
 )
-
-let carton = try Unit.define(
+try registryBuilder.addUnit(
     name: "carton",
     symbol: "carton",
     dimension: [.Amount: 1],
     coefficient: 48
 )
+let registry = registryBuilder.registry()
+
+let apple = try Unit(fromSymbol: "apple", registry: registry)
+let carton = try Unit(fromSymbol: "carton", registry: registry)
 
 let harvest = 288.measured(in: apple)
 print(harvest.convert(to: carton)) // Prints '6.0 carton'
@@ -163,47 +180,19 @@ print(harvest.convert(to: carton)) // Prints '6.0 carton'
 We can extend this example to determine how many cartons a group of people can pick in a week:
 
 ```swift
-let person = try Unit.define(
+try registryBuilder.addUnit(
     name: "person",
     symbol: "person",
     dimension: [.Amount: 1],
     coefficient: 1
 )
+let person = try Unit(fromSymbol: "person", registry: registryBuilder.registry())
 
 let personPickRate = 600.measured(in: apple / .day / person)
 let workforce = 4.measured(in: person)
 let weeklyCartons = try (workforce * personPickRate).convert(to: carton / .week)
 print(weeklyCartons)  // Prints '350.0 carton/week'
 ```
-
-### Adding custom units to the Registry
-
-To support deserialization and runtime querying of available units, this package keeps a global registry of the default units. The `Unit.define` method does not insert new definitions into this registry. While this avoids conflicts and prevents race conditions, it also means that units created using `Unit.define` cannot be deserialized correctly or looked up using `Unit(fromSymbol:)`
-
-If these features are absolutely needed, and the implications are understood, custom units can be added to the registry using `Unit.register`:
-
-```swift
-let centifoot = try Unit.register(
-    name: "centifoot",
-    symbol: "cft",
-    dimension: [.Length: 1],
-    coefficient: 0.003048 // This is the conversion to meters
-)
-```
-
-Note that you may only register the unit once globally, and afterwards it should be accessed either by the assigned variable or using `Unit(fromSymbol: String)`.
-
-To simplify access, `Unit` may be extended with a static property:
-
-```swift
-extension Unit {
-    public static var centifoot = try! Unit.fromSymbol("cft")
-}
-
-let measurement = 5.measured(in: .centifoot)
-```
-
-Again, unless strictly necessary, `Unit.define` is preferred over `Unit.register`.
 
 ## CLI
 

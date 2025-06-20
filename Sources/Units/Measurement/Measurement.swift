@@ -165,9 +165,9 @@ extension Measurement: CustomStringConvertible {
     }
 }
 
-extension Measurement: LosslessStringConvertible {
-    public init?(_ description: String) {
-        guard let parsed = try? Parser(description).parseMeasurement() else {
+public extension Measurement {
+    init?(_ description: String, registry _: Registry = .default) {
+        guard let parsed = try? Parser(description, registry: .default).parseMeasurement() else {
             return nil
         }
         value = parsed.value

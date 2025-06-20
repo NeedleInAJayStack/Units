@@ -362,13 +362,15 @@ final class MeasurementTests: XCTestCase {
         )
     }
 
-    func testUnitDefine() throws {
-        let centifoot = try Unit.define(
+    func testRegistryAddUnits() throws {
+        let registryBuilder = RegistryBuilder()
+        var registry = try registryBuilder.addUnit(
             name: "centifoot",
             symbol: "cft",
             dimension: [.Length: 1],
             coefficient: 0.003048
-        )
+        ).registry()
+        let centifoot = try Unit(fromSymbol: "cft", registry: registry)
 
         // Test conversion from custom unit
         XCTAssertEqual(
@@ -384,12 +386,13 @@ final class MeasurementTests: XCTestCase {
             accuracy: accuracy
         )
 
-        let centiinch = try Unit.define(
+        registry = try registryBuilder.addUnit(
             name: "centiinch",
             symbol: "cin",
             dimension: [.Length: 1],
             coefficient: 0.000254
-        )
+        ).registry()
+        let centiinch = try Unit(fromSymbol: "cin", registry: registry)
 
         // Test conversion from a custom unit to a different custom unit
         XCTAssertEqual(
@@ -400,7 +403,7 @@ final class MeasurementTests: XCTestCase {
 
         // Test that definitions with bad characters are rejected
         XCTAssertThrowsError(
-            try Unit.define(
+            try registryBuilder.addUnit(
                 name: "no name",
                 symbol: "",
                 dimension: [.Amount: 1],
@@ -408,7 +411,7 @@ final class MeasurementTests: XCTestCase {
             )
         )
         XCTAssertThrowsError(
-            try Unit.define(
+            try registryBuilder.addUnit(
                 name: "unit with space",
                 symbol: "unit with space",
                 dimension: [.Amount: 1],
@@ -416,7 +419,7 @@ final class MeasurementTests: XCTestCase {
             )
         )
         XCTAssertThrowsError(
-            try Unit.define(
+            try registryBuilder.addUnit(
                 name: "slash",
                 symbol: "/",
                 dimension: [.Amount: 1],
@@ -424,7 +427,7 @@ final class MeasurementTests: XCTestCase {
             )
         )
         XCTAssertThrowsError(
-            try Unit.define(
+            try registryBuilder.addUnit(
                 name: "star",
                 symbol: "*",
                 dimension: [.Amount: 1],
@@ -432,7 +435,7 @@ final class MeasurementTests: XCTestCase {
             )
         )
         XCTAssertThrowsError(
-            try Unit.define(
+            try registryBuilder.addUnit(
                 name: "carrot",
                 symbol: "^",
                 dimension: [.Amount: 1],
@@ -477,27 +480,36 @@ final class MeasurementTests: XCTestCase {
     }
 
     func testUnitRegister() throws {
-        try Unit.register(
+        let registryBuilder = RegistryBuilder()
+
+        try registryBuilder.addUnit(
             name: "centiinch",
             symbol: "cin",
             dimension: [.Length: 1],
             coefficient: 0.000254
         )
+        let registry = registryBuilder.registry()
+
         // Test referencing string before running the extension
         XCTAssertEqual(
-            try 25.measured(in: Unit(fromSymbol: "cin")).convert(to: .inch),
+            try 25.measured(in: Unit(fromSymbol: "cin", registry: registry)).convert(to: .inch),
             0.25.measured(in: .inch),
             accuracy: accuracy
         )
+
+        let centiinch = try XCTUnwrap(
+            Unit(fromName: "centiinch", registry: registry)
+        )
+
         // Test typical usage
         XCTAssertEqual(
-            try 25.measured(in: .centiinch).convert(to: .inch),
+            try 25.measured(in: centiinch).convert(to: .inch),
             0.25.measured(in: .inch),
             accuracy: accuracy
         )
         // Try using twice to verify that multiple access doesn't error
         XCTAssertEqual(
-            try 100.measured(in: .centiinch).convert(to: .inch),
+            try 100.measured(in: centiinch).convert(to: .inch),
             1.measured(in: .inch),
             accuracy: accuracy
         )
@@ -545,19 +557,23 @@ final class MeasurementTests: XCTestCase {
     }
 
     func testCustomUnitSystemExample() throws {
-        let apple = try Unit.define(
+        let registryBuilder = RegistryBuilder()
+        try registryBuilder.addUnit(
             name: "apple",
             symbol: "apple",
             dimension: [.Amount: 1],
             coefficient: 1
         )
-
-        let carton = try Unit.define(
+        try registryBuilder.addUnit(
             name: "carton",
             symbol: "carton",
             dimension: [.Amount: 1],
             coefficient: 48
         )
+        var registry = registryBuilder.registry()
+
+        let apple = try Unit(fromSymbol: "apple", registry: registry)
+        let carton = try Unit(fromSymbol: "carton", registry: registry)
 
         let harvest = 288.measured(in: apple)
         XCTAssertEqual(
@@ -566,12 +582,14 @@ final class MeasurementTests: XCTestCase {
             accuracy: accuracy
         )
 
-        let person = try Unit.define(
+        try registryBuilder.addUnit(
             name: "person",
             symbol: "person",
             dimension: [.Amount: 1],
             coefficient: 1
         )
+        registry = registryBuilder.registry()
+        let person = try Unit(fromSymbol: "person", registry: registry)
 
         let personPickRate = 600.measured(in: apple / .day / person)
         let workforce = 4.measured(in: person)
@@ -582,8 +600,4 @@ final class MeasurementTests: XCTestCase {
             accuracy: accuracy
         )
     }
-}
-
-extension Units.Unit {
-    static let centiinch = try! Unit(fromSymbol: "cin")
 }

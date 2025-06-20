@@ -198,6 +198,7 @@ final class UnitTests: XCTestCase {
 
     func testEncode() throws {
         let encoder = JSONEncoder()
+        encoder.userInfo[Unit.registryUserInfoKey] = Registry.default
 
         XCTAssertEqual(
             try String(data: encoder.encode(Unit.meter / .second), encoding: .utf8),
@@ -207,6 +208,7 @@ final class UnitTests: XCTestCase {
 
     func testDecode() throws {
         let decoder = JSONDecoder()
+        decoder.userInfo[Unit.registryUserInfoKey] = Registry.default
 
         XCTAssertEqual(
             try decoder.decode(Unit.self, from: "\"m\\/s\"".data(using: .utf8)!),
