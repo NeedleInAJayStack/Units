@@ -2,11 +2,11 @@
 struct DefinedUnit: Hashable, Sendable {
     let name: String
     let symbol: String
-    let dimension: [Quantity: Int]
+    let dimension: [Quantity: Fraction]
     let coefficient: Double
     let constant: Double
 
-    init(name: String, symbol: String, dimension: [Quantity: Int], coefficient: Double = 1, constant: Double = 0) throws {
+    init(name: String, symbol: String, dimension: [Quantity: Fraction], coefficient: Double = 1, constant: Double = 0) throws {
         guard !symbol.isEmpty else {
             throw UnitError.invalidSymbol(message: "Symbol cannot be empty")
         }
