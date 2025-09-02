@@ -4,15 +4,38 @@ on:
   push: { branches: [ main ] }
 
 jobs:
-  test:
+  macos:
+    name: Test on macOS
+    runs-on: macos-latest
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - uses: actions/checkout@v4
+    - name: Build and test
+      run: |
+        swift test \
+          --parallel \
+          --skip PerformanceTests
+
+  linux:
+    name: Test on Linux - ${{ matrix.swift-image }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        swift-image:
+          - "swift:5.10-jammy"
+          - "swift:5.10-noble"
+          - "swift:6.0-jammy"
+          - "swift:6.0-noble"
+          - "swift:6.1-jammy"
+          - "swift:6.1-noble"
+    runs-on: ubuntu-latest
+    container: ${{ matrix.swift-image }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Swift
-        uses: swift-actions/setup-swift@v2
-      - name: Run tests
-        run: swift test --skip PerformanceTests
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Test
+      run: |
+        swift test \
+          --parallel \
+          --skip PerformanceTests
