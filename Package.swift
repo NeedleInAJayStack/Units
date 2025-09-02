@@ -37,5 +37,6 @@ let package = Package(
             name: "PerformanceTests",
             dependencies: ["Units"]
         ),
-    ]
+    ],
+    swiftLanguageVersions: [.v5, .version("6")]
 )
