@@ -41,14 +41,14 @@ struct Convert: ParsableCommand {
 
 let registry = Units.Registry.default
 
-extension Expression: @retroactive ExpressibleByArgument {
+extension Units.Expression: ArgumentParser.ExpressibleByArgument {
     public convenience init?(argument: String) {
         let argument = argument.replacingOccurrences(of: "_", with: " ")
         try? self.init(argument)
     }
 }
 
-extension Units.Unit: @retroactive ExpressibleByArgument {
+extension Units.Unit: ArgumentParser.ExpressibleByArgument {
     public init?(argument: String) {
         if let unit = try? Self(fromName: argument, registry: registry) {
             self = unit
