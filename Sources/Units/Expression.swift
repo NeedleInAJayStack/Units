@@ -27,8 +27,8 @@ public final class Expression {
     /// - `5m^2/s + (1m + 2m)^2 / 5s`
     ///
     /// - Parameter expr: The string expression to parse.
-    public init(_ expr: String) throws {
-        let parsed = try Parser(expr).parseExpression()
+    public init(_ expr: String, registry: Registry = .default) throws {
+        let parsed = try Parser(expr, registry: registry).parseExpression()
         first = parsed.first
         last = parsed.last
         count = parsed.count

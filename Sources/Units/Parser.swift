@@ -1,6 +1,7 @@
 import Foundation
 
 class Parser {
+    var registry: Registry
     var data: [UnicodeScalar]
     var position = 0
 
@@ -18,8 +19,9 @@ class Parser {
         return Character(UnicodeScalar(data[position + 1]))
     }
 
-    init(_ string: String) {
+    init(_ string: String, registry: Registry) {
         data = Array(string.unicodeScalars)
+        self.registry = registry
     }
 
     func parseMeasurement() throws -> Measurement {
@@ -206,7 +208,7 @@ class Parser {
                 unitString.append(cur)
                 consume()
             }
-            let unit = try Unit(fromSymbol: unitString)
+            let unit = try Unit(fromSymbol: unitString, registry: registry)
             return .unit(unit)
         }
     }
