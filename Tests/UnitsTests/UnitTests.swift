@@ -80,6 +80,20 @@ final class UnitTests: XCTestCase {
         )
     }
 
+    func testPercent() throws {
+        let value1 = 100.measured(in: .none)
+        
+        XCTAssertEqual(Percent.unit.symbol, "%")
+
+        XCTAssertEqual(1%, 1%)
+    
+        XCTAssertEqual(110.measured(in: .none), value1 + 10%)
+        XCTAssertEqual(90.measured(in: .none), value1 - 10%)
+
+        XCTAssertEqual(10.measured(in: .none), value1 * 10%)
+        XCTAssertEqual(1_000.measured(in: .none), value1 / 10%)
+    }
+
     func testSymbol() throws {
         XCTAssertEqual(
             Unit.meter.symbol,

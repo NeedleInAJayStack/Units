@@ -6,6 +6,10 @@ struct List: ParsableCommand {
         abstract: "Print a table of the available units, their symbols, and their dimensionality."
     )
 
+    @Option(name: .shortAndLong,
+        help: "Substring to filter on dimensions and symbols")
+    var filter: String? = nil
+    
     func run() throws {
         let units = registry.allUnits().sorted { u1, u2 in
             u1.name <= u2.name
@@ -17,7 +21,9 @@ struct List: ParsableCommand {
             "dimension",
         ]
 
-        let rows = units.map { unit in
+        let rows = units
+            .filter({ $0.contains(filter)})
+            .map { unit in
             [
                 unit.name,
                 unit.symbol,
@@ -57,5 +63,13 @@ struct List: ParsableCommand {
         for rowString in rowStrings {
             print(rowString)
         }
+    }
+}
+
+extension Units.Unit {
+    func contains(_ substring: String?) -> Bool {
+        guard let substring else { return true }
+        return self.symbol.contains(substring)
+        || self.dimensionDescription().contains(substring)
     }
 }
