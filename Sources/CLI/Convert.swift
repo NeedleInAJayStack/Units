@@ -31,6 +31,7 @@ struct Convert: ParsableCommand {
     @Argument(help: """
     The unit to convert to. This can either be a unit name, a unit symbol, or an equation of \
     unit symbols.
+    Example: unit convert 1_ft meter -> 0.3048 m
     """)
     var to: Units.Unit
 
