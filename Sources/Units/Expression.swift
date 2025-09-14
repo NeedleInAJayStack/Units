@@ -107,19 +107,27 @@ public final class Expression {
         while let next = left.next {
             let right = next.node
             switch (left.value, right.value) {
-            case let (.measurement(leftMeasurement), .measurement(rightMeasurement)):
-                switch next.op {
-                case .add, .subtract: // Skip over operation
-                    left = right
-                case .multiply: // Compute and absorb right node into left
-                    left.value = .measurement(leftMeasurement * rightMeasurement)
-                    left.next = right.next
-                case .divide: // Compute and absorb right node into left
-                    left.value = .measurement(leftMeasurement / rightMeasurement)
-                    left.next = right.next
-                }
-            default:
-                fatalError("Parentheses still present during multiplication phase")
+                case let (.measurement(leftMeasurement), .measurement(rightMeasurement)):
+                    switch next.op {
+                        case .add, .subtract: // Skip over operation
+                            left = right
+                        case .multiply: // Compute and absorb right node into left
+                            if let percent = rightMeasurement.asPercent {
+                                left.value = .measurement(leftMeasurement * percent)
+                            } else {
+                                left.value = .measurement(leftMeasurement * rightMeasurement)
+                            }
+                            left.next = right.next
+                        case .divide: // Compute and absorb right node into left
+                            if let percent = rightMeasurement.asPercent {
+                                left.value = .measurement(leftMeasurement / percent)
+                            } else {
+                                left.value = .measurement(leftMeasurement / rightMeasurement)
+                            }
+                            left.next = right.next
+                    }
+                default:
+                    fatalError("Parentheses still present during multiplication phase")
             }
         }
 
@@ -130,11 +138,21 @@ public final class Expression {
             switch (left.value, right.value) {
             case let (.measurement(leftMeasurement), .measurement(rightMeasurement)):
                 switch next.op {
+
                 case .add: // Compute and absorb right node into left
-                    left.value = try .measurement(leftMeasurement + rightMeasurement)
+                   // NOTE: Exceptional handling of Percent
+                    if let percent = rightMeasurement.asPercent {
+                        left.value = .measurement(leftMeasurement + percent)
+                    } else {
+                        left.value = try .measurement(leftMeasurement + rightMeasurement)
+                    }
                     left.next = right.next
                 case .subtract: // Compute and absorb right node into left
-                    left.value = try .measurement(leftMeasurement - rightMeasurement)
+                    if let percent = rightMeasurement.asPercent {
+                        left.value = .measurement(leftMeasurement - percent)
+                    } else {
+                        left.value = try .measurement(leftMeasurement - rightMeasurement)
+                    }
                     left.next = right.next
                 case .multiply, .divide:
                     fatalError("Multiplication still present during addition phase")

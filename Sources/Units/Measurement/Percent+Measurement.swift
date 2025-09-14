@@ -1,10 +1,3 @@
-//
-//  Percent.swift
-//  Units
-//
-//  Created by Jason Jobe on 9/5/25.
-//
-
 import Foundation
 /*
  NOTE: Should consider introducing `protocol Scalar`
@@ -72,17 +65,22 @@ public struct Percent: Numeric, Equatable, Codable {
     }
 }
 
+extension Measurement {
+    public var isPercent: Bool {
+        self.unit == Percent.unit
+    }
+    
+    public var asPercent: Percent? {
+        isPercent ? Percent(magnitude: self.value/100) : nil
+    }
+}
+
 // MARK: Percent as Unit
 extension Percent {
     public var unit: Unit { Self.unit }
     
     public static let unit = Unit(
-        definedBy: try! DefinedUnit(
-        name: "percent",
-        symbol: "%",
-        dimension: [:],
-        coefficient: 0.01
-    ))
+        definedBy: DefaultUnits.percent)
 }
 
 // MARK: Numeric Conformance
@@ -129,11 +127,11 @@ extension BinaryFloatingPoint {
 // AdditiveArithmetic operations `*` and `/`
 
 public extension Measurement {
-    /// Calculate the percentage of the Measurement
+    /// Adds a percentage to a measurement by increasing its value by the given percent.
     /// - Parameters:
-    ///   - lhs: The left-hand-side measurement
-    ///   - rhs: The right-hand-side measurement
-    /// - Returns: A new measurement with the summed scalar values and the same unit of measure
+    ///   - lhs: The base measurement.
+    ///   - rhs: The percentage to add.
+    /// - Returns: A new `Measurement` with its value increased by the given percentage.
     @_disfavoredOverload
     static func + (lhs: Measurement, rhs: Percent) -> Measurement {
         return Measurement(
@@ -142,6 +140,11 @@ public extension Measurement {
         )
     }
     
+    /// Subtracts a percentage from a measurement by decreasing its value by the given percent.
+    /// - Parameters:
+    ///   - lhs: The base measurement.
+    ///   - rhs: The percentage to subtract.
+    /// - Returns: A new `Measurement` with its value decreased by the given percentage.
     @_disfavoredOverload
     static func - (lhs: Measurement, rhs: Percent) -> Measurement {
         return Measurement(
@@ -150,21 +153,33 @@ public extension Measurement {
         )
     }
     
+    /// Increases a measurement in place by the given percentage.
+    /// - Parameters:
+    ///   - lhs: The measurement to modify.
+    ///   - rhs: The percentage to add.
     @_disfavoredOverload
     static func += (lhs: inout Measurement, rhs: Percent) {
         lhs = lhs + rhs
     }
-
+    
+    /// Decreases a measurement in place by the given percentage.
+    /// - Parameters:
+    ///   - lhs: The measurement to modify.
+    ///   - rhs: The percentage to subtract.
     @_disfavoredOverload
     static func -= (lhs: inout Measurement, rhs: Percent) {
         lhs = lhs - rhs
     }
-
+    
 }
 
 // Scalar operations `*` and `/`
 public extension Measurement {
-    
+    /// Multiplies a measurement by a percentage, treating the percent as a scalar (e.g., 25% = 0.25).
+    /// - Parameters:
+    ///   - lhs: The base measurement to scale.
+    ///   - rhs: The percentage factor.
+    /// - Returns: A new `Measurement` whose value is `lhs.value * rhs.magnitude` with the same unit.
     @_disfavoredOverload
     static func * (lhs: Measurement, rhs: Percent) -> Measurement {
         return Measurement(
@@ -172,7 +187,12 @@ public extension Measurement {
             unit: lhs.unit
         )
     }
-
+    
+    /// Divides a measurement by a percentage, treating the percent as a scalar (e.g., 25% = 0.25).
+    /// - Parameters:
+    ///   - lhs: The base measurement to scale.
+    ///   - rhs: The percentage divisor.
+    /// - Returns: A new `Measurement` whose value is `lhs.value / rhs.magnitude` with the same unit.
     @_disfavoredOverload
     static func / (lhs: Measurement, rhs: Percent) -> Measurement {
         return Measurement(
@@ -180,5 +200,4 @@ public extension Measurement {
             unit: lhs.unit
         )
     }
-
 }
