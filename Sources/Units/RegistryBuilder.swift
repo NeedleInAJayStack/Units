@@ -249,6 +249,9 @@ public class RegistryBuilder {
         DefaultUnits.troyOunces,
         DefaultUnits.slug,
 
+        // MARK: Percent
+        DefaultUnits.percent,
+
         // MARK: Power
 
         DefaultUnits.watt,

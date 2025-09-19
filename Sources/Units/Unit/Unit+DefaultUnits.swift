@@ -190,6 +190,10 @@ public extension Unit {
     static let troyOunces = Unit(definedBy: DefaultUnits.troyOunces)
     static let slug = Unit(definedBy: DefaultUnits.slug)
 
+    // MARK: Percent
+    
+    static let percent = Unit(definedBy: DefaultUnits.percent)
+
     // MARK: Power
 
     static let watt = Unit(definedBy: DefaultUnits.watt)

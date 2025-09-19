@@ -818,6 +818,15 @@ enum DefaultUnits {
         coefficient: 14.5939
     )
 
+    // MARK: Percent
+
+    static let percent = try! DefinedUnit(
+        name: "percent",
+        symbol: "%",
+        dimension: [:],
+        coefficient: 0.01
+    )
+
     // MARK: Power
 
     // Base unit: watt
