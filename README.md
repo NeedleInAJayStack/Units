@@ -194,6 +194,38 @@ let weeklyCartons = try (workforce * personPickRate).convert(to: carton / .week)
 print(weeklyCartons)  // Prints '350.0 carton/week'
 ```
 
+### Custom Dimensions
+
+The built-in `Quantity` dimensions (`Length`, `Mass`, `Time`, etc.) cover the ISQ base
+quantities, but you can define your own dimension when none of them fit — for example, a
+`Money` dimension for cost calculations. Because `Quantity` is `RawRepresentable`, you can
+add one with a static extension:
+
+```swift
+extension Quantity {
+    static let money = Quantity(rawValue: "Money")
+}
+```
+
+Your dimension then behaves like any built-in one. Here a concrete rate of `$/m^3` is
+multiplied by a volume in `m^3`, and the volume cancels to leave a pure cost:
+
+```swift
+let registry = try RegistryBuilder().addUnit(
+    name: "dollar",
+    symbol: "$",
+    dimension: [.money: 1]
+).registry()
+let dollar = try Unit(fromSymbol: "$", registry: registry)
+
+let rate = Measurement(value: 180, unit: dollar / .meter.pow(3)) // $180 per m^3
+let volume = Measurement(value: 24, unit: .meter.pow(3))         // 24 m^3
+print(rate * volume) // Prints '4320.0 $'
+```
+
+Unlike repurposing an unrelated base quantity such as `Amount`, a dedicated dimension can't
+silently cancel against unrelated units. Use a unique `rawValue` for each distinct dimension.
+
 ## CLI
 
 The easiest way to install the CLI is with brew:
