@@ -10,21 +10,27 @@ private extension Quantity {
 class QuantityTests: XCTestCase {
     /// Built-in quantities keep their stable string raw values.
     func testBuiltInRawValues() {
-        XCTAssertEqual(Quantity.Length.rawValue, "Length")
-        XCTAssertEqual(Quantity.Time.rawValue, "Time")
-        XCTAssertEqual(Quantity(rawValue: "Mass"), .Mass)
+        XCTAssertEqual(Quantity.length.rawValue, "Length")
+        XCTAssertEqual(Quantity.time.rawValue, "Time")
+        XCTAssertEqual(Quantity(rawValue: "Mass"), .mass)
+    }
+
+    /// Interpolating a Quantity yields its raw value, matching the former enum behavior.
+    func testDescription() {
+        XCTAssertEqual(Quantity.length.description, "Length")
+        XCTAssertEqual("\(Quantity.money)", "Money")
     }
 
     /// A custom dimension is distinct from every built-in one and equal to itself.
     func testCustomQuantityIdentity() {
         XCTAssertEqual(Quantity.money, Quantity(rawValue: "Money"))
-        XCTAssertNotEqual(Quantity.money, .Length)
-        XCTAssertNotEqual(Quantity.money, .Amount)
+        XCTAssertNotEqual(Quantity.money, .length)
+        XCTAssertNotEqual(Quantity.money, .amount)
 
         // Usable as a dictionary key alongside built-ins.
-        let dimension: [Quantity: Int] = [.money: 1, .Length: -3]
+        let dimension: [Quantity: Int] = [.money: 1, .length: -3]
         XCTAssertEqual(dimension[.money], 1)
-        XCTAssertEqual(dimension[.Length], -3)
+        XCTAssertEqual(dimension[.length], -3)
     }
 
     /// A unit on a custom dimension participates in dimensional arithmetic:

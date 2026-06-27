@@ -9,7 +9,11 @@
 /// }
 /// ```
 ///
-/// Use a unique `rawValue` for each distinct dimension — equality and hashing are based on it.
+/// Equality and hashing are based on `rawValue`, so each distinct dimension needs a unique
+/// raw string. Because the namespace is global across every module that links this package,
+/// two modules that independently pick the same raw value are treated as the *same* dimension
+/// and silently cancel against one another. Prefix custom raw values to avoid collisions —
+/// e.g. `"Acme.Money"` rather than `"Money"`.
 public struct Quantity: RawRepresentable, Hashable, Sendable {
     public let rawValue: String
 
@@ -18,15 +22,49 @@ public struct Quantity: RawRepresentable, Hashable, Sendable {
     }
 
     // Base ISQ quantities: https://en.wikipedia.org/wiki/International_System_of_Quantities#Base_quantities
-    public static let Amount = Quantity(rawValue: "Amount")
-    public static let Current = Quantity(rawValue: "Current")
-    public static let Length = Quantity(rawValue: "Length")
-    public static let Mass = Quantity(rawValue: "Mass")
-    public static let Temperature = Quantity(rawValue: "Temperature")
-    public static let Time = Quantity(rawValue: "Time")
-    public static let LuminousIntensity = Quantity(rawValue: "LuminousIntensity")
+    public static let amount = Quantity(rawValue: "Amount")
+    public static let current = Quantity(rawValue: "Current")
+    public static let length = Quantity(rawValue: "Length")
+    public static let mass = Quantity(rawValue: "Mass")
+    public static let temperature = Quantity(rawValue: "Temperature")
+    public static let time = Quantity(rawValue: "Time")
+    public static let luminousIntensity = Quantity(rawValue: "LuminousIntensity")
 
     // Extended SI Units: https://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI
-    public static let Angle = Quantity(rawValue: "Angle")
-    public static let Data = Quantity(rawValue: "Data")
+    public static let angle = Quantity(rawValue: "Angle")
+    public static let data = Quantity(rawValue: "Data")
+}
+
+// MARK: - Deprecated PascalCase aliases
+
+// The previous `enum Quantity` spelled its cases in PascalCase. These aliases keep existing
+// call sites compiling against the renamed lowerCamelCase properties (Swift API Design
+// Guidelines) and can be removed in a future major release.
+public extension Quantity {
+    @available(*, deprecated, renamed: "amount")
+    static let Amount = Quantity.amount
+    @available(*, deprecated, renamed: "current")
+    static let Current = Quantity.current
+    @available(*, deprecated, renamed: "length")
+    static let Length = Quantity.length
+    @available(*, deprecated, renamed: "mass")
+    static let Mass = Quantity.mass
+    @available(*, deprecated, renamed: "temperature")
+    static let Temperature = Quantity.temperature
+    @available(*, deprecated, renamed: "time")
+    static let Time = Quantity.time
+    @available(*, deprecated, renamed: "luminousIntensity")
+    static let LuminousIntensity = Quantity.luminousIntensity
+    @available(*, deprecated, renamed: "angle")
+    static let Angle = Quantity.angle
+    @available(*, deprecated, renamed: "data")
+    static let Data = Quantity.data
+}
+
+// MARK: - CustomStringConvertible
+
+extension Quantity: CustomStringConvertible {
+    // Preserve the enum's behavior: interpolating a Quantity yields its raw value
+    // (e.g. "Length"), not the synthesized struct description.
+    public var description: String { rawValue }
 }
