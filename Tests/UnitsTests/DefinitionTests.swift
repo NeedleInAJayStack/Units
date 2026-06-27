@@ -263,7 +263,8 @@ class DefinitionTests: XCTestCase {
         // Base unit: kelvin
         XCTAssertEqual(Measurement("1K"), 1.measured(in: .kelvin))
         try XCTAssertEqual(Measurement("1°C"), (273.15.measured(in: .kelvin) + 1.measured(in: .kelvin)).convert(to: .celsius))
-        try XCTAssertEqual(XCTUnwrap(Measurement("1°F")), try ((273.15 - (32 * 5.0 / 9.0)).measured(in: .kelvin) + (5.0 / 9.0).measured(in: .kelvin)).convert(to: .fahrenheit), accuracy: 0.0001)
+        // 1°F expressed in kelvin, within the test's margin of error: (1 - 32) * 5 / 9 + 273.15
+        try XCTAssertEqual(XCTUnwrap(Measurement("1°F")), 255.927778.measured(in: .kelvin).convert(to: .fahrenheit), accuracy: 0.0001)
         try XCTAssertEqual(Measurement("1°R"), (5.0 / 9.0).measured(in: .kelvin).convert(to: .rankine))
     }
 
