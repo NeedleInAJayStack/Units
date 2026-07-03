@@ -117,7 +117,7 @@ final class MeasurementTests: XCTestCase {
         let workUnit = try XCTUnwrap(work.unit)
         XCTAssertEqual(
             workUnit.dimension,
-            [.Mass: 1, .Length: 2, .Time: -2]
+            [.mass: 1, .length: 2, .time: -2]
         )
 
         // Test scalar multiplication
@@ -367,7 +367,7 @@ final class MeasurementTests: XCTestCase {
         var registry = try registryBuilder.addUnit(
             name: "centifoot",
             symbol: "cft",
-            dimension: [.Length: 1],
+            dimension: [.length: 1],
             coefficient: 0.003048
         ).registry()
         let centifoot = try Unit(fromSymbol: "cft", registry: registry)
@@ -389,7 +389,7 @@ final class MeasurementTests: XCTestCase {
         registry = try registryBuilder.addUnit(
             name: "centiinch",
             symbol: "cin",
-            dimension: [.Length: 1],
+            dimension: [.length: 1],
             coefficient: 0.000254
         ).registry()
         let centiinch = try Unit(fromSymbol: "cin", registry: registry)
@@ -406,7 +406,7 @@ final class MeasurementTests: XCTestCase {
             try registryBuilder.addUnit(
                 name: "no name",
                 symbol: "",
-                dimension: [.Amount: 1],
+                dimension: [.amount: 1],
                 coefficient: 1
             )
         )
@@ -414,7 +414,7 @@ final class MeasurementTests: XCTestCase {
             try registryBuilder.addUnit(
                 name: "unit with space",
                 symbol: "unit with space",
-                dimension: [.Amount: 1],
+                dimension: [.amount: 1],
                 coefficient: 1
             )
         )
@@ -422,7 +422,7 @@ final class MeasurementTests: XCTestCase {
             try registryBuilder.addUnit(
                 name: "slash",
                 symbol: "/",
-                dimension: [.Amount: 1],
+                dimension: [.amount: 1],
                 coefficient: 1
             )
         )
@@ -430,7 +430,7 @@ final class MeasurementTests: XCTestCase {
             try registryBuilder.addUnit(
                 name: "star",
                 symbol: "*",
-                dimension: [.Amount: 1],
+                dimension: [.amount: 1],
                 coefficient: 1
             )
         )
@@ -438,7 +438,7 @@ final class MeasurementTests: XCTestCase {
             try registryBuilder.addUnit(
                 name: "carrot",
                 symbol: "^",
-                dimension: [.Amount: 1],
+                dimension: [.amount: 1],
                 coefficient: 1
             )
         )
@@ -485,7 +485,7 @@ final class MeasurementTests: XCTestCase {
         try registryBuilder.addUnit(
             name: "centiinch",
             symbol: "cin",
-            dimension: [.Length: 1],
+            dimension: [.length: 1],
             coefficient: 0.000254
         )
         let registry = registryBuilder.registry()
@@ -561,13 +561,13 @@ final class MeasurementTests: XCTestCase {
         try registryBuilder.addUnit(
             name: "apple",
             symbol: "apple",
-            dimension: [.Amount: 1],
+            dimension: [.amount: 1],
             coefficient: 1
         )
         try registryBuilder.addUnit(
             name: "carton",
             symbol: "carton",
-            dimension: [.Amount: 1],
+            dimension: [.amount: 1],
             coefficient: 48
         )
         var registry = registryBuilder.registry()
@@ -585,7 +585,7 @@ final class MeasurementTests: XCTestCase {
         try registryBuilder.addUnit(
             name: "person",
             symbol: "person",
-            dimension: [.Amount: 1],
+            dimension: [.amount: 1],
             coefficient: 1
         )
         registry = registryBuilder.registry()

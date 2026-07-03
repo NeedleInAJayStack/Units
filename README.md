@@ -128,7 +128,7 @@ let registryBuilder = RegistryBuilder()
 registryBuilder.addUnit(
     name: "centifoot",
     symbol: "cft",
-    dimension: [.Length: 1],
+    dimension: [.length: 1],
     coefficient: 0.003048 // This is the conversion to meters
 )
 let registry = registryBuilder.registry()
@@ -159,13 +159,13 @@ let registryBuilder = RegistryBuilder()
 try registryBuilder.addUnit(
     name: "apple",
     symbol: "apple",
-    dimension: [.Amount: 1],
+    dimension: [.amount: 1],
     coefficient: 1
 )
 try registryBuilder.addUnit(
     name: "carton",
     symbol: "carton",
-    dimension: [.Amount: 1],
+    dimension: [.amount: 1],
     coefficient: 48
 )
 let registry = registryBuilder.registry()
@@ -183,7 +183,7 @@ We can extend this example to determine how many cartons a group of people can p
 try registryBuilder.addUnit(
     name: "person",
     symbol: "person",
-    dimension: [.Amount: 1],
+    dimension: [.amount: 1],
     coefficient: 1
 )
 let person = try Unit(fromSymbol: "person", registry: registryBuilder.registry())
@@ -193,6 +193,46 @@ let workforce = 4.measured(in: person)
 let weeklyCartons = try (workforce * personPickRate).convert(to: carton / .week)
 print(weeklyCartons)  // Prints '350.0 carton/week'
 ```
+
+### Custom Dimensions
+
+The built-in `Quantity` dimensions (`.length`, `.mass`, `.time`, etc.) cover the ISQ base
+quantities, but you can define your own dimension when none of them fit — for example, a
+`Money` dimension for cost calculations. Because `Quantity` is `RawRepresentable`, you can
+add one with a static extension:
+
+```swift
+extension Quantity {
+    static let money = Quantity(rawValue: "Acme.Money")
+}
+```
+
+Your dimension then behaves like any built-in one. Here a concrete rate of `$/m^3` is
+multiplied by a volume in `m^3`, and the volume cancels to leave a pure cost:
+
+```swift
+let registry = try RegistryBuilder().addUnit(
+    name: "dollar",
+    symbol: "$",
+    dimension: [.money: 1]
+).registry()
+let dollar = try Unit(fromSymbol: "$", registry: registry)
+
+let rate = Measurement(value: 180, unit: dollar / .meter.pow(3)) // $180 per m^3
+let volume = Measurement(value: 24, unit: .meter.pow(3))         // 24 m^3
+print(rate * volume) // Prints '4320.0 $'
+```
+
+A dedicated dimension is safer than repurposing an unrelated base quantity such as `.amount`,
+which would silently cancel against unrelated units that share it. But the `rawValue` namespace
+is **global**: a `Quantity` is identified solely by its raw string, across every module linked
+into the program. If two modules each define a dimension with the same raw value — say both use
+`"Money"` — they are treated as *the same dimension* and will silently cancel against each other,
+producing wrong results with no error. There is no central registry to detect the clash.
+
+To avoid this, namespace every custom `rawValue` with a prefix unique to your module or
+organization (e.g. `"Acme.Money"`, not `"Money"`), exactly as the example above does. Reserve
+bare names like `"Money"` for nothing, since you cannot know what another dependency has chosen.
 
 ## CLI
 

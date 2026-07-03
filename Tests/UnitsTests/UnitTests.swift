@@ -176,37 +176,37 @@ final class UnitTests: XCTestCase {
     func testDimension() throws {
         XCTAssertEqual(
             Unit.meter.dimension,
-            [.Length: 1]
+            [.length: 1]
         )
 
         XCTAssertEqual(
             (Unit.meter / Unit.second).dimension,
-            [.Length: 1, .Time: -1]
+            [.length: 1, .time: -1]
         )
 
         XCTAssertEqual(
             (Unit.meter * Unit.foot / Unit.second).dimension,
-            [.Length: 2, .Time: -1]
+            [.length: 2, .time: -1]
         )
 
         XCTAssertEqual(
             (Unit.meter * Unit.meter / Unit.second).dimension,
-            [.Length: 2, .Time: -1]
+            [.length: 2, .time: -1]
         )
 
         XCTAssertEqual(
             (Unit.meter / Unit.second / Unit.foot).dimension,
-            [.Time: -1]
+            [.time: -1]
         )
 
         XCTAssertEqual(
             (Unit.meter / (Unit.second * Unit.foot)).dimension,
-            [.Time: -1]
+            [.time: -1]
         )
 
         XCTAssertEqual(
             (Unit.meter / Unit.second.pow(2)).dimension,
-            [.Length: 1, .Time: -2]
+            [.length: 1, .time: -2]
         )
     }
 
